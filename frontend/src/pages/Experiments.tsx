@@ -144,16 +144,17 @@ function NewExperiment({ datasets, connections, models, onCreated, onError }: {
   return (
     <Card title="Новый эксперимент">
       {!connections.length ? <Empty>Нужно подключение к БД (раздел «Базы данных»)</Empty> : (
-        <div className="grid grid-cols-[90px_1fr] items-center gap-2 text-[13px]">
+        <div className="grid grid-cols-[90px_minmax(0,1fr)] items-center gap-2 text-[13px]">
           <label className="text-muted">Название</label><input value={name} onChange={e => setName(e.target.value)} placeholder="авто" />
           <label className="text-muted">БД</label>
           <select value={connId ?? ''} onChange={e => setConnId(Number(e.target.value))}>{connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
           <label className="text-muted">Датасет</label>
           <select value={datasetId ?? ''} onChange={e => setDatasetId(Number(e.target.value))}>{fitting.map(d => <option key={d.id} value={d.id}>{d.version} ({d.size})</option>)}</select>
           <label className="self-start pt-1 text-muted">Модели</label>
-          <div className="space-y-1">{models?.models.map(m => (
-            <label key={m} className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4" checked={chosen.includes(m)} onChange={() => toggle(m)} />
-              <span className="mono text-[12.5px]">{m}</span>{m === models.baseline && <span className="text-[11px] text-muted">(без ИИ, базовая линия)</span>}</label>
+          <div className="min-w-0 space-y-1">{models?.models.map(m => (
+            <label key={m} className="flex items-start gap-2"><input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0" checked={chosen.includes(m)} onChange={() => toggle(m)} />
+              <span className="min-w-0"><span className="mono break-all text-[12.5px]">{m}</span>
+                {m === models.baseline && <span className="block text-[11px] text-muted">без ИИ, базовая линия</span>}</span></label>
           ))}</div>
           <label className="text-muted">Промпт</label>
           <select value={prompt} onChange={e => setPrompt(e.target.value)}>{models?.prompts.map(p => <option key={p}>{p}</option>)}</select>
