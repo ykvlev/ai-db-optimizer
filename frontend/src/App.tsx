@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { Connection, Examples, ModelsInfo, Stats } from './api'
+import type { CompareDraft, Connection, Examples, ModelsInfo, Stats } from './api'
 import { api } from './api'
 import { Analyzer } from './pages/Analyzer'
 import { Compare } from './pages/Compare'
@@ -50,6 +50,8 @@ export default function App() {
   }, [loadConnections, refresh])
 
   const go = (p: string) => { window.location.hash = `#/${p}` }
+  const [compareDraft, setCompareDraft] = useState<CompareDraft | null>(null)
+  const sendToCompare = (d: Omit<CompareDraft, 'nonce'>) => { setCompareDraft({ ...d, nonce: Date.now() }); go('compare') }
 
   return (
     <div className="flex h-full">
@@ -79,8 +81,8 @@ export default function App() {
         <div className="p-6">
           {backendError && <div className="mb-4 rounded-md border border-bad/40 bg-bad/10 px-3 py-2 text-[13px] text-bad">{backendError}</div>}
           <div hidden={page !== 'dashboard'}><Dashboard stats={stats} onNavigate={go} /></div>
-          <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} /></div>
-          <div hidden={page !== 'compare'}><Compare connections={connections} onRun={refresh} /></div>
+          <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} onSendToCompare={sendToCompare} /></div>
+          <div hidden={page !== 'compare'}><Compare connections={connections} onRun={refresh} draft={compareDraft} /></div>
           <div hidden={page !== 'experiments'}><Experiments connections={connections} models={models} onRun={refresh} /></div>
           <div hidden={page !== 'databases'}><Databases connections={connections} onChange={loadConnections} /></div>
           <div hidden={page !== 'history'}><History refreshKey={refreshKey} /></div>

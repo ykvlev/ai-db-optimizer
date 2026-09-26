@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { AnalyzeResponse, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo, ScriptAnalyzeResponse } from '../api'
+import type { AnalyzeResponse, CompareDraft, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo, ScriptAnalyzeResponse } from '../api'
 import { api } from '../api'
 import { ComparisonView } from '../components/ComparisonView'
 import { IssueList } from '../components/IssueList'
@@ -27,8 +27,9 @@ const factorNames: Record<string, string> = {
   plan_confirmed: 'Подтверждение планом', benchmark_stability: 'Стабильность бенчмарка',
 }
 
-export function Analyzer({ connections, models, examples, onRun }: {
+export function Analyzer({ connections, models, examples, onRun, onSendToCompare }: {
   connections: Connection[]; models: ModelsInfo | null; examples: Examples | null; onRun: () => void
+  onSendToCompare: (d: Omit<CompareDraft, 'nonce'>) => void
 }) {
   const [dbms, setDbms] = useState<Dialect>('mysql')
   const [connId, setConnId] = useState<number | null>(null)
@@ -220,8 +221,10 @@ export function Analyzer({ connections, models, examples, onRun }: {
                 ? <Empty>Правила статического анализа проблем не нашли. Запрос не выполняется на БД (см. причину выше), поэтому план выполнения и замеры недоступны.</Empty>
                 : <IssueList issues={a.issues.filter(i => i.code !== 'RULE_ERROR')} />}
               {a.rule_rewrite && (
-                <Card title="Детерминированное переписывание (rule-based, без ИИ)" actions={conn &&
-                  <Button onClick={verifyRewrite} disabled={cmpBusy}>{cmpBusy && <Spinner />} Проверить на БД</Button>}>
+                <Card title="Детерминированное переписывание (rule-based, без ИИ)" actions={<>
+                  {conn && <Button onClick={verifyRewrite} disabled={cmpBusy}>{cmpBusy && <Spinner />} Проверить на БД</Button>}
+                  <Button variant="ghost" onClick={() => onSendToCompare({ original: currentSql, optimized: a.rule_rewrite!, connectionId: connId, source: 'rule-based переписывание' })}>Отправить в сравнение</Button>
+                </>}>
                   <ul className="mb-2 text-[13px] text-muted">{a.rule_rewrite_notes.map((n, i) => <li key={i}>• {n}</li>)}</ul>
                   <SqlDiff original={currentSql} modified={a.rule_rewrite} height={200} />
                 </Card>
@@ -259,7 +262,8 @@ export function Analyzer({ connections, models, examples, onRun }: {
                     )}
                   </Card>
                   {opt.optimized_query && (
-                    <Card title="Исходный → оптимизированный SQL">
+                    <Card title="Исходный → оптимизированный SQL" actions={
+                      <Button variant="primary" onClick={() => onSendToCompare({ original: currentSql, optimized: opt.optimized_query!, connectionId: connId, source: `рекомендация ${opt.llm?.model ?? 'модели'}` })}>Отправить в сравнение</Button>}>
                       <SqlDiff original={currentSql} modified={opt.optimized_query} />
                       {opt.ai.explanation.length > 0 && <ul className="mt-3 space-y-1 text-[13px]">{opt.ai.explanation.map((e, i) => <li key={i}>• {e}</li>)}</ul>}
                     </Card>

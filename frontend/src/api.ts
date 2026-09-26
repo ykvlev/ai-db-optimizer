@@ -92,6 +92,9 @@ export interface AnalyzeResponse {
   parse_error?: string | null
 }
 
+// передача пары запросов из анализатора на страницу сравнения
+export interface CompareDraft { original: string; optimized: string; connectionId: number | null; source: string; nonce: number }
+
 export interface ScriptStatement {
   index: number
   title?: string | null
