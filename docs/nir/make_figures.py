@@ -167,7 +167,7 @@ def render(html_by_name: dict[str, tuple[str, int]]):
 def main():
     FIG.mkdir(exist_ok=True)
     c = httpx.Client(base_url=API, timeout=60)
-    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3)}
+    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3, 4, 5, 6)}
     m1 = exps[1]["summary"]["models"]["baseline:rule-based"]
     m2 = exps[2]["summary"]["models"]["baseline:rule-based"]
     e3 = exps[3]
@@ -189,12 +189,22 @@ def main():
         "fig_llm": (page(bars_big([("Qwen2.5-Coder-7B", l3), ("Базовая линия", b3)]), 1000), 1000),
         "fig_speedup_llm": (page(speed_big(per_q), 1000), 1000),
         "fig_divergent": (page(speed_big(neg), 1000), 1000),
+        "fig_full": (page(bars_big([("Qwen, MySQL", exps[5]["summary"]["models"][llm]),
+                                    ("Базовая, MySQL", exps[5]["summary"]["models"]["baseline:rule-based"]),
+                                    ("Qwen, PostgreSQL", exps[6]["summary"]["models"][llm]),
+                                    ("Базовая, PostgreSQL", exps[6]["summary"]["models"]["baseline:rule-based"])]), 1000), 1000),
     })
     for name in ("screen_experiment.png", "screen_dashboard.png"):
         shutil.copy(HERE.parent / "konkurs" / "attachments" / name, FIG / name)
 
     caught = next(r for r in e3["results"] if r["model"] == llm and r["outcome"] == "invalid")
     caught_run = c.get(f"/api/runs/{caught['run_id']}").json()["result"]
+    def run_of(exp_id, key):
+        r = next(r for r in exps[exp_id]["results"] if r["key"] == key and r["model"] == llm)
+        x = c.get(f"/api/runs/{r['run_id']}").json()
+        return {"original": x["sql"], "optimized": x["result"].get("optimized_query"),
+                "eq": (x["result"].get("comparison") or {}).get("equivalence"), "speedup": r["speedup"]}
+
     data = {
         "exp": {i: {"meta": exps[i]["meta"], "summary": exps[i]["summary"]["models"], "results": exps[i]["results"]}
                 for i in exps},
@@ -202,6 +212,8 @@ def main():
         "caught": {"title": caught["title"], "original": caught_run["comparison"]["original_sql"],
                    "optimized": caught_run["optimized_query"], "eq": caught_run["comparison"]["equivalence"],
                    "speedup": caught_run["comparison"]["speedup"], "summary": caught_run["ai"]["summary"]},
+        "distinct": run_of(5, "distinct_join-2"),
+        "reorder": run_of(5, "year_function-2"),
         "prompt": json.loads((HERE.parents[1] / "backend/app/services/ai/prompts/optimizer-v1.json").read_text(encoding="utf-8")),
     }
     (HERE / "data.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
