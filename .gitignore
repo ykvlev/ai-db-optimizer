@@ -1,0 +1,13 @@
+backend/.venv/
+backend/data/
+backend/.env
+__pycache__/
+.pytest_cache/
+frontend/node_modules/
+frontend/dist/
+*.log
+
+# личные документы и сгенерированные файлы
+docs/konkurs/
+docs/rospatent/out/
+docs/rospatent/ЗАЯВКА_Роспатент.md

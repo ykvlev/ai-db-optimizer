@@ -1,0 +1,18 @@
+{
+  "_comment": "Веса компонентов Optimization Score (0-100). Компоненты без данных исключаются, веса оставшихся нормируются.",
+  "weights": {
+    "speed": 0.40,
+    "query_cost": 0.20,
+    "rows_examined": 0.15,
+    "index_usage": 0.10,
+    "stability": 0.10,
+    "complexity": 0.05
+  },
+  "confidence_weights": {
+    "equivalence": 0.35,
+    "real_speedup": 0.25,
+    "rule_ai_agreement": 0.15,
+    "plan_confirmed": 0.15,
+    "benchmark_stability": 0.10
+  }
+}

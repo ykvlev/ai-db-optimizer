@@ -1,0 +1,41 @@
+# Тестовые СУБД с демонстрационной БД «shop» (детерминированные данные, seed v1).
+# Запуск:  docker compose -f docker/docker-compose.yml up -d
+# Подключение для анализа (только SELECT): user optimizer_ro / optimizer_ro
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: aidbo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: shop
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    command: ["--innodb-buffer-pool-size=512M", "--character-set-server=utf8mb4"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-prootpass"]
+      interval: 5s
+      retries: 60
+
+  postgres:
+    image: postgres:16
+    container_name: aidbo-postgres
+    environment:
+      POSTGRES_PASSWORD: rootpass
+      POSTGRES_DB: shop
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+      - pg-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "work_mem=8MB"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "shop"]
+      interval: 5s
+      retries: 60
+
+volumes:
+  mysql-data:
+  pg-data:
