@@ -14,7 +14,7 @@ from app import __version__
 from app.config import get_settings
 from app.db import (AIRecommendation, AnalysisRun, Benchmark, DatabaseConnection, ExecutionPlan, IndexRecommendation,
                     Query, QueryVersion, SessionLocal, decrypt, utcnow)
-from app.models import (AnalyzeRequest, AnalyzeResponse, Comparison, Dialect, EquivalenceResult, ErrorType,
+from app.models import (AnalyzeRequest, AnalyzeResponse, ScriptAnalyzeResponse, ScriptStatement, Comparison, Dialect, EquivalenceResult, ErrorType,
                         LLMCallInfo, OptimizeRequest, OptimizeResponse, PlanSummary, SchemaInfo)
 from app.services import benchmark as bench
 from app.services import explain, rewriter, rules, safety, scoring
@@ -22,7 +22,7 @@ from app.services.ai import optimizer as ai
 from app.services.ai.providers import LLMError
 from app.services.connectors import ConnectionConfig, Connector, DBError, make_connector
 from app.services.schema_ddl import parse_ddl
-from app.services.sql_parser import SQLParseError, parse
+from app.services.sql_parser import SQLParseError, parse, split_script
 
 SCHEMA_CACHE_TTL_S = 300
 _schema_cache: dict[int, tuple[float, SchemaInfo, str]] = {}
@@ -125,6 +125,35 @@ def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     resp.run_id = _save_run("analyze", req.sql, req.dbms, req.connection_id, state.version, started, resp,
                             issue_codes=[i.code for i in resp.issues], plans={"original": resp.plan})
     return resp
+
+
+MAX_SCRIPT_STATEMENTS = 100
+
+
+def analyze_script(req: AnalyzeRequest) -> ScriptAnalyzeResponse:
+    """Скрипт из нескольких операторов: каждый анализируется отдельно (одно подключение на весь скрипт)."""
+    conn = None
+    if req.connection_id:
+        rec, conn = open_connector(req.connection_id)
+        req.dbms = rec.dbms
+    parts = split_script(req.sql, req.dbms)[:MAX_SCRIPT_STATEMENTS]
+    out: list[ScriptStatement] = []
+    try:
+        if conn is not None:
+            conn.__enter__()
+        for part in parts:
+            started = utcnow()
+            sub = req.model_copy(update={"sql": part.sql})
+            state = _analyze(sub, conn, req.connection_id)
+            resp = state.response
+            resp.run_id = _save_run("analyze", part.sql, req.dbms, req.connection_id, state.version, started, resp,
+                                    issue_codes=[i.code for i in resp.issues], plans={"original": resp.plan})
+            out.append(ScriptStatement(index=part.index, title=part.title, start_line=part.start_line, sql=part.sql,
+                                       analysis=resp))
+    finally:
+        if conn is not None:
+            conn.__exit__(None, None, None)
+    return ScriptAnalyzeResponse(dbms=req.dbms, statements=out)
 
 
 # ---------------------------------------------------------------- сравнение

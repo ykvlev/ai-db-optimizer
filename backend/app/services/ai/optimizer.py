@@ -15,7 +15,7 @@ from app.config import PROMPTS_DIR
 from app.models import AIResponse, Dialect, ErrorType, Issue, PlanNode, PlanSummary, SchemaInfo
 from app.services import safety
 from app.services.ai.providers import LLMResult, get_registry
-from app.services.sql_parser import SQLParseError, cte_names, parse, real_tables
+from app.services.sql_parser import SQLParseError, cte_names, parse, qualified_name, real_tables
 
 DEFAULT_PROMPT = "optimizer-v1"
 
@@ -162,9 +162,9 @@ def validate_ai_output(resp: AIResponse, original_sql: str, dialect: Dialect, sc
             if schema.tables:
                 ctes = cte_names(p.ast)
                 for t in real_tables(p.ast):
-                    if schema.table(t.name) is None and t.name.lower() not in ctes:
+                    if schema.table(qualified_name(t)) is None and t.name.lower() not in ctes:
                         errors.append(ErrorType.WRONG_TABLE)
-                        notes.append(f"Таблица {t.name} отсутствует в схеме")
+                        notes.append(f"Таблица {qualified_name(t)} отсутствует в схеме")
                 aliases = {a.lower(): r for a, r in p.info.table_aliases.items()}
                 derived = {s.alias_or_name.lower() for s in p.ast.find_all(exp.Subquery) if s.alias_or_name}
                 for c in p.ast.find_all(exp.Column):
@@ -175,7 +175,7 @@ def validate_ai_output(resp: AIResponse, original_sql: str, dialect: Dialect, sc
                         errors.append(ErrorType.WRONG_COLUMN)
                         notes.append(f"Колонка {c.table}.{c.name} отсутствует в таблице {table.name}")
                 for t in real_tables(p.ast):
-                    table = schema.table(t.name)
+                    table = schema.table(qualified_name(t))
                     for hint in t.args.get("hints") or []:
                         if isinstance(hint, exp.IndexTableHint) and table is not None:
                             existing = {i.name.lower() for i in table.indexes}

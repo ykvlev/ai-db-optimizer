@@ -201,3 +201,21 @@ def test_safety_blocks_pg_writable_cte():
     v = safety.check("WITH d AS (DELETE FROM users RETURNING id) SELECT * FROM d", "postgres")
     assert not v.allowed
     assert not safety.check("SELECT pg_sleep(5)", "postgres").allowed
+
+
+def test_distinct_with_window():
+    sql = ("SELECT DISTINCT EXTRACT(YEAR FROM created_at) AS y, LAST_VALUE(created_at) OVER (PARTITION BY "
+           "EXTRACT(YEAR FROM created_at) ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) "
+           "FROM orders")
+    assert "DISTINCT_WITH_WINDOW" in codes(sql, "postgres")
+    assert "DISTINCT_WITH_WINDOW" not in codes("SELECT id, SUM(total) OVER (ORDER BY id) FROM orders", "postgres")
+
+
+def test_split_script():
+    from app.services.sql_parser import split_script
+    script = ("-- Запрос 1. Книги\nSELECT 'a;b' FROM t;\n/* Запрос 2 */\nSELECT 1;\n"
+              "CREATE FUNCTION f() RETURNS int AS $$ SELECT 1; $$ LANGUAGE sql;\n-- хвост")
+    parts = split_script(script, "postgres")
+    assert [p.title for p in parts] == ["Запрос 1. Книги", "Запрос 2", None]
+    assert parts[0].sql == "SELECT 'a;b' FROM t" and parts[0].start_line == 2
+    assert parts[2].sql.endswith("LANGUAGE sql")

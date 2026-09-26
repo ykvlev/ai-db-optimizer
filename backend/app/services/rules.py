@@ -13,7 +13,8 @@ from typing import Callable
 from sqlglot import exp
 
 from app.models import Dialect, Issue, SchemaInfo, TableInfo
-from app.services.sql_parser import (ParsedSQL, func_name, is_correlated, select_tables, split_and, sqlglot_dialect,
+from app.services.sql_parser import (ParsedSQL, func_name, is_correlated, qualified_name, select_tables, split_and,
+                                     sqlglot_dialect,
                                      unwrap_column)
 
 LARGE_TABLE_ROWS = 100_000
@@ -43,7 +44,7 @@ class RuleContext:
             real = self.parsed.info.table_aliases.get(col.table) or col.table
             return self.schema.table(real)
         # неквалифицированная колонка: сначала таблицы своего SELECT, затем всего запроса
-        for names in ([t.name for t in select_tables(col)], self.parsed.info.tables):
+        for names in ([qualified_name(t) for t in select_tables(col)], self.parsed.info.tables):
             candidates = [self.schema.table(t) for t in names]
             matches = [t for t in candidates if t and t.column(col.name)]
             if len(matches) == 1:
@@ -124,7 +125,7 @@ def rule_function_on_column(ctx: RuleContext) -> list[Issue]:
                 suggestion = "Перенесите вычисление на сторону константы или создайте функциональный индекс."
             issues.append(Issue(
                 code="FUNCTION_ON_COLUMN", severity="high" if indexed else "medium",
-                title=f"Функция {name}() над колонкой в условии",
+                title=f"Функция {name if name.endswith(')') else name + '()'} над колонкой в условии",
                 description=f"Условие «{ctx.sql(cmp)}» применяет функцию к колонке {col.sql()}. "
                             "B-tree индекс по колонке в таком случае не используется для поиска"
                             + (" (а индекс по этой колонке есть)." if indexed else "."),
@@ -433,6 +434,28 @@ def rule_order_by_filesort(ctx: RuleContext) -> list[Issue]:
                   suggestion=f"Составной индекс ({', '.join(eq_cols + cols)}) по фильтру и сортировке.")]
 
 
+def rule_distinct_with_window(ctx: RuleContext) -> list[Issue]:
+    """DISTINCT поверх оконных функций: окно вычисляется для каждой строки, затем дубликаты выбрасываются."""
+    issues = []
+    for sel in ctx.ast.find_all(exp.Select):
+        if not sel.args.get("distinct"):
+            continue
+        windows = [w for e in sel.expressions for w in e.find_all(exp.Window)]
+        if not windows:
+            continue
+        names = sorted({func_name(w.this) for w in windows if isinstance(w.this, exp.Func)})
+        issues.append(Issue(
+            code="DISTINCT_WITH_WINDOW", severity="medium", title="DISTINCT вместе с оконной функцией",
+            description=f"Оконные функции ({', '.join(names) or 'OVER'}) вычисляются для каждой строки исходной выборки, "
+                        "после чего DISTINCT сортирует или хеширует весь результат, чтобы убрать дубликаты. "
+                        "Это двойная работа над полным набором строк.",
+            fragment=ctx.sql(windows[0])[:300],
+            suggestion="Если окно считает агрегат по разделу, замените конструкцию на GROUP BY с агрегатной функцией: "
+                       "например, LAST_VALUE(x) OVER (PARTITION BY g ORDER BY x ROWS BETWEEN UNBOUNDED PRECEDING AND "
+                       "UNBOUNDED FOLLOWING) с DISTINCT эквивалентно MAX(x) ... GROUP BY g."))
+    return issues
+
+
 RULES: list[Callable[[RuleContext], list[Issue]]] = [
     rule_cartesian_join,
     rule_null_comparison,
@@ -449,6 +472,7 @@ RULES: list[Callable[[RuleContext], list[Issue]]] = [
     rule_missing_where_on_large_table,
     rule_select_star,
     rule_union_distinct,
+    rule_distinct_with_window,
     rule_having_without_aggregate,
 ]
 

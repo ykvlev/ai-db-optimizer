@@ -221,7 +221,10 @@ class _PGWalker:
             if est * loops >= BIG_SCAN_ROWS:
                 self.issues.append(Issue(code="FULL_TABLE_SCAN", severity="high" if est * loops >= HUGE_SCAN_ROWS else "medium",
                                          source="plan", table=rel, title=f"Последовательное сканирование {rel}",
-                                         description=f"Seq Scan по {rel}: ~{est * loops:,.0f} строк просмотрено."
+                                         description=(f"Seq Scan по {rel}: просмотрено {est * loops:,.0f} строк."
+                                                      if self.analyzed else
+                                                      f"Seq Scan: таблица {rel} читается целиком; по оценке планировщика "
+                                                      f"после фильтра остаётся ~{node.rows or 0:,.0f} строк.")
                                          .replace(",", " ") + (f" Фильтр: {p['Filter']}" if p.get("Filter") else "")))
         elif base in _PG_SCANS or base == "Bitmap Index Scan":
             if rel:

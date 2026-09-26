@@ -286,38 +286,48 @@ class PostgresConnector(Connector):
                              "транзакции)."]
         return True, []
 
+    # все пользовательские схемы; таблицы схемы по умолчанию называются без префикса, остальные — schema.table
+    _USER_SCHEMAS = ("n.nspname NOT IN ('pg_catalog', 'information_schema') AND n.nspname NOT LIKE 'pg_toast%' "
+                     "AND n.nspname NOT LIKE 'pg_temp%'")
+    _QNAME = "CASE WHEN n.nspname = current_schema() THEN {rel} ELSE n.nspname || '.' || {rel} END"
+
     def introspect(self) -> SchemaInfo:
         tables: dict[str, TableInfo] = {}
+        q = self._QNAME
         for name, rows, size in self._query(
-                "SELECT c.relname, GREATEST(c.reltuples, 0)::bigint, pg_total_relation_size(c.oid) FROM pg_class c "
-                "JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = current_schema() AND c.relkind IN ('r','p') "
-                "ORDER BY c.relname"):
+                f"SELECT {q.format(rel='c.relname')}, GREATEST(c.reltuples, 0)::bigint, pg_total_relation_size(c.oid) "
+                f"FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+                f"WHERE {self._USER_SCHEMAS} AND c.relkind IN ('r','p') ORDER BY 1"):
             tables[name] = TableInfo(name=name, row_count=int(rows), size_bytes=int(size))
         for t, col, ctype, nullable in self._query(
-                "SELECT table_name, column_name, "
+                "SELECT CASE WHEN table_schema = current_schema() THEN table_name ELSE table_schema || '.' || table_name END, "
+                "column_name, "
                 "CASE WHEN data_type IN ('character varying','character') AND character_maximum_length IS NOT NULL "
                 "THEN data_type || '(' || character_maximum_length || ')' "
                 "WHEN data_type = 'numeric' AND numeric_precision IS NOT NULL "
                 "THEN 'numeric(' || numeric_precision || ',' || numeric_scale || ')' ELSE data_type END, is_nullable "
-                "FROM information_schema.columns WHERE table_schema = current_schema() ORDER BY table_name, ordinal_position"):
+                "FROM information_schema.columns WHERE table_schema NOT IN ('pg_catalog', 'information_schema') "
+                "ORDER BY 1, ordinal_position"):
             if t in tables:
                 tables[t].columns.append(ColumnInfo(name=col, type=ctype.upper(), nullable=nullable == "YES"))
         for t, iname, uniq, prim, cols in self._query(
-                "SELECT t.relname, i.relname, ix.indisunique, ix.indisprimary, "
+                f"SELECT {q.format(rel='t.relname')}, i.relname, ix.indisunique, ix.indisprimary, "
                 "ARRAY(SELECT COALESCE(a.attname, '<expr>') FROM unnest(ix.indkey) WITH ORDINALITY k(attnum, ord) "
                 "LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum ORDER BY k.ord) "
                 "FROM pg_index ix JOIN pg_class t ON t.oid = ix.indrelid JOIN pg_class i ON i.oid = ix.indexrelid "
-                "JOIN pg_namespace n ON n.oid = t.relnamespace WHERE n.nspname = current_schema() ORDER BY t.relname, i.relname"):
+                f"JOIN pg_namespace n ON n.oid = t.relnamespace WHERE {self._USER_SCHEMAS} ORDER BY 1, 2"):
             if t in tables:
                 tables[t].indexes.append(IndexInfo(name=iname, columns=list(cols), unique=uniq, primary=prim))
         for t, cname, cols, rt, rcols in self._query(
-                "SELECT cl.relname, con.conname, "
+                f"SELECT {q.format(rel='cl.relname')}, con.conname, "
                 "ARRAY(SELECT a.attname FROM unnest(con.conkey) WITH ORDINALITY k(n, o) JOIN pg_attribute a "
-                "ON a.attrelid = con.conrelid AND a.attnum = k.n ORDER BY k.o), rc.relname, "
+                "ON a.attrelid = con.conrelid AND a.attnum = k.n ORDER BY k.o), "
+                "CASE WHEN rn.nspname = current_schema() THEN rc.relname ELSE rn.nspname || '.' || rc.relname END, "
                 "ARRAY(SELECT a.attname FROM unnest(con.confkey) WITH ORDINALITY k(n, o) JOIN pg_attribute a "
                 "ON a.attrelid = con.confrelid AND a.attnum = k.n ORDER BY k.o) "
                 "FROM pg_constraint con JOIN pg_class cl ON cl.oid = con.conrelid JOIN pg_class rc ON rc.oid = con.confrelid "
-                "JOIN pg_namespace n ON n.oid = cl.relnamespace WHERE con.contype = 'f' AND n.nspname = current_schema()"):
+                "JOIN pg_namespace n ON n.oid = cl.relnamespace JOIN pg_namespace rn ON rn.oid = rc.relnamespace "
+                f"WHERE con.contype = 'f' AND {self._USER_SCHEMAS}"):
             if t in tables:
                 tables[t].foreign_keys.append(ForeignKeyInfo(name=cname, columns=list(cols), ref_table=rt,
                                                              ref_columns=list(rcols)))

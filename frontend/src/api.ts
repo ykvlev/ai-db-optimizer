@@ -92,6 +92,16 @@ export interface AnalyzeResponse {
   parse_error?: string | null
 }
 
+export interface ScriptStatement {
+  index: number
+  title?: string | null
+  start_line: number
+  sql: string
+  analysis: AnalyzeResponse
+}
+
+export interface ScriptAnalyzeResponse { dbms: Dialect; statements: ScriptStatement[] }
+
 export interface AIResponse {
   summary: string
   issues: { type: string; severity: string; description: string }[]
@@ -244,6 +254,8 @@ export const api = {
   models: () => request<ModelsInfo>('GET', '/api/models'),
   examples: () => request<Examples>('GET', '/api/examples'),
   stats: () => request<Stats>('GET', '/api/stats'),
+  analyzeScript: (b: { sql: string; dbms: Dialect; ddl?: string; connection_id?: number | null }) =>
+    request<ScriptAnalyzeResponse>('POST', '/api/query/analyze-script', b),
   analyze: (b: { sql: string; dbms: Dialect; ddl?: string; connection_id?: number | null }) =>
     request<AnalyzeResponse>('POST', '/api/query/analyze', b),
   optimize: (b: { sql: string; dbms: Dialect; ddl?: string; connection_id?: number | null; model?: string | null; prompt_version?: string | null; runs?: number }) =>

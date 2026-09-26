@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 
 import sqlglot
 from sqlglot import exp
@@ -76,6 +77,11 @@ def cte_names(ast: exp.Expression) -> set[str]:
     return {c.alias_or_name.lower() for c in ast.find_all(exp.CTE)}
 
 
+def qualified_name(t: exp.Table) -> str:
+    """schema.table, если схема указана явно, иначе table."""
+    return f"{t.db}.{t.name}" if t.db else t.name
+
+
 def real_tables(ast: exp.Expression) -> list[exp.Table]:
     ctes = cte_names(ast)
     return [t for t in ast.find_all(exp.Table) if t.name and t.name.lower() not in ctes]
@@ -123,8 +129,8 @@ def parse(sql: str, dialect: Dialect) -> ParsedSQL:
     info.normalized_sql = ast.sql(dialect=d, pretty=True)
 
     tables = real_tables(ast)
-    info.tables = sorted({t.name for t in tables})
-    info.table_aliases = {(t.alias or t.name): t.name for t in tables}
+    info.tables = sorted({qualified_name(t) for t in tables})
+    info.table_aliases = {(t.alias or t.name): qualified_name(t) for t in tables}
     info.cte = [c.alias_or_name for c in ast.find_all(exp.CTE)]
     info.union = any(isinstance(n, exp.Union) for n in ast.walk())
 
@@ -178,3 +184,83 @@ def parse(sql: str, dialect: Dialect) -> ParsedSQL:
     except Exception:  # scope-анализ не поддерживает некоторые конструкции — не критично
         info.subqueries = max(0, sum(1 for _ in ast.find_all(exp.Select)) - 1 - len(info.cte))
     return ParsedSQL(ast=ast, info=info, dialect=dialect)
+
+
+# ---------------------------------------------------------------- скрипты из нескольких запросов
+@dataclass
+class ScriptPart:
+    index: int
+    sql: str  # текст запроса без ведущих комментариев и завершающей ;
+    title: str | None  # первый ведущий комментарий (например, «Запрос 3. …»)
+    start_line: int  # строка начала запроса в исходном скрипте (с 1)
+
+
+_DOLLAR_TAG = re.compile(r"\$[A-Za-z_]*\$")
+
+
+def _split_raw(text: str, dialect: Dialect) -> list[tuple[str, int]]:
+    """Режет текст по «;» вне строк, идентификаторов в кавычках, комментариев и $$-блоков PostgreSQL."""
+    parts: list[tuple[str, int]] = []
+    start, i, n = 0, 0, len(text)
+    while i < n:
+        ch, two = text[i], text[i:i + 2]
+        if two == "--" or (ch == "#" and dialect == "mysql"):
+            j = text.find("\n", i)
+            i = n if j < 0 else j
+        elif two == "/*":
+            j = text.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+        elif ch in ("'", '"', "`"):
+            j = i + 1
+            while j < n:
+                if text[j] == "\\" and ch != "`":
+                    j += 2
+                elif text[j] == ch and j + 1 < n and text[j + 1] == ch:  # удвоенная кавычка
+                    j += 2
+                elif text[j] == ch:
+                    break
+                else:
+                    j += 1
+            i = j + 1
+        elif ch == "$" and dialect == "postgres" and (m := _DOLLAR_TAG.match(text, i)):
+            j = text.find(m.group(0), m.end())
+            i = n if j < 0 else j + len(m.group(0))
+        elif ch == ";":
+            parts.append((text[start:i], start))
+            i += 1
+            start = i
+        else:
+            i += 1
+    parts.append((text[start:], start))
+    return parts
+
+
+def _strip_leading_comments(raw: str, dialect: Dialect) -> tuple[str, str | None]:
+    """Снимает ведущие комментарии; первый непустой комментарий возвращается как заголовок."""
+    titles: list[str] = []
+    body = raw
+    while True:
+        s = body.lstrip()
+        if s.startswith("--") or (dialect == "mysql" and s.startswith("#")):
+            line, _, body = s.partition("\n")
+            text = line.lstrip("-#").strip()
+        elif s.startswith("/*"):
+            end = s.find("*/")
+            text = s[2:end if end >= 0 else None].strip(" *\n\t")
+            body = s[end + 2:] if end >= 0 else ""
+            text = text.splitlines()[0].strip() if text else ""
+        else:
+            return s.strip(), (" ".join(titles).rstrip(";").strip()[:200] or None)
+        if text:
+            titles.append(text)
+
+
+def split_script(text: str, dialect: Dialect) -> list[ScriptPart]:
+    out: list[ScriptPart] = []
+    for raw, offset in _split_raw(text, dialect):
+        sql, title = _strip_leading_comments(raw, dialect)
+        if not sql:
+            continue
+        first = offset + raw.find(sql)
+        out.append(ScriptPart(index=len(out), sql=sql, title=title, start_line=text.count("\n", 0, first) + 1))
+    return out

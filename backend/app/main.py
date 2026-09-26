@@ -18,7 +18,7 @@ from app.examples import EXAMPLES
 from app.research.api import router as research_router, seed_builtin_datasets
 from app.research.runner import mark_interrupted
 from app.models import (AnalyzeRequest, AnalyzeResponse, BenchmarkRequest, BenchmarkStats, CompareRequest, Comparison,
-                        ConnectionCreate, ConnectionOut, ExplainRequest, OptimizeRequest, OptimizeResponse, PlanSummary,
+                        ConnectionCreate, ConnectionOut, ExplainRequest, OptimizeRequest, OptimizeResponse, PlanSummary, ScriptAnalyzeResponse,
                         SchemaInfo)
 from app.services import benchmark as bench
 from app.services import explain, pipeline, safety
@@ -74,6 +74,12 @@ def examples():
 @app.post("/api/query/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest):
     return pipeline.analyze(req)
+
+
+@app.post("/api/query/analyze-script", response_model=ScriptAnalyzeResponse)
+def analyze_script(req: AnalyzeRequest):
+    """Скрипт из нескольких SQL-операторов: разбивка по «;» и анализ каждого оператора отдельно."""
+    return pipeline.analyze_script(req)
 
 
 @app.post("/api/query/optimize", response_model=OptimizeResponse)

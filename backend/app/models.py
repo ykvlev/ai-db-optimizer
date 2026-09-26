@@ -82,8 +82,17 @@ class SchemaInfo(BaseModel):
     source: Literal["ddl", "live", "none"] = "none"
 
     def table(self, name: str) -> TableInfo | None:
-        name = name.lower().split(".")[-1]
-        return next((t for t in self.tables if t.name.lower() == name), None)
+        """Поиск по полному имени (schema.table), затем по короткому, если оно однозначно."""
+        full = name.lower()
+        exact = next((t for t in self.tables if t.name.lower() == full), None)
+        if exact is not None:
+            return exact
+        short = full.split(".")[-1]
+        matches = [t for t in self.tables if t.name.lower().split(".")[-1] == short]
+        if len(matches) == 1:
+            return matches[0]
+        # при неоднозначности без схемы — таблица схемы по умолчанию (имя без префикса)
+        return next((t for t in matches if "." not in t.name), None) if "." not in full else None
 
 
 # ---------------------------------------------------------------- Issues
@@ -340,3 +349,16 @@ class BenchmarkRequest(BaseModel):
     connection_id: int
     runs: int | None = None
     warmup: int | None = None
+
+
+class ScriptStatement(BaseModel):
+    index: int
+    title: str | None = None
+    start_line: int
+    sql: str
+    analysis: AnalyzeResponse
+
+
+class ScriptAnalyzeResponse(BaseModel):
+    dbms: Dialect
+    statements: list[ScriptStatement]

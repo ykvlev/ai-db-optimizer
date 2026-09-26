@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
-import type { AnalyzeResponse, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo } from '../api'
+import type { AnalyzeResponse, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo, ScriptAnalyzeResponse } from '../api'
 import { api } from '../api'
 import { ComparisonView } from '../components/ComparisonView'
 import { IssueList } from '../components/IssueList'
 import { PlanView } from '../components/PlanTree'
 import { SqlDiff, SqlEditor } from '../components/SqlEditor'
 import { Button, Card, Code, Empty, ErrorBox, SeverityBadge, Spinner, Tabs, Tag, fmtNum } from '../components/ui'
+
+const plural = (n: number, one: string, few: string, many: string) => {
+  const m10 = n % 10, m100 = n % 100
+  return `${n} ${m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many}`
+}
 
 type Tab = 'problems' | 'parse' | 'plan' | 'schema' | 'ai' | 'benchmark'
 
@@ -42,6 +47,12 @@ export function Analyzer({ connections, models, examples, onRun }: {
   const [plain, setPlain] = useState(false)
   const [ruleCmp, setRuleCmp] = useState<Comparison | null>(null)
   const [cmpBusy, setCmpBusy] = useState(false)
+  // скрипт из нескольких запросов: разбивка и выбранный запрос
+  const [script, setScript] = useState<ScriptAnalyzeResponse | null>(null)
+  const [selIdx, setSelIdx] = useState(0)
+  const multi = (script?.statements.length ?? 0) > 1
+  const currentSql = multi ? script!.statements[selIdx]?.sql ?? sql : sql
+  const changeSql = (v: string) => { setSql(v); setScript(null) }
 
   const conn = connections.find(c => c.id === connId) ?? null
   useEffect(() => { if (conn) setDbms(conn.dbms) }, [conn])
@@ -56,7 +67,7 @@ export function Analyzer({ connections, models, examples, onRun }: {
   const loadExample = (id: string) => {
     const ex = examples?.queries.find(q => q.id === id)
     if (!ex) return
-    setSql(ex[dbms])
+    changeSql(ex[dbms])
     if (!conn && examples) setDdl(examples.ddl[dbms])
   }
 
@@ -64,11 +75,20 @@ export function Analyzer({ connections, models, examples, onRun }: {
     setBusy(kind); setError(null)
     const body = { sql, dbms, ddl: conn ? undefined : ddl, connection_id: connId }
     try {
+      // всегда разбиваем текст на запросы: скрипт из нескольких запросов анализируется по частям
+      let sc = script
+      if (kind === 'analyze' || !sc) {
+        sc = await api.analyzeScript(body)
+        setScript(sc)
+        if (kind === 'analyze') setSelIdx(0)
+      }
+      const idx = kind === 'analyze' ? 0 : Math.min(selIdx, sc.statements.length - 1)
+      const st = sc.statements[idx]
+      if (!st) throw new Error('В тексте нет ни одного SQL-запроса')
       if (kind === 'analyze') {
-        const r = await api.analyze(body)
-        setAnalysis(r); setOpt(null); setRuleCmp(null); setTab('problems')
+        setAnalysis(st.analysis); setOpt(null); setRuleCmp(null); setTab('problems')
       } else {
-        const r = await api.optimize({ ...body, model: model || null })
+        const r = await api.optimize({ ...body, sql: sc.statements.length > 1 ? st.sql : sql, model: model || null })
         setAnalysis(r.analysis); setOpt(r); setRuleCmp(null); setTab('ai')
       }
       onRun()
@@ -79,11 +99,16 @@ export function Analyzer({ connections, models, examples, onRun }: {
     }
   }
 
+  const selectStatement = (i: number) => {
+    if (!script) return
+    setSelIdx(i); setAnalysis(script.statements[i].analysis); setOpt(null); setRuleCmp(null); setTab('problems')
+  }
+
   const verifyRewrite = async () => {
     if (!analysis?.rule_rewrite || connId == null) return
     setCmpBusy(true); setError(null)
     try {
-      setRuleCmp(await api.compare({ original_sql: sql, optimized_sql: analysis.rule_rewrite, connection_id: connId }))
+      setRuleCmp(await api.compare({ original_sql: currentSql, optimized_sql: analysis.rule_rewrite, connection_id: connId }))
       setTab('benchmark')
       onRun()
     } catch (e) { setError((e as Error).message) } finally { setCmpBusy(false) }
@@ -122,7 +147,7 @@ export function Analyzer({ connections, models, examples, onRun }: {
           )}
         </div>
 
-        <SqlEditor value={sql} onChange={setSql} height={300} />
+        <SqlEditor value={sql} onChange={changeSql} height={300} />
 
         {!conn && (
           <div>
@@ -162,6 +187,25 @@ export function Analyzer({ connections, models, examples, onRun }: {
 
       {/* ------------------------------------------------ правая колонка */}
       <div className="min-w-0 rounded-lg border border-line bg-panel">
+        {multi && (
+          <div className="border-b border-line p-3">
+            <div className="mb-2 text-[12px] text-muted">В тексте {plural(script!.statements.length, 'запрос', 'запроса', 'запросов')} — выберите запрос для анализа и оптимизации:</div>
+            <div className="flex max-h-44 flex-col gap-1 overflow-y-auto">
+              {script!.statements.map((st, i) => {
+                const n = st.analysis.issues.filter(x => x.code !== 'RULE_ERROR').length
+                return (
+                  <button key={i} onClick={() => selectStatement(i)}
+                    className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left text-[12.5px] ${i === selIdx ? 'border-accent bg-accent/10' : 'border-line hover:border-muted'}`}>
+                    <span className="shrink-0 text-muted">#{i + 1}</span>
+                    <span className="min-w-0 flex-1 truncate">{st.title ?? st.sql.replace(/\s+/g, ' ').slice(0, 90)}</span>
+                    <span className="shrink-0 text-[11px] text-muted">стр. {st.start_line}</span>
+                    {!st.analysis.safety.allowed ? <Tag tone="muted">не выполняется</Tag> : <Tag tone={n ? 'warn' : 'good'}>{n}</Tag>}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
         <div className="px-3 pt-1"><Tabs tabs={tabs} active={tab} onChange={setTab} /></div>
         <div className="p-4">
           {!a && tab !== 'ai' && <Empty>Вставьте SQL и нажмите «Анализировать»</Empty>}
@@ -171,12 +215,15 @@ export function Analyzer({ connections, models, examples, onRun }: {
               {!a.safety.allowed && <ErrorBox>Запрос не будет выполняться: {a.safety.reasons.join('; ')}</ErrorBox>}
               {a.safety.warnings.map((w, i) => <div key={i} className="text-[12px] text-warn">⚠ {w}</div>)}
               {a.parse_error && <ErrorBox>Ошибка разбора: {a.parse_error}</ErrorBox>}
-              <IssueList issues={a.issues.filter(i => i.code !== 'RULE_ERROR')} />
+              {multi && <Code>{currentSql}</Code>}
+              {!a.safety.allowed && a.issues.every(i => i.code === 'RULE_ERROR')
+                ? <Empty>Правила статического анализа проблем не нашли. Запрос не выполняется на БД (см. причину выше), поэтому план выполнения и замеры недоступны.</Empty>
+                : <IssueList issues={a.issues.filter(i => i.code !== 'RULE_ERROR')} />}
               {a.rule_rewrite && (
                 <Card title="Детерминированное переписывание (rule-based, без ИИ)" actions={conn &&
                   <Button onClick={verifyRewrite} disabled={cmpBusy}>{cmpBusy && <Spinner />} Проверить на БД</Button>}>
                   <ul className="mb-2 text-[13px] text-muted">{a.rule_rewrite_notes.map((n, i) => <li key={i}>• {n}</li>)}</ul>
-                  <SqlDiff original={sql} modified={a.rule_rewrite} height={200} />
+                  <SqlDiff original={currentSql} modified={a.rule_rewrite} height={200} />
                 </Card>
               )}
             </div>
@@ -213,7 +260,7 @@ export function Analyzer({ connections, models, examples, onRun }: {
                   </Card>
                   {opt.optimized_query && (
                     <Card title="Исходный → оптимизированный SQL">
-                      <SqlDiff original={sql} modified={opt.optimized_query} />
+                      <SqlDiff original={currentSql} modified={opt.optimized_query} />
                       {opt.ai.explanation.length > 0 && <ul className="mt-3 space-y-1 text-[13px]">{opt.ai.explanation.map((e, i) => <li key={i}>• {e}</li>)}</ul>}
                     </Card>
                   )}

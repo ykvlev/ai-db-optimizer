@@ -87,3 +87,35 @@ def test_hallucinated_column_is_rejected_before_execution(conn_id):
     r = _optimize(conn_id, ORIGINAL, {"summary": "x", "optimized_query": "SELECT o.id FROM orders o WHERE o.order_date = '2025-03-15'"})
     assert r.verdict == "rejected" and r.comparison is None
     assert [e.value for e in r.error_types] == ["WRONG_COLUMN"]
+
+
+def test_postgres_non_default_schema():
+    """Таблицы из пользовательской схемы (study.books) видны в интроспекции и используются правилами."""
+    import psycopg
+    from app.services import rules
+    from app.services.sql_parser import parse
+    cfg = TARGETS["postgres"]
+    if not _available(cfg):
+        pytest.skip("postgres недоступна")
+    admin = psycopg.connect(host=cfg.host, port=cfg.port, dbname=cfg.database, user="postgres", password="rootpass",
+                            autocommit=True)
+    try:
+        admin.execute("DROP SCHEMA IF EXISTS study CASCADE")
+        admin.execute("CREATE SCHEMA study")
+        admin.execute("CREATE TABLE study.books (bshifr int PRIMARY KEY, title text, price numeric(8,2))")
+        admin.execute("CREATE TABLE study.tickets (id int PRIMARY KEY, bshifr int REFERENCES study.books, data_vydachi date)")
+        admin.execute("GRANT USAGE ON SCHEMA study TO optimizer_ro")
+        admin.execute("GRANT SELECT ON ALL TABLES IN SCHEMA study TO optimizer_ro")
+        with make_connector(cfg, 10000) as c:
+            schema = c.introspect()
+            books = schema.table("study.books")
+            assert books is not None and [col.name for col in books.columns] == ["bshifr", "title", "price"]
+            assert schema.table("study.tickets").foreign_keys[0].ref_table == "study.books"
+            assert schema.table("orders") is not None  # таблицы схемы по умолчанию — без префикса
+            sql = "SELECT t.id, b.title FROM study.books b JOIN study.tickets t ON t.bshifr = b.bshifr WHERE EXTRACT(YEAR FROM t.data_vydachi) = 2024"
+            codes = {i.code for i in rules.run_rules(parse(sql, "postgres"), schema, "postgres")}
+            assert "FUNCTION_ON_COLUMN" in codes and "MISSING_INDEX" in codes  # tickets.bshifr без индекса
+            c.explain(sql)
+    finally:
+        admin.execute("DROP SCHEMA IF EXISTS study CASCADE")
+        admin.close()
