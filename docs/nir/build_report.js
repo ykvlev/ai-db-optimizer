@@ -158,6 +158,7 @@ const RULES = [
   ['SELECT_STAR', 'Выборка всех колонок SELECT *'],
   ['UNION_DISTINCT', 'UNION вместо UNION ALL'],
   ['HAVING_WITHOUT_AGGREGATE', 'Условие без агрегатной функции в HAVING'],
+  ['DISTINCT_WITH_WINDOW', 'DISTINCT вместе с оконной функцией'],
 ]
 
 const CATS = [

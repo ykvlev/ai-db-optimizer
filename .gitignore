@@ -18,3 +18,5 @@ docs/nir/*.pdf
 docs/nir/*.json
 !docs/nir/package.json
 !docs/nir/package-lock.json
+docs/articles/*.docx
+docs/articles/*.pdf
