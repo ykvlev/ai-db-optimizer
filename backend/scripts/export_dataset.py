@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.db import AIRecommendation, AnalysisRun, Experiment, ExperimentResult, SessionLocal  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 NAME = "sql-optimization-dataset"
 
 
@@ -172,7 +172,7 @@ def build(exp_ids: list[int], out: Path) -> None:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--experiments", default="1,2,3,4,5,6")
+    ap.add_argument("--experiments", default="1,2,3,4,5,6,7,8")
     ap.add_argument("--out", default=str(ROOT / "dataset" / f"{NAME}-v1"))
     a = ap.parse_args()
     build([int(i) for i in a.experiments.split(",")], Path(a.out))

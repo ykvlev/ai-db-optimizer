@@ -8,8 +8,8 @@ authors:
     affiliation: "Политехнический колледж Новгородского государственного университета имени Ярослава Мудрого"
 repository-code: "https://github.com/ykvlev/ai-db-optimizer"
 license: MIT
-version: "1.0.0"
-date-released: "2026-09-26"
+version: "1.1.0"
+date-released: "2026-09-27"
 doi: "10.5281/zenodo.22982517"
 identifiers:
   - type: doi

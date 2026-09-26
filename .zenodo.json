@@ -1,12 +1,24 @@
 {
   "title": "AI Database Optimizer and SQL Optimization Dataset",
   "upload_type": "software",
-  "description": "<p>AI Database Optimizer analyses and optimizes SQL queries for MySQL and PostgreSQL. Recommendations of large language models (GigaChat, YandexGPT, OpenAI-compatible, local models via Ollama) are accepted only after safety, schema, result-equivalence and benchmark checks.</p><p>The release includes SQL Optimization Dataset v1.0.0 (directory <code>dataset/</code>, CC BY 4.0): 304 measured records from six experiments with original and candidate SQL, execution plans, per-run timings, equivalence checksums, outcome labels and full LLM prompts and responses.</p><p>Программа анализа и оптимизации SQL-запросов с проверкой рекомендаций языковых моделей и открытый датасет результатов экспериментов.</p>",
+  "description": "<p>AI Database Optimizer analyses and optimizes SQL queries for MySQL and PostgreSQL. Recommendations of large language models (GigaChat, YandexGPT, OpenAI-compatible, local models via Ollama) are accepted only after safety, schema, result-equivalence and benchmark checks.</p><p>The release includes SQL Optimization Dataset v1.1.0 (directory <code>dataset/</code>, CC BY 4.0): 704 measured records from eight experiments, including a comparison of GigaChat-2, GigaChat-2-Pro, GigaChat-2-Max, Qwen2.5-Coder-7B and a rule-based rewriter, with original and candidate SQL, execution plans, per-run timings, equivalence checksums, outcome labels and full LLM prompts and responses.</p><p>Программа анализа и оптимизации SQL-запросов с проверкой рекомендаций языковых моделей и открытый датасет результатов экспериментов.</p>",
   "creators": [
-    {"name": "Yakovlev, Artyom", "affiliation": "Polytechnic College of Yaroslav-the-Wise Novgorod State University"}
+    {
+      "name": "Yakovlev, Artyom",
+      "affiliation": "Polytechnic College of Yaroslav-the-Wise Novgorod State University"
+    }
   ],
   "license": "MIT",
-  "keywords": ["SQL query optimization", "large language models", "execution plan", "query equivalence", "benchmark", "MySQL", "PostgreSQL", "dataset"],
+  "keywords": [
+    "SQL query optimization",
+    "large language models",
+    "execution plan",
+    "query equivalence",
+    "benchmark",
+    "MySQL",
+    "PostgreSQL",
+    "dataset"
+  ],
   "language": "rus",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
