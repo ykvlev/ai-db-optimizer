@@ -13,10 +13,11 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 
 import httpx
 
-from app.config import Settings, get_settings
+from app.config import BACKEND_DIR, Settings, get_settings
 
 
 class LLMError(Exception):
@@ -176,7 +177,10 @@ class ProviderRegistry:
         self.providers: dict[str, LLMProvider] = {}
         t = settings.llm_timeout_s
         if settings.gigachat_auth_key:
-            verify: bool | str = settings.gigachat_ca_bundle or settings.gigachat_verify_ssl
+            verify: bool | str = settings.gigachat_verify_ssl
+            if settings.gigachat_ca_bundle:  # относительный путь — от папки backend, а не от текущей директории
+                ca = Path(settings.gigachat_ca_bundle)
+                verify = str(ca if ca.is_absolute() else BACKEND_DIR / ca)
             self.providers["gigachat"] = GigaChatProvider(settings.gigachat_auth_key, settings.gigachat_scope,
                                                           _split(settings.gigachat_models), verify, t)
         if settings.yandex_api_key and settings.yandex_folder_id:

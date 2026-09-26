@@ -72,10 +72,10 @@ export function Databases({ connections, onChange }: { connections: Connection[]
         </Card>
 
         <Card title="Подключения">
-          {!connections.length ? <Empty>Подключений нет</Empty> : (
+          {!connections.length ? <Empty>Подключений пока нет. Нажмите «Демо MySQL (docker)» или «Демо PostgreSQL (docker)» над формой — поля заполнятся сами, останется нажать «Проверить и сохранить». Для своей базы введите её адрес и пользователя с правом только на чтение.</Empty> : (
             <ul className="space-y-2">{connections.map(c => (
               <li key={c.id} onClick={() => setSelected(c.id)}
-                className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === c.id ? 'border-accent bg-accent/10' : 'border-line bg-panel-2 hover:border-muted'}`}>
+                className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === c.id ? 'border-text bg-panel-2' : 'border-line bg-panel-2 hover:border-muted'}`}>
                 <div className="flex items-center gap-2"><span className="font-semibold">{c.name}</span><span className="ml-auto" /><Button variant="danger" onClick={() => remove(c.id)}>Удалить</Button></div>
                 <div className="mono mt-1 text-[11.5px] text-muted">{c.dbms} {c.server_version} · {c.username}@{c.host}:{c.port}/{c.database}</div>
                 <div className="mt-1">{c.read_only_user ? <Tag tone="good">только чтение</Tag> : c.read_only_user === false ? <Tag tone="warn">есть права на запись</Tag> : null}</div>

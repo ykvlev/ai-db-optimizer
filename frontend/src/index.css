@@ -1,20 +1,29 @@
+@import "@fontsource-variable/inter";
 @import "tailwindcss";
 
+/* Швейцарский минимализм: чёрный фон, гротеск, прямые углы, тонкие линейки, один акцент — красный. */
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
 
-  --color-bg: #0d1117;
-  --color-panel: #151b23;
-  --color-panel-2: #1c2330;
-  --color-line: #2a3341;
-  --color-text: #e6edf3;
-  --color-muted: #8b949e;
-  --color-accent: #4c8dff;
-  --color-good: #3fb950;
-  --color-warn: #d29922;
-  --color-bad: #f85149;
-  --color-crit: #ff7b72;
+  --color-bg: #000000;
+  --color-panel: #0a0a0a;
+  --color-panel-2: #141414;
+  --color-line: #262626;
+  --color-text: #f2f2f2;
+  --color-muted: #8f8f8f;
+  --color-accent: #ff3b30;
+  --color-good: #34d17a;
+  --color-warn: #ffb020;
+  --color-bad: #ff5c52;
+  --color-crit: #ff5c52;
+
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
 }
 
 html, body, #root {
@@ -27,21 +36,32 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 14px;
+  font-feature-settings: "tnum" 0, "cv11" 1;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 6px; }
+::selection { background: var(--color-accent); color: #000; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #2e2e2e; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
 ::-webkit-scrollbar-track { background: transparent; }
 
 code, pre, .mono { font-family: var(--font-mono); }
 
 input, select, textarea {
-  background: var(--color-panel-2);
+  background: var(--color-bg);
   border: 1px solid var(--color-line);
-  border-radius: 6px;
+  border-radius: 0;
   color: var(--color-text);
   padding: 6px 10px;
   outline: none;
 }
-input:focus, select:focus, textarea:focus { border-color: var(--color-accent); }
+input:hover, select:hover, textarea:hover { border-color: #3d3d3d; }
+input:focus, select:focus, textarea:focus { border-color: var(--color-text); }
+input[type="checkbox"] { accent-color: var(--color-accent); }
+select option { background: var(--color-panel-2); }
+
+/* подпись-«кикер» в швейцарской типографике */
+.kicker { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; }

@@ -58,7 +58,7 @@ export function Experiments({ connections, models, onRun }: { connections: Conne
           {!experiments.length ? <Empty>Экспериментов пока нет</Empty> : (
             <ul className="space-y-1.5">{experiments.map(e => (
               <li key={e.id} onClick={() => setSelected(e.id)}
-                className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === e.id ? 'border-accent bg-accent/10' : 'border-line bg-panel-2 hover:border-muted'}`}>
+                className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === e.id ? 'border-text bg-panel-2' : 'border-line bg-panel-2 hover:border-muted'}`}>
                 <div className="flex items-center gap-2">
                   <span className="text-muted">#{e.id}</span><span className="truncate font-semibold">{e.name}</span>
                   <span className="ml-auto"><Tag tone={statusTone(e.status)}>{statusName[e.status]}</Tag></span>
@@ -101,7 +101,7 @@ function Progress({ done, total }: { done: number; total: number }) {
   const p = total ? (done / total) * 100 : 0
   return (
     <div className="mt-1.5 flex items-center gap-2">
-      <div className="h-1.5 flex-1 rounded bg-line"><div className="h-1.5 rounded bg-accent transition-all" style={{ width: `${p}%` }} /></div>
+      <div className="h-1.5 flex-1 rounded bg-line"><div className="h-1.5 rounded bg-text transition-all" style={{ width: `${p}%` }} /></div>
       <span className="text-[11px] tabular-nums text-muted">{done}/{total}</span>
     </div>
   )

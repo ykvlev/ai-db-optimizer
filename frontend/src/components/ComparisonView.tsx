@@ -128,7 +128,7 @@ export function ComparisonView({ cmp }: { cmp: Comparison }) {
                 {cmp.score.components.map(c => (
                   <div key={c.name}>
                     <div className="flex justify-between text-[12px]"><span>{scoreNames[c.name] ?? c.name} <span className="text-muted">· вес {Math.round(c.weight * 100)}%</span></span><span className="tabular-nums">{c.value}</span></div>
-                    <div className="mt-0.5 h-1.5 rounded bg-line"><div className="h-1.5 rounded bg-accent" style={{ width: `${c.value}%` }} /></div>
+                    <div className="mt-0.5 h-1.5 rounded bg-line"><div className="h-1.5 rounded bg-text" style={{ width: `${c.value}%` }} /></div>
                     <div className="text-[11.5px] text-muted">{c.detail}</div>
                   </div>
                 ))}

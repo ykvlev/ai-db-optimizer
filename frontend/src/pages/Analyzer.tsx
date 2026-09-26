@@ -27,9 +27,9 @@ const factorNames: Record<string, string> = {
   plan_confirmed: 'Подтверждение планом', benchmark_stability: 'Стабильность бенчмарка',
 }
 
-export function Analyzer({ connections, models, examples, onRun, onSendToCompare }: {
+export function Analyzer({ connections, models, examples, onRun, onSendToCompare, onNavigate }: {
   connections: Connection[]; models: ModelsInfo | null; examples: Examples | null; onRun: () => void
-  onSendToCompare: (d: Omit<CompareDraft, 'nonce'>) => void
+  onSendToCompare: (d: Omit<CompareDraft, 'nonce'>) => void; onNavigate: (p: string) => void
 }) {
   const [dbms, setDbms] = useState<Dialect>('mysql')
   const [connId, setConnId] = useState<number | null>(null)
@@ -122,10 +122,10 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
   const issueCount = a?.issues.filter(i => i.code !== 'RULE_ERROR').length ?? 0
   const tabs: { id: Tab; label: React.ReactNode }[] = [
     { id: 'problems', label: <>Проблемы {a && <Tag tone={issueCount ? 'warn' : 'good'}>{issueCount}</Tag>}</> },
-    { id: 'parse', label: 'Разбор запроса' },
-    { id: 'plan', label: 'План выполнения' },
-    { id: 'schema', label: 'Схема и индексы' },
-    { id: 'ai', label: 'AI-оптимизация' },
+    { id: 'parse', label: 'Разбор' },
+    { id: 'plan', label: 'План' },
+    { id: 'schema', label: 'Схема' },
+    { id: 'ai', label: 'ИИ-оптимизация' },
     { id: 'benchmark', label: 'Бенчмарк' },
   ]
 
@@ -180,10 +180,22 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
           </p>
         )}
         {!conn && (
-          <p className="rounded-md border border-warn/40 bg-warn/10 px-3 py-2 text-[12px] text-warn">
-            Офлайн-режим: запрос не выполняется на БД, поэтому нет плана выполнения, проверки эквивалентности и бенчмарка.
-            {connections.length > 0 && ' Выберите подключение в списке выше.'}
-          </p>
+          <div className="border-l-2 border-warn bg-warn/5 px-3 py-2 text-[12.5px] leading-relaxed">
+            <span className="font-semibold text-warn">База не выбрана.</span>{' '}
+            <span className="text-muted">Программа проверит только текст запроса: без базы нет плана выполнения, проверки результата и замеров скорости.
+            {connections.length > 0 ? ' Выберите базу в списке выше.' : ''}</span>
+            {!connections.length && <button className="ml-1 font-semibold text-text underline underline-offset-4 hover:text-accent" onClick={() => onNavigate('start')}>Подключить демо-базу</button>}
+          </div>
+        )}
+        {!a && (
+          <ol className="border-b border-line text-[12.5px]">
+            {[['Выберите базу', 'и СУБД — или оставьте офлайн-режим'], ['Анализировать', 'быстро, без ИИ: проблемы, план выполнения, схема'], ['Оптимизировать с ИИ', 'новый запрос с проверкой результата и скорости']].map(([t, d], i) => (
+              <li key={t} className="flex gap-3 border-t border-line py-2">
+                <span className="w-5 shrink-0 font-bold tabular-nums text-accent">{String(i + 1).padStart(2, '0')}</span>
+                <span className="w-40 shrink-0 font-semibold">{t}</span><span className="text-muted">{d}</span>
+              </li>
+            ))}
+          </ol>
         )}
         {error && <ErrorBox>{error}</ErrorBox>}
       </div>
@@ -198,7 +210,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
                 const n = st.analysis.issues.filter(x => x.code !== 'RULE_ERROR').length
                 return (
                   <button key={i} onClick={() => selectStatement(i)}
-                    className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left text-[12.5px] ${i === selIdx ? 'border-accent bg-accent/10' : 'border-line hover:border-muted'}`}>
+                    className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left text-[12.5px] ${i === selIdx ? 'border-text bg-panel-2' : 'border-line hover:border-muted'}`}>
                     <span className="shrink-0 text-muted">#{i + 1}</span>
                     <span className="min-w-0 flex-1 truncate">{st.title ?? st.sql.replace(/\s+/g, ' ').slice(0, 90)}</span>
                     <span className="shrink-0 text-[11px] text-muted">стр. {st.start_line}</span>
@@ -211,7 +223,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
         )}
         <div className="px-3 pt-1"><Tabs tabs={tabs} active={tab} onChange={setTab} /></div>
         <div className="p-4">
-          {!a && tab !== 'ai' && <Empty>Вставьте SQL и нажмите «Анализировать»</Empty>}
+          {!a && tab !== 'ai' && <Empty>Здесь появятся результаты. Слева уже вставлен пример запроса — нажмите «Анализировать», чтобы увидеть, какие проблемы найдёт программа. Другие примеры — в списке «Примеры…».</Empty>}
 
           {a && tab === 'problems' && (
             <div className="space-y-3">
