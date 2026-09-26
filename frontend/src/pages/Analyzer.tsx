@@ -27,6 +27,9 @@ export function Analyzer({ connections, models, examples, onRun }: {
 }) {
   const [dbms, setDbms] = useState<Dialect>('mysql')
   const [connId, setConnId] = useState<number | null>(null)
+  const [connTouched, setConnTouched] = useState(false)
+  // по умолчанию — первое подключение: без него нет плана, эквивалентности и бенчмарка
+  useEffect(() => { if (!connTouched && connId == null && connections.length) setConnId(connections[0].id) }, [connections, connId, connTouched])
   const [model, setModel] = useState<string>('')
   const [sql, setSql] = useState('')
   const [ddl, setDdl] = useState('')
@@ -103,7 +106,7 @@ export function Analyzer({ connections, models, examples, onRun }: {
       {/* ------------------------------------------------ левая колонка */}
       <div className="flex min-w-0 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <select value={connId ?? ''} onChange={e => setConnId(e.target.value ? Number(e.target.value) : null)} className="min-w-0 flex-1">
+          <select value={connId ?? ''} onChange={e => { setConnTouched(true); setConnId(e.target.value ? Number(e.target.value) : null) }} className={`min-w-0 flex-1 ${conn ? '' : 'border-warn text-warn'}`}>
             <option value="">Без подключения (офлайн-анализ)</option>
             {connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -145,12 +148,13 @@ export function Analyzer({ connections, models, examples, onRun }: {
         </div>
         {busy === 'optimize' && (
           <p className="text-[12px] text-muted">
-            {conn ? 'Анализ → запрос к модели → проверки → эквивалентность → бенчмарк. Это может занять до минуты.' : 'Анализ → запрос к модели → статические проверки.'}
+            {conn ? 'Анализ → запрос к модели → проверки → эквивалентность → бенчмарк. С локальной моделью на CPU это занимает 2–5 минут.' : 'Анализ → запрос к модели → статические проверки. С локальной моделью на CPU это занимает 2–5 минут.'}
           </p>
         )}
         {!conn && (
-          <p className="text-[12px] text-muted">
-            Без подключения к БД выполняется только статический анализ: реальные показатели (время, ускорение, эквивалентность) не измеряются и не показываются.
+          <p className="rounded-md border border-warn/40 bg-warn/10 px-3 py-2 text-[12px] text-warn">
+            Офлайн-режим: запрос не выполняется на БД, поэтому нет плана выполнения, проверки эквивалентности и бенчмарка.
+            {connections.length > 0 && ' Выберите подключение в списке выше.'}
           </p>
         )}
         {error && <ErrorBox>{error}</ErrorBox>}
