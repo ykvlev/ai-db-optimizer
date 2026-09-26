@@ -198,6 +198,9 @@ def main():
     CMP = [("gigachat:GigaChat-2", "GigaChat-2"), ("gigachat:GigaChat-2-Pro", "GigaChat-2-Pro"),
            ("gigachat:GigaChat-2-Max", "GigaChat-2-Max"), (llm, "Qwen2.5-Coder-7B"), ("baseline:rule-based", "Базовая линия")]
 
+    CMP_SHORT = [("gigachat:GigaChat-2", "GigaChat-2"), ("gigachat:GigaChat-2-Pro", "Pro"), ("gigachat:GigaChat-2-Max", "Max"),
+                 (llm, "Qwen"), ("baseline:rule-based", "Правила")]
+
     def cmp_rows(e):
         return [(name, exps[e]["summary"]["models"][mid]) for mid, name in CMP]
 
@@ -211,6 +214,8 @@ def main():
         "fig_full_bw": (page(bars_big(full_rows, bw=True), 1000), 1000),
         "fig_models_mysql": (page(bars_big(cmp_rows(7)), 1000), 1000),
         "fig_models_pg": (page(bars_big(cmp_rows(8)), 1000), 1000),
+        "fig_models_bw": (page(bars_big([(f"{name}, {db}", exps[e]["summary"]["models"][mid])
+                                         for mid, name in CMP_SHORT for db, e in (("MySQL", 7), ("PG", 8))], bw=True), 1000), 1000),
     })
     for name in ("screen_experiment.png", "screen_dashboard.png"):
         shutil.copy(HERE.parent / "konkurs" / "attachments" / name, FIG / name)

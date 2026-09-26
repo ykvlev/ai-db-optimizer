@@ -176,6 +176,9 @@ def build():
     giga_lat = statistics.fmean(mt[(db, m)]["lat"] for db in EXPS for m in giga)
     qwen_lat = statistics.fmean(mt[(db, "ollama:qwen2.5-coder:7b")]["lat"] for db in EXPS)
     max_giga = max(mt[(db, m)]["max"] or 0 for db in EXPS for m in giga)
+    corr = [r["speedup"] for d in data.values() for r in d["results"]
+            if r["category"] == "correlated_select" and r["model"] in giga and r["speedup"]]
+    corr_min, corr_max = min(corr), max(corr)
     only_idx = sum(1 for d in data.values() for r in d["results"] if r["model"] == mx_ and not r["proposed"])
     notin_max = max(r["speedup"] or 0 for d in data.values() for r in d["results"]
                     if r["model"] == pro and r["category"] == "not_in" and r["outcome"] == "improved")
@@ -275,7 +278,7 @@ def build():
     <div class="two">{sql(r['offset']['sql'])}{sql(r['offset']['new'])}</div>
   </div>
   <div class="case bad">
-    <h3>«Учебное» правило, которое замедляет · все три модели GigaChat · 0,13–0,33x</h3>
+    <h3>«Учебное» правило, которое замедляет · все три модели GigaChat · {fx(corr_min, 2)}–{fx(corr_max, 2)}x</h3>
     <p>Коррелированные подзапросы в <code>SELECT</code> модели заменяют соединением с агрегатом по всей таблице заказов. Результат верный, но на MySQL запрос стал медленнее в {fx(1 / r['join_slow']['row']['speedup'], 0)} раз ({fx(r['join_slow']['row']['time_before_ms'], 0)} → {fx(r['join_slow']['row']['time_after_ms'], 0)} мс): исходный запрос читал заказы только отобранных клиентов по индексу.</p>
     <div class="two">{sql(r['join_slow']['sql'])}{sql(r['join_slow']['new'])}</div>
   </div>
