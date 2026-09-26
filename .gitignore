@@ -11,3 +11,10 @@ frontend/dist/
 docs/konkurs/
 docs/rospatent/out/
 docs/rospatent/ЗАЯВКА_Роспатент.md
+docs/nir/node_modules/
+docs/nir/figures/
+docs/nir/*.docx
+docs/nir/*.pdf
+docs/nir/*.json
+!docs/nir/package.json
+!docs/nir/package-lock.json
