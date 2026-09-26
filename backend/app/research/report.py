@@ -44,13 +44,17 @@ def conclusions(meta: dict, summary: dict) -> list[str]:
             + (f"Медианное ускорение среди эквивалентных кандидатов {_x(s['median_speedup'])}"
                + (f" (95% ДИ {_x(s['median_speedup_ci95'][0])}–{_x(s['median_speedup_ci95'][1])})" if s["median_speedup_ci95"] else "")
                + f", геометрическое среднее {_x(s['geomean_speedup'])}." if s["median_speedup"] else "Измеренных эквивалентных кандидатов нет."))
-    best = max(models.items(), key=lambda kv: (kv[1]["outcomes"]["improved"], -(kv[1]["outcomes"]["invalid"])))
     if len(models) > 1:
-        out.append(f"Наибольшее число подтверждённых улучшений — у {best[0]} ({best[1]['outcomes']['improved']} из {n_queries}).")
-    safest = min(models.items(), key=lambda kv: kv[1]["outcomes"]["invalid"] + kv[1]["outcomes"]["worse"])
-    if len(models) > 1:
-        out.append(f"Меньше всего некорректных и ухудшающих кандидатов — у {safest[0]} "
-                   f"({safest[1]['outcomes']['invalid'] + safest[1]['outcomes']['worse']}).")
+        improved = {m: s["outcomes"]["improved"] for m, s in models.items()}
+        top = max(improved.values())
+        leaders = [m for m, v in improved.items() if v == top]
+        if len(leaders) == 1:
+            out.append(f"Наибольшее число подтверждённых улучшений — у {leaders[0]} ({top} из {n_queries}).")
+        bad = {m: s["outcomes"]["invalid"] + s["outcomes"]["worse"] for m, s in models.items()}
+        low = min(bad.values())
+        safest = [m for m, v in bad.items() if v == low]
+        if len(safest) == 1:
+            out.append(f"Меньше всего некорректных и ухудшающих кандидатов — у {safest[0]} ({low}).")
     halluc = {m: s["hallucinations"] for m, s in models.items() if s["hallucinations"]}
     if halluc:
         out.append("Обнаружены галлюцинации схемы (несуществующие таблицы, колонки, индексы): "

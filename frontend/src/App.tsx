@@ -19,7 +19,7 @@ const pages = [
 type PageId = typeof pages[number]['id']
 
 function currentPage(): PageId {
-  const h = window.location.hash.replace('#/', '') as PageId
+  const h = window.location.hash.replace('#/', '').split('/')[0] as PageId
   return pages.some(p => p.id === h) ? h : 'analyzer'
 }
 

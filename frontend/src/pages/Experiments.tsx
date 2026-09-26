@@ -14,7 +14,15 @@ const pct = (v?: number | null) => v == null ? '—' : `${v.toFixed(1)}%`
 export function Experiments({ connections, models, onRun }: { connections: Connection[]; models: ModelsInfo | null; onRun: () => void }) {
   const [datasets, setDatasets] = useState<DatasetInfo[]>([])
   const [experiments, setExperiments] = useState<ExperimentMeta[]>([])
-  const [selected, setSelected] = useState<number | null>(null)
+  // поддерживается прямая ссылка #/experiments/<id>
+  const [selected, setSelectedState] = useState<number | null>(() => {
+    const id = Number(window.location.hash.split('/')[2])
+    return Number.isInteger(id) && id > 0 ? id : null
+  })
+  const setSelected = useCallback((id: number | null) => {
+    setSelectedState(id)
+    history.replaceState(null, '', id == null ? '#/experiments' : `#/experiments/${id}`)
+  }, [])
   const [detail, setDetail] = useState<ExperimentDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showImport, setShowImport] = useState(false)
