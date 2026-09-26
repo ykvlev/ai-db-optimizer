@@ -24,3 +24,6 @@ docs/rospatent/ЗАЯВКА_БД_Роспатент.md
 docs/techreport/*.docx
 docs/techreport/*.pdf
 docs/techreport/*.json
+docs/gigachat/*.html
+docs/gigachat/*.pdf
+docs/gigachat/Письмо_в_Сбер.md
