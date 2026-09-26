@@ -10,6 +10,11 @@ repository-code: "https://github.com/ykvlev/ai-db-optimizer"
 license: MIT
 version: "1.0.0"
 date-released: "2026-09-26"
+doi: "10.5281/zenodo.22982517"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22982518"
+    description: "Версия 1.0.0"
 keywords:
   - SQL query optimization
   - large language models
