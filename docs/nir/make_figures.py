@@ -59,13 +59,13 @@ def pipeline_svg() -> str:
     return PIPELINE_SVG.format(boxes="".join(parts))
 
 
-OC = {"improved": "#2e9d57", "unchanged": "#a3acb8", "worse": "#e08a2b", "invalid": "#d64545"}
-ON = {"improved": "Улучшено", "unchanged": "Без изменений", "worse": "Ухудшено", "invalid": "Некорректно"}
+OC = {"improved": "#2e9d57", "unchanged": "#a3acb8", "worse": "#e08a2b", "invalid": "#d64545", "error": "#5b6270"}
+ON = {"improved": "Улучшено", "unchanged": "Без изменений", "worse": "Ухудшено", "invalid": "Некорректно", "error": "Сбой вызова"}
 
 
 # для чёрно-белой печати (журналы): оттенки серого с разной светлотой, цифры контрастным цветом
-OC_BW = {"improved": "#3a3a3a", "unchanged": "#e6e6e6", "worse": "#9a9a9a", "invalid": "#000000"}
-TEXT_BW = {"improved": "#fff", "unchanged": "#000", "worse": "#000", "invalid": "#fff"}
+OC_BW = {"improved": "#3a3a3a", "unchanged": "#e6e6e6", "worse": "#9a9a9a", "invalid": "#000000", "error": "#6e6e6e"}
+TEXT_BW = {"improved": "#fff", "unchanged": "#000", "worse": "#000", "invalid": "#fff", "error": "#fff"}
 
 
 def bars_big(rows, bw: bool = False) -> str:
@@ -79,7 +79,7 @@ def bars_big(rows, bw: bool = False) -> str:
         p.append(f'<text x="{left - 16}" y="{y + bh * 0.66}" text-anchor="end" font-size="32">{label}</text>')
         xx = left
         for o in OC:
-            v = s["outcomes"][o]
+            v = s["outcomes"].get(o, 0)
             if not v:
                 continue
             w_ = (w - left - 6) * v / s["n"]
@@ -89,10 +89,11 @@ def bars_big(rows, bw: bool = False) -> str:
                          f'fill="{TEXT_BW[o] if bw else "#000"}">{v}</text>')
             xx += w_
     lx, ly = 20, len(rows) * (bh + gap) + 44
-    for o in OC:
+    present = [o for o in OC if any(s["outcomes"].get(o) for _, s in rows)]
+    for o in present:
         p.append(f'<rect x="{lx}" y="{ly - 22}" width="24" height="24" fill="{oc[o]}" stroke="#000" stroke-width="1"/>'
-                 f'<text x="{lx + 32}" y="{ly}" font-size="28">{ON[o]}</text>')
-        lx += 60 + len(ON[o]) * 14
+                 f'<text x="{lx + 32}" y="{ly}" font-size="26">{ON[o]}</text>')
+        lx += 52 + len(ON[o]) * 13
     p.append("</svg>")
     return "".join(p)
 
@@ -174,7 +175,7 @@ def render(html_by_name: dict[str, tuple[str, int]]):
 def main():
     FIG.mkdir(exist_ok=True)
     c = httpx.Client(base_url=API, timeout=60)
-    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3, 4, 5, 6)}
+    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3, 4, 5, 6, 7, 8)}
     m1 = exps[1]["summary"]["models"]["baseline:rule-based"]
     m2 = exps[2]["summary"]["models"]["baseline:rule-based"]
     e3 = exps[3]
@@ -194,6 +195,12 @@ def main():
                  ("Базовая, MySQL", exps[5]["summary"]["models"]["baseline:rule-based"]),
                  ("Qwen, PostgreSQL", exps[6]["summary"]["models"][llm]),
                  ("Базовая, PostgreSQL", exps[6]["summary"]["models"]["baseline:rule-based"])]
+    CMP = [("gigachat:GigaChat-2", "GigaChat-2"), ("gigachat:GigaChat-2-Pro", "GigaChat-2-Pro"),
+           ("gigachat:GigaChat-2-Max", "GigaChat-2-Max"), (llm, "Qwen2.5-Coder-7B"), ("baseline:rule-based", "Базовая линия")]
+
+    def cmp_rows(e):
+        return [(name, exps[e]["summary"]["models"][mid]) for mid, name in CMP]
+
     render({
         "fig_pipeline": (page(pipeline_svg(), 1000), 1000),
         "fig_baseline": (page(bars_big([("MySQL 8.4", m1), ("PostgreSQL 16", m2)]), 1000), 1000),
@@ -202,6 +209,8 @@ def main():
         "fig_divergent": (page(speed_big(neg), 1000), 1000),
         "fig_full": (page(bars_big(full_rows), 1000), 1000),
         "fig_full_bw": (page(bars_big(full_rows, bw=True), 1000), 1000),
+        "fig_models_mysql": (page(bars_big(cmp_rows(7)), 1000), 1000),
+        "fig_models_pg": (page(bars_big(cmp_rows(8)), 1000), 1000),
     })
     for name in ("screen_experiment.png", "screen_dashboard.png"):
         shutil.copy(HERE.parent / "konkurs" / "attachments" / name, FIG / name)
