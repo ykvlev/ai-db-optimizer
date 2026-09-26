@@ -12,6 +12,7 @@ import httpx
 
 API = "http://127.0.0.1:8000"
 QWEN = "ollama:qwen2.5-coder:7b"
+GIGA = ["gigachat:GigaChat-2", "gigachat:GigaChat-2-Pro", "gigachat:GigaChat-2-Max"]
 
 QUEUE = [
     ("Абляция: план выполнения в контексте (с планом / без плана), MySQL", "shop-bench-mini-v1", "mysql",
@@ -20,6 +21,10 @@ QUEUE = [
      [QWEN, "baseline:rule-based"]),
     ("Полный прогон shop-bench-v1: qwen2.5-coder:7b vs базовая линия, PostgreSQL", "shop-bench-v1", "postgres",
      [QWEN, "baseline:rule-based"]),
+    ("Сравнение моделей shop-bench-v1: GigaChat-2 / Pro / Max, Qwen, базовая линия, MySQL", "shop-bench-v1", "mysql",
+     [*GIGA, QWEN, "baseline:rule-based"]),
+    ("Сравнение моделей shop-bench-v1: GigaChat-2 / Pro / Max, Qwen, базовая линия, PostgreSQL", "shop-bench-v1",
+     "postgres", [*GIGA, QWEN, "baseline:rule-based"]),
 ]
 
 
@@ -77,6 +82,9 @@ def main():
                   f"за {(time.time() - t0) / 60:.0f} мин {m['error'] or ''}", flush=True)
     finally:
         keep_awake(False)
+        import subprocess
+        for container in CONTAINERS.values():  # после очереди обе СУБД снова доступны
+            subprocess.run(["docker", "start", container], capture_output=True)
     print("очередь завершена", flush=True)
 
 

@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Если вы используете программу или датасет, пожалуйста, сошлитесь на них так."
+title: "AI Database Optimizer и SQL Optimization Dataset"
+type: software
+authors:
+  - family-names: "Яковлев"
+    given-names: "Артём"
+    affiliation: "Политехнический колледж Новгородского государственного университета имени Ярослава Мудрого"
+repository-code: "https://github.com/ykvlev/ai-db-optimizer"
+license: MIT
+version: "1.0.0"
+date-released: "2026-09-26"
+keywords:
+  - SQL query optimization
+  - large language models
+  - execution plan
+  - query equivalence
+  - benchmark
+  - MySQL
+  - PostgreSQL
+  - dataset
+abstract: >-
+  Система анализа и оптимизации SQL-запросов для MySQL и PostgreSQL, в которой рекомендации
+  языковой модели принимаются только после проверки безопасности, соответствия схеме,
+  эквивалентности результата и бенчмарка, а также открытый датасет измеренных результатов
+  оптимизации (каталог dataset/, лицензия CC BY 4.0).
