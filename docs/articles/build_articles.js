@@ -44,15 +44,18 @@ function figure(file, caption, widthCm) {
   ]
 }
 const border = { style: BorderStyle.SINGLE, size: 4, color: '000000' }
-function table(caption, headers, rows, widths) {
+function table(caption, headers, rows, widths, title = null) {
   const cell = (t, w, center, keep) => new TableCell({
     width: { size: w, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
     borders: { top: border, bottom: border, left: border, right: border }, margins: { top: 30, bottom: 30, left: 80, right: 80 },
     children: [new Paragraph({ children: [run(String(t), { size: 24 })], keepNext: keep, spacing: { line: 240 },
       alignment: center ? AlignmentType.CENTER : AlignmentType.LEFT })],
   })
+  const head = title
+    ? [r(caption, { keepNext: true, before: 120 }), c(title, { bold: true, keepNext: true })]
+    : [p(caption, { noIndent: true, align: AlignmentType.LEFT, keepNext: true, before: 120 })]
   return [
-    p(caption, { noIndent: true, align: AlignmentType.LEFT, keepNext: true, before: 120 }),
+    ...head,
     new Table({
       width: { size: widths.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED,
       rows: [headers, ...rows].map((row, ri) => new TableRow({ cantSplit: true, tableHeader: ri === 0,
@@ -62,7 +65,7 @@ function table(caption, headers, rows, widths) {
   ]
 }
 const refs = list => [
-  p('Литература:', { noIndent: true, before: 120, keepNext: true }),
+  p('Литература:', { noIndent: true, before: 240, keepNext: true }),
   ...list.map((t, i) => p(`${i + 1}. ${t}`)),
 ]
 
@@ -85,16 +88,13 @@ const SUP = 'Научный руководитель: ________________________'
 
 // ================================================================== статья
 const article = [
-  p('УДК 004.65:004.8', { noIndent: true, align: AlignmentType.LEFT }),
-  p('', { noIndent: true }),
   c('Применение больших языковых моделей для оптимизации SQL-запросов с автоматической проверкой рекомендаций', { bold: true }),
+  c(AUTHOR),
+  c(ORG),
+  c(SUP),
   p('', { noIndent: true }),
-  r(AUTHOR, { italics: true }),
-  r(ORG, { italics: true }),
-  r(SUP, { italics: true }),
-  p('', { noIndent: true }),
-  p('В статье рассматривается применение больших языковых моделей для переписывания SQL-запросов с целью ускорения их выполнения. Предложен конвейер, в котором рекомендация модели принимается только после проверки безопасности, соответствия схеме базы данных, совпадения результата и замера времени выполнения. На наборе из 40 запросов к базам данных MySQL и PostgreSQL локальная модель Qwen2.5-Coder-7B сопоставлена с детерминированным переписывателем на основе правил. Модель улучшила 9 и 7 запросов против 8 и 9 у правил, ускорив в том числе запросы, для которых правила отсутствуют, а все её рекомендации, изменявшие результат, были отклонены автоматически.', { size: 24, line: 276 }),
-  p([run('Ключевые слова: ', { size: 24, italics: true }), run('оптимизация SQL-запросов, большие языковые модели, план выполнения, эквивалентность запросов, бенчмарк, MySQL, PostgreSQL.', { size: 24 })], { line: 276 }),
+  p('В статье рассматривается применение больших языковых моделей для переписывания SQL-запросов с целью ускорения их выполнения. Предложен конвейер, в котором рекомендация модели принимается только после проверки безопасности, соответствия схеме базы данных, совпадения результата и замера времени выполнения. На наборе из 40 запросов к базам данных MySQL и PostgreSQL локальная модель Qwen2.5-Coder-7B сопоставлена с детерминированным переписывателем на основе правил. Модель улучшила 9 и 7 запросов против 8 и 9 у правил, ускорив в том числе запросы, для которых правила отсутствуют, а все её рекомендации, изменявшие результат, были отклонены автоматически.', { italics: true }),
+  p([run('Ключевые слова: ', { bold: true, italics: true }), run('оптимизация SQL-запросов, большие языковые модели, план выполнения, эквивалентность запросов, бенчмарк, MySQL, PostgreSQL.', { italics: true })]),
   p('', { noIndent: true }),
 
   p('Производительность информационной системы во многом определяется скоростью выполнения её запросов к базе данных. Оптимизатор СУБД выбирает способ выполнения запроса на основе оценки стоимости альтернативных планов [1], однако не может исправить неудачную формулировку самого запроса. Классический пример – условие YEAR(created_at) = 2024: функция над колонкой не позволяет использовать индекс по этой колонке, и СУБД просматривает всю таблицу, хотя эквивалентное условие-диапазон читало бы только нужные строки [2].'),
@@ -108,14 +108,14 @@ const article = [
 
   p('Результаты', { bold: true, keepNext: true, before: 120 }),
   p('Результаты сравнения на СУБД MySQL 8.4 и PostgreSQL 16 приведены в таблице 1 и на рисунке 1.'),
-  ...table('Таблица 1. Результаты на наборе из 40 запросов', ['Показатель', 'Модель, MySQL', 'Правила, MySQL', 'Модель, PostgreSQL', 'Правила, PostgreSQL'], [
+  ...table('Таблица 1', ['Показатель', 'Модель, MySQL', 'Правила, MySQL', 'Модель, PostgreSQL', 'Правила, PostgreSQL'], [
     ['Улучшено', L5.outcomes.improved, B5.outcomes.improved, L6.outcomes.improved, B6.outcomes.improved],
     ['Без изменений', L5.outcomes.unchanged, B5.outcomes.unchanged, L6.outcomes.unchanged, B6.outcomes.unchanged],
     ['Ухудшено', L5.outcomes.worse, B5.outcomes.worse, L6.outcomes.worse, B6.outcomes.worse],
     ['Отклонено (ошибка)', L5.outcomes.invalid, B5.outcomes.invalid, L6.outcomes.invalid, B6.outcomes.invalid],
     ['Геометрическое среднее ускорения', x(L5.geomean_speedup), x(B5.geomean_speedup), x(L6.geomean_speedup), x(B6.geomean_speedup)],
-  ], [2650, 1500, 1500, 1500, 1500]),
-  ...figure('fig_full.png', 'Рис. 1. Исходы рекомендаций модели и правил на MySQL и PostgreSQL', 15),
+  ], [2360, 1500, 1500, 1500, 1500], 'Результаты модели и правил на наборе из 40 запросов'),
+  ...figure('fig_full_bw.png', 'Рис. 1. Исходы рекомендаций модели и правил на MySQL и PostgreSQL', 15),
   p(`По числу улучшенных запросов модель и правила оказались сопоставимы, но улучшали разные запросы. Наибольший эффект – ускорение до ${x(L5.max_speedup)} у модели и до ${x(B5.max_speedup)} у правил – получен на запросах с функциями над датами, которые исправляют оба участника. Только модель ускорила запросы с DISTINCT при соединении и с условием OR по разным колонкам: например, условие по двум колонкам она заменила объединением двух запросов через UNION, каждый из которых использует свой индекс (ускорение около 1,4 раза). Правила, в свою очередь, стабильнее исправляли условия с функцией YEAR. Запросы контрольной группы не изменил ни один участник.`),
   p(`Модель допустила ошибки нескольких типов, и все они были обнаружены автоматически. В одном случае модель удалила из запроса ключевое слово DISTINCT, и результат вырос с ${n0(D.distinct.eq.rows_original)} до ${n0(D.distinct.eq.rows_optimized)} строк за счёт повторов; в другом – заменила коррелированный подзапрос соединением, потеряв условие отбора клиентов. Оба варианта сопровождались уверенным пояснением и были отклонены проверкой эквивалентности. Встречалась и «имитация оптимизации»: модель переставила условия в WHERE, не устранив функцию над колонкой. Наконец, формально корректное преобразование условия с датой в аналитическом запросе с тремя соединениями замедлило его на PostgreSQL примерно вдвое – и у модели, и у правил, поскольку оптимизатор выбрал для нового условия менее удачный порядок соединения.`),
   p(`Дополнительно проверено, нужен ли модели план выполнения. Без плана в контексте модель улучшила столько же запросов из 16 (${A2.outcomes.improved} против ${A1.outcomes.improved}), работая на ${fx((1 - A2.avg_latency_ms / A1.avg_latency_ms) * 100, 0)} % быстрее, но единственное ухудшение в этом опыте допустил именно вариант без плана. Среднее время ответа модели на процессоре составило около ${fx(L5.avg_latency_ms / 60000, 0)} минут на запрос.`),
@@ -123,12 +123,6 @@ const article = [
   p('Выводы', { bold: true, keepNext: true, before: 120 }),
   p('Даже небольшая локальная языковая модель находит преобразования, которых нет в наборе правил, и по числу улучшений сопоставима с ним. Однако рекомендации модели нельзя применять без проверки: часть из них меняет результат запроса, а часть, будучи корректной, замедляет его. Кроме того, эффект одного и того же преобразования зависит от СУБД и плана выполнения. Поэтому решение о принятии рекомендации должно приниматься по результатам измерений, а наиболее перспективным представляется совместное использование правил и модели с общей системой проверки. Исходный код комплекса и данные экспериментов опубликованы в открытом доступе [7].'),
   ...refs([REF.selinger, REF.winand, REF.bird, REF.llmr2, REF.genrewrite, REF.halluc, REF.repo, REF.cosette, REF.qwen]),
-  p('', { noIndent: true }),
-  c('Large language models for SQL query optimization with automatic verification of recommendations', { bold: true }),
-  c('Yakovlev Artyom Sergeyevich, student', { italics: true }),
-  c('Polytechnic College of Yaroslav-the-Wise Novgorod State University (Veliky Novgorod, Russia)', { italics: true }),
-  p('The paper studies large language models for rewriting SQL queries to speed them up. A pipeline is proposed in which a model recommendation is accepted only after safety, schema, result-equivalence and benchmark checks. On 40 queries for MySQL and PostgreSQL, the local model Qwen2.5-Coder-7B is compared with a rule-based rewriter. The model improved 9 and 7 queries versus 8 and 9 for the rules, including queries no rule covers, while all of its result-changing recommendations were rejected automatically.', { size: 24, line: 276 }),
-  p([run('Keywords: ', { size: 24, italics: true }), run('SQL query optimization, large language models, execution plan, query equivalence, benchmark, MySQL, PostgreSQL.', { size: 24 })], { line: 276 }),
 ]
 
 // ================================================================== тезисы
@@ -148,13 +142,32 @@ const theses = [
   ...refs([REF.winand, REF.genrewrite, REF.halluc, REF.repo]),
 ]
 
-function save(children, file) {
+const MARGINS = { top: 1134, bottom: 1134, left: 1134, right: 1134 }
+const MOLUCH = { top: 1134, bottom: 1134, left: 1701, right: 850 } // 2 / 2 / 3 / 1,5 см
+function save(children, file, margin = MARGINS) {
   const doc = new Document({
     creator: 'А. С. Яковлев',
     styles: { default: { document: { run: { font: FONT, size: 28 }, paragraph: { spacing: { line: 360 } } } } },
     sections: [{ properties: { page: { size: { width: 11906, height: 16838 },
-      margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } } }, children }],
+      margin } }, children }],
   })
   return Packer.toBuffer(doc).then(b => { fs.writeFileSync(path.join(HERE, file), b); console.log(file) })
 }
-save(article, 'Статья_Молодой_ученый.docx').then(() => save(theses, 'Тезисы.docx'))
+// сведения об авторе для редакции «Молодого учёного»; пустые поля заполняет автор
+const info = [
+  c('Сведения об авторе', { bold: true, after: 240 }),
+  ...[
+    ['Название статьи', 'Применение больших языковых моделей для оптимизации SQL-запросов с автоматической проверкой рекомендаций'],
+    ['Фамилия, имя, отчество', 'Яковлев Артём Сергеевич'],
+    ['Учёная степень, звание', 'нет'],
+    ['Статус', 'студент'],
+    ['Место учёбы', 'Политехнический колледж ФГБОУ ВО «Новгородский государственный университет имени Ярослава Мудрого», г. Великий Новгород'],
+    ['Адрес электронной почты', process.env.AUTHOR_EMAIL || '________________'],
+    ['Научный руководитель', '________________ (ФИО, должность)'],
+    ['Печатный экземпляр', '________________ (нужен ли, количество)'],
+    ['Почтовый адрес с индексом', '________________'],
+    ['Предпочтительный раздел журнала', 'Информационные технологии'],
+  ].map(([k, v]) => p([run(`${k}: `, { bold: true }), run(v)], { noIndent: true, align: AlignmentType.LEFT })),
+]
+save(article, 'Статья_Молодой_ученый.docx', MOLUCH).then(() => save(theses, 'Тезисы.docx'))
+  .then(() => save(info, 'Сведения_об_авторе.docx', MOLUCH))

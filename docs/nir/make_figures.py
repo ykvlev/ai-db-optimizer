@@ -63,8 +63,14 @@ OC = {"improved": "#2e9d57", "unchanged": "#a3acb8", "worse": "#e08a2b", "invali
 ON = {"improved": "Улучшено", "unchanged": "Без изменений", "worse": "Ухудшено", "invalid": "Некорректно"}
 
 
-def bars_big(rows) -> str:
+# для чёрно-белой печати (журналы): оттенки серого с разной светлотой, цифры контрастным цветом
+OC_BW = {"improved": "#3a3a3a", "unchanged": "#e6e6e6", "worse": "#9a9a9a", "invalid": "#000000"}
+TEXT_BW = {"improved": "#fff", "unchanged": "#000", "worse": "#000", "invalid": "#fff"}
+
+
+def bars_big(rows, bw: bool = False) -> str:
     """Диаграмма исходов для печати: крупный шрифт при ширине рисунка 15–16 см."""
+    oc = OC_BW if bw else OC
     w, bh, gap, left = 1000, 64, 26, 300
     h = len(rows) * (bh + gap) + 70
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" font-family="Times New Roman">']
@@ -76,14 +82,15 @@ def bars_big(rows) -> str:
             v = s["outcomes"][o]
             if not v:
                 continue
-            bw = (w - left - 6) * v / s["n"]
-            p.append(f'<rect x="{xx:.1f}" y="{y}" width="{bw:.1f}" height="{bh}" fill="{OC[o]}" stroke="#000" stroke-width="1"/>')
-            if bw > 34:
-                p.append(f'<text x="{xx + bw / 2:.1f}" y="{y + bh * 0.68}" text-anchor="middle" font-size="32" fill="#000">{v}</text>')
-            xx += bw
+            w_ = (w - left - 6) * v / s["n"]
+            p.append(f'<rect x="{xx:.1f}" y="{y}" width="{w_:.1f}" height="{bh}" fill="{oc[o]}" stroke="#000" stroke-width="1"/>')
+            if w_ > 34:
+                p.append(f'<text x="{xx + w_ / 2:.1f}" y="{y + bh * 0.68}" text-anchor="middle" font-size="32" '
+                         f'fill="{TEXT_BW[o] if bw else "#000"}">{v}</text>')
+            xx += w_
     lx, ly = 20, len(rows) * (bh + gap) + 44
     for o in OC:
-        p.append(f'<rect x="{lx}" y="{ly - 22}" width="24" height="24" fill="{OC[o]}" stroke="#000" stroke-width="1"/>'
+        p.append(f'<rect x="{lx}" y="{ly - 22}" width="24" height="24" fill="{oc[o]}" stroke="#000" stroke-width="1"/>'
                  f'<text x="{lx + 32}" y="{ly}" font-size="28">{ON[o]}</text>')
         lx += 60 + len(ON[o]) * 14
     p.append("</svg>")
@@ -183,16 +190,18 @@ def main():
            ("Отчёт с JOIN, PostgreSQL", sp(exps[2], "report-1"))]
     per_q = [(r["title"], r["speedup"]) for r in e3["results"] if r["model"] == llm and r["equivalent"] and r["speedup"]]
 
+    full_rows = [("Qwen, MySQL", exps[5]["summary"]["models"][llm]),
+                 ("Базовая, MySQL", exps[5]["summary"]["models"]["baseline:rule-based"]),
+                 ("Qwen, PostgreSQL", exps[6]["summary"]["models"][llm]),
+                 ("Базовая, PostgreSQL", exps[6]["summary"]["models"]["baseline:rule-based"])]
     render({
         "fig_pipeline": (page(pipeline_svg(), 1000), 1000),
         "fig_baseline": (page(bars_big([("MySQL 8.4", m1), ("PostgreSQL 16", m2)]), 1000), 1000),
         "fig_llm": (page(bars_big([("Qwen2.5-Coder-7B", l3), ("Базовая линия", b3)]), 1000), 1000),
         "fig_speedup_llm": (page(speed_big(per_q), 1000), 1000),
         "fig_divergent": (page(speed_big(neg), 1000), 1000),
-        "fig_full": (page(bars_big([("Qwen, MySQL", exps[5]["summary"]["models"][llm]),
-                                    ("Базовая, MySQL", exps[5]["summary"]["models"]["baseline:rule-based"]),
-                                    ("Qwen, PostgreSQL", exps[6]["summary"]["models"][llm]),
-                                    ("Базовая, PostgreSQL", exps[6]["summary"]["models"]["baseline:rule-based"])]), 1000), 1000),
+        "fig_full": (page(bars_big(full_rows), 1000), 1000),
+        "fig_full_bw": (page(bars_big(full_rows, bw=True), 1000), 1000),
     })
     for name in ("screen_experiment.png", "screen_dashboard.png"):
         shutil.copy(HERE.parent / "konkurs" / "attachments" / name, FIG / name)
