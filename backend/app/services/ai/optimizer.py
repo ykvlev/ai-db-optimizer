@@ -26,6 +26,8 @@ class PromptTemplate:
     system: str
     user: str
     sha256: str
+    exclude_context: tuple[str, ...] = ()  # ключи контекста, которые не передаются модели (абляция)
+    exclude_issue_sources: tuple[str, ...] = ()  # источники найденных проблем, которые скрываются (rule/plan)
 
 
 @lru_cache
@@ -35,7 +37,9 @@ def load_prompt(prompt_id: str = DEFAULT_PROMPT) -> PromptTemplate:
     raw = (PROMPTS_DIR / f"{prompt_id}.json").read_text(encoding="utf-8")
     data = json.loads(raw)
     return PromptTemplate(id=data["id"], system=data["system"], user=data["user"],
-                          sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest())
+                          sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                          exclude_context=tuple(data.get("exclude_context", ())),
+                          exclude_issue_sources=tuple(data.get("exclude_issue_sources", ())))
 
 
 def list_prompts() -> list[str]:
@@ -70,7 +74,8 @@ def build_context(sql: str, dialect: Dialect, version: str | None, schema: Schem
         "execution_plan": {"total_cost": plan.total_cost, "tree": _compact_plan(plan.root),
                            "uses_filesort": plan.uses_filesort, "uses_temporary": plan.uses_temporary}
         if plan else None,
-        "detected_issues": [{"code": i.code, "severity": i.severity, "title": i.title, "fragment": i.fragment}
+        "detected_issues": [{"code": i.code, "severity": i.severity, "title": i.title, "fragment": i.fragment,
+                             "source": i.source}
                             for i in issues if i.code != "RULE_ERROR"],
         "constraints": {"must_preserve_result": True, "read_only": True, "single_statement": True},
     }
@@ -100,6 +105,10 @@ class AIRunResult:
 
 def call_model(context: dict, model_id: str | None, prompt_id: str | None, temperature: float) -> AIRunResult:
     prompt = load_prompt(prompt_id or DEFAULT_PROMPT)
+    context = {k: v for k, v in context.items() if k not in prompt.exclude_context}
+    if prompt.exclude_issue_sources:
+        context["detected_issues"] = [i for i in context.get("detected_issues", [])
+                                      if i.get("source") not in prompt.exclude_issue_sources]
     system = prompt.system.replace("{dbms}", context["dbms"]).replace("{version}", str(context["version"]))
     user = prompt.user.replace("{context_json}", json.dumps(context, ensure_ascii=False, separators=(",", ":"), default=str))
     provider, model = get_registry().resolve(model_id)

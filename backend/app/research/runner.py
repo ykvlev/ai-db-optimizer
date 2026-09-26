@@ -39,6 +39,12 @@ def create(name: str, dataset_id: int, connection_id: int, models: list[str], pr
         return exp
 
 
+def split_variant(model: str, default_prompt: str) -> tuple[str, str]:
+    """«модель@промпт» — вариант участника эксперимента с другим промптом (для абляций)."""
+    base, _, prompt = model.partition("@")
+    return base, prompt or default_prompt
+
+
 def start(exp_id: int) -> None:
     t = threading.Thread(target=_run, args=(exp_id,), name=f"experiment-{exp_id}", daemon=True)
     _threads[exp_id] = t
@@ -94,8 +100,9 @@ def _run(exp_id: int) -> None:
                 if (qid, model) in done_pairs:
                     continue
                 _set(exp_id, current_item=f"{key} · {model}")
-                req = OptimizeRequest(sql=sql, dbms=dbms, connection_id=connection_id, model=model,
-                                      prompt_version=None if model == ai.BASELINE_MODEL else prompt_version,
+                base_model, variant_prompt = split_variant(model, prompt_version)
+                req = OptimizeRequest(sql=sql, dbms=dbms, connection_id=connection_id, model=base_model,
+                                      prompt_version=None if base_model == ai.BASELINE_MODEL else variant_prompt,
                                       runs=runs, warmup=warmup)
                 try:
                     resp = pipeline._optimize(req, conn, utcnow(), st)

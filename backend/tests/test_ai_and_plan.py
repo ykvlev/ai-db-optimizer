@@ -126,3 +126,34 @@ def test_optimize_offline_pipeline(tmp_path, monkeypatch):
     get_registry().register(FakeProvider("я не умею в json"))
     resp = pipeline.optimize(OptimizeRequest(sql="SELECT id FROM orders", dbms="mysql", model="fake:m1"))
     assert resp.verdict == "rejected" and [e.value for e in resp.error_types] == ["INVALID_RESPONSE"]
+
+
+class CapturingProvider(LLMProvider):
+    name = "cap"
+    models = ["m"]
+    seen: list[str] = []
+
+    def complete(self, model, system, user, temperature):
+        CapturingProvider.seen.append(system + "\n" + user)
+        return LLMResult(text='{"summary": "ok", "optimized_query": null}', provider="cap", model=model, latency_ms=1)
+
+
+def test_noplan_prompt_hides_plan_and_plan_issues():
+    from app.models import Issue
+    ctx = {"dbms": "mysql", "version": "8", "query": "SELECT 1", "schema": {}, "constraints": {},
+           "execution_plan": {"total_cost": 123456, "tree": {"type": "Full table scan"}},
+           "detected_issues": [{"code": "FULL_TABLE_SCAN", "source": "plan"}, {"code": "SELECT_STAR", "source": "rule"}]}
+    get_registry().register(CapturingProvider())
+    CapturingProvider.seen.clear()
+    ai.call_model(dict(ctx), "cap:m", "optimizer-v1", 0.1)
+    ai.call_model(dict(ctx), "cap:m", "optimizer-v1-noplan", 0.1)
+    with_plan, no_plan = CapturingProvider.seen
+    assert "123456" in with_plan and "FULL_TABLE_SCAN" in with_plan
+    assert "123456" not in no_plan and "execution_plan" not in no_plan and "FULL_TABLE_SCAN" not in no_plan
+    assert "SELECT_STAR" in no_plan
+
+
+def test_split_variant():
+    from app.research.runner import split_variant
+    assert split_variant("ollama:qwen:7b@optimizer-v1-noplan", "optimizer-v1") == ("ollama:qwen:7b", "optimizer-v1-noplan")
+    assert split_variant("ollama:qwen:7b", "optimizer-v1") == ("ollama:qwen:7b", "optimizer-v1")

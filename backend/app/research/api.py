@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from app.db import Dataset, DatasetQuery, Experiment, ExperimentResult, SessionLocal
 from app.research import datasets as builtin, report, runner, stats
 from app.services import safety
-from app.services.ai.optimizer import BASELINE_MODEL
+from app.services.ai.optimizer import BASELINE_MODEL, list_prompts
 from app.services.ai.providers import get_registry
 
 router = APIRouter(prefix="/api")
@@ -152,7 +152,11 @@ def list_experiments():
 @router.post("/experiments")
 def create_experiment(body: ExperimentIn):
     available = set(get_registry().model_ids()) | {BASELINE_MODEL}
-    unknown = [m for m in body.models if m not in available]
+    unknown = [m for m in body.models if m.partition("@")[0] not in available]
+    prompts = set(list_prompts())
+    bad_prompts = [m for m in body.models if m.partition("@")[2] and m.partition("@")[2] not in prompts]
+    if bad_prompts:
+        raise HTTPException(400, f"Неизвестные версии промпта: {', '.join(bad_prompts)}")
     if unknown:
         raise HTTPException(400, f"Модели не настроены: {', '.join(unknown)}")
     try:
