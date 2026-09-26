@@ -1,0 +1,450 @@
+﻿query_set,dbms,query_key,category,title,sql
+shop-bench-mini-v1,mysql,big_offset-1,big_offset,"Страница заказов, OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+shop-bench-mini-v1,mysql,control-1,control,Заказ по первичному ключу,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242"
+shop-bench-mini-v1,mysql,correlated_exists-1,correlated_exists,"Клиенты с крупными заказами, Казань","SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id"
+shop-bench-mini-v1,mysql,correlated_select-1,correlated_select,"Статистика клиентов, Томск","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+shop-bench-mini-v1,mysql,count_distinct_subquery-1,count_distinct_subquery,Число клиентов с оплаченными заказами,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t"
+shop-bench-mini-v1,mysql,date_function-1,date_function,Заказы за 2025-03-15,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id"
+shop-bench-mini-v1,mysql,distinct_join-1,distinct_join,"Активные клиенты с 2026-01-01, Казань","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+shop-bench-mini-v1,mysql,in_subquery_agg-1,in_subquery_agg,Товары с продажами > 1900 шт.,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id"
+shop-bench-mini-v1,mysql,leading_like-1,leading_like,Поиск по окончанию email «%123@example.org»,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id"
+shop-bench-mini-v1,mysql,max_per_group-1,max_per_group,Крупнейший заказ клиентов 1–1500,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id"
+shop-bench-mini-v1,mysql,not_in-1,not_in,Клиенты без заказов «cancelled»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100"
+shop-bench-mini-v1,mysql,or_columns-1,or_columns,Поиск клиента по email или телефону (500),"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'"
+shop-bench-mini-v1,mysql,report-1,report,"Отчёт по категориям, refunded 2025","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC"
+shop-bench-mini-v1,mysql,type_mismatch-1,type_mismatch,Поиск заказа по id-строке,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'"
+shop-bench-mini-v1,mysql,year_aggregate-1,year_aggregate,Выручка по статусам за 2021,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status"
+shop-bench-mini-v1,mysql,year_function-1,year_function,Последние заказы «paid» за 2024,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,mysql,big_offset-1,big_offset,"Страница заказов, OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+shop-bench-v1,mysql,big_offset-2,big_offset,"Страница заказов, OFFSET 250000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000"
+shop-bench-v1,mysql,big_offset-3,big_offset,"Страница заказов, OFFSET 450000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000"
+shop-bench-v1,mysql,control-1,control,Заказ по первичному ключу,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242"
+shop-bench-v1,mysql,control-2,control,Заказы клиента,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at"
+shop-bench-v1,mysql,control-3,control,Диапазон дат с LIMIT,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100"
+shop-bench-v1,mysql,control-4,control,Позиции заказа с товарами,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id"
+shop-bench-v1,mysql,correlated_exists-1,correlated_exists,"Клиенты с крупными заказами, Казань","SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id"
+shop-bench-v1,mysql,correlated_exists-2,correlated_exists,"Клиенты с крупными заказами, Новосибирск","SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id"
+shop-bench-v1,mysql,correlated_select-1,correlated_select,"Статистика клиентов, Томск","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+shop-bench-v1,mysql,correlated_select-2,correlated_select,"Статистика клиентов, Иркутск","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id"
+shop-bench-v1,mysql,correlated_select-3,correlated_select,"Статистика клиентов, Самара","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id"
+shop-bench-v1,mysql,count_distinct_subquery-1,count_distinct_subquery,Число клиентов с оплаченными заказами,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t"
+shop-bench-v1,mysql,date_function-1,date_function,Заказы за 2025-03-15,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id"
+shop-bench-v1,mysql,date_function-2,date_function,Заказы за 2023-11-02,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id"
+shop-bench-v1,mysql,date_function-3,date_function,Заказы за 2021-07-19,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id"
+shop-bench-v1,mysql,date_function-4,date_function,Заказы за 2026-01-05,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id"
+shop-bench-v1,mysql,distinct_join-1,distinct_join,"Активные клиенты с 2026-01-01, Казань","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+shop-bench-v1,mysql,distinct_join-2,distinct_join,"Активные клиенты с 2025-06-01, Томск","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id"
+shop-bench-v1,mysql,distinct_join-3,distinct_join,"Активные клиенты с 2025-12-01, Самара","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+shop-bench-v1,mysql,in_subquery_agg-1,in_subquery_agg,Товары с продажами > 1900 шт.,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id"
+shop-bench-v1,mysql,in_subquery_agg-2,in_subquery_agg,Товары с продажами > 1950 шт.,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id"
+shop-bench-v1,mysql,leading_like-1,leading_like,Поиск по окончанию email «%123@example.org»,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id"
+shop-bench-v1,mysql,leading_like-2,leading_like,Поиск по окончанию email «%496@mail.ru»,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id"
+shop-bench-v1,mysql,max_per_group-1,max_per_group,Крупнейший заказ клиентов 1–1500,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id"
+shop-bench-v1,mysql,max_per_group-2,max_per_group,Крупнейший заказ клиентов 50001–51500,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id"
+shop-bench-v1,mysql,not_in-1,not_in,Клиенты без заказов «cancelled»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,mysql,not_in-2,not_in,Клиенты без заказов «refunded»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,mysql,not_in-3,not_in,Клиенты без заказов «new»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,mysql,or_columns-1,or_columns,Поиск клиента по email или телефону (500),"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'"
+shop-bench-v1,mysql,or_columns-2,or_columns,Поиск клиента по email или телефону (77777),"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'"
+shop-bench-v1,mysql,report-1,report,"Отчёт по категориям, refunded 2025","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC"
+shop-bench-v1,mysql,report-2,report,"Отчёт по категориям, cancelled 2023","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC"
+shop-bench-v1,mysql,type_mismatch-1,type_mismatch,Поиск заказа по id-строке,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'"
+shop-bench-v1,mysql,type_mismatch-2,type_mismatch,Поиск по телефону числом,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345"
+shop-bench-v1,mysql,year_aggregate-1,year_aggregate,Выручка по статусам за 2021,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status"
+shop-bench-v1,mysql,year_aggregate-2,year_aggregate,Выручка по статусам за 2025,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status"
+shop-bench-v1,mysql,year_function-1,year_function,Последние заказы «paid» за 2024,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,mysql,year_function-2,year_function,Последние заказы «delivered» за 2022,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,mysql,year_function-3,year_function,Последние заказы «cancelled» за 2025,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,postgres,big_offset-1,big_offset,"Страница заказов, OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+shop-bench-v1,postgres,big_offset-2,big_offset,"Страница заказов, OFFSET 250000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000"
+shop-bench-v1,postgres,big_offset-3,big_offset,"Страница заказов, OFFSET 450000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000"
+shop-bench-v1,postgres,control-1,control,Заказ по первичному ключу,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242"
+shop-bench-v1,postgres,control-2,control,Заказы клиента,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at"
+shop-bench-v1,postgres,control-3,control,Диапазон дат с LIMIT,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100"
+shop-bench-v1,postgres,control-4,control,Позиции заказа с товарами,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id"
+shop-bench-v1,postgres,correlated_exists-1,correlated_exists,"Клиенты с крупными заказами, Казань","SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id"
+shop-bench-v1,postgres,correlated_exists-2,correlated_exists,"Клиенты с крупными заказами, Новосибирск","SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id"
+shop-bench-v1,postgres,correlated_select-1,correlated_select,"Статистика клиентов, Томск","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+shop-bench-v1,postgres,correlated_select-2,correlated_select,"Статистика клиентов, Иркутск","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id"
+shop-bench-v1,postgres,correlated_select-3,correlated_select,"Статистика клиентов, Самара","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id"
+shop-bench-v1,postgres,count_distinct_subquery-1,count_distinct_subquery,Число клиентов с оплаченными заказами,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t"
+shop-bench-v1,postgres,date_function-1,date_function,Заказы за 2025-03-15,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id"
+shop-bench-v1,postgres,date_function-2,date_function,Заказы за 2023-11-02,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id"
+shop-bench-v1,postgres,date_function-3,date_function,Заказы за 2021-07-19,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id"
+shop-bench-v1,postgres,date_function-4,date_function,Заказы за 2026-01-05,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id"
+shop-bench-v1,postgres,distinct_join-1,distinct_join,"Активные клиенты с 2026-01-01, Казань","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+shop-bench-v1,postgres,distinct_join-2,distinct_join,"Активные клиенты с 2025-06-01, Томск","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id"
+shop-bench-v1,postgres,distinct_join-3,distinct_join,"Активные клиенты с 2025-12-01, Самара","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+shop-bench-v1,postgres,in_subquery_agg-1,in_subquery_agg,Товары с продажами > 1900 шт.,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id"
+shop-bench-v1,postgres,in_subquery_agg-2,in_subquery_agg,Товары с продажами > 1950 шт.,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id"
+shop-bench-v1,postgres,leading_like-1,leading_like,Поиск по окончанию email «%123@example.org»,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id"
+shop-bench-v1,postgres,leading_like-2,leading_like,Поиск по окончанию email «%496@mail.ru»,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id"
+shop-bench-v1,postgres,max_per_group-1,max_per_group,Крупнейший заказ клиентов 1–1500,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id"
+shop-bench-v1,postgres,max_per_group-2,max_per_group,Крупнейший заказ клиентов 50001–51500,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id"
+shop-bench-v1,postgres,not_in-1,not_in,Клиенты без заказов «cancelled»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,postgres,not_in-2,not_in,Клиенты без заказов «refunded»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,postgres,not_in-3,not_in,Клиенты без заказов «new»,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100"
+shop-bench-v1,postgres,or_columns-1,or_columns,Поиск клиента по email или телефону (500),"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'"
+shop-bench-v1,postgres,or_columns-2,or_columns,Поиск клиента по email или телефону (77777),"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'"
+shop-bench-v1,postgres,report-1,report,"Отчёт по категориям, refunded 2025","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND EXTRACT(YEAR FROM o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC"
+shop-bench-v1,postgres,report-2,report,"Отчёт по категориям, cancelled 2023","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND EXTRACT(YEAR FROM o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC"
+shop-bench-v1,postgres,type_mismatch-1,type_mismatch,Поиск заказа по id-строке,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'"
+shop-bench-v1,postgres,type_mismatch-2,type_mismatch,Поиск по телефону с приведением,"SELECT id, name, phone
+FROM users
+WHERE CAST(phone AS TEXT) = '+79000012345'"
+shop-bench-v1,postgres,year_aggregate-1,year_aggregate,Выручка по статусам за 2021,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2021
+GROUP BY status
+ORDER BY status"
+shop-bench-v1,postgres,year_aggregate-2,year_aggregate,Выручка по статусам за 2025,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025
+GROUP BY status
+ORDER BY status"
+shop-bench-v1,postgres,year_function-1,year_function,Последние заказы «paid» за 2024,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,postgres,year_function-2,year_function,Последние заказы «delivered» за 2022,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50"
+shop-bench-v1,postgres,year_function-3,year_function,Последние заказы «cancelled» за 2025,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50"

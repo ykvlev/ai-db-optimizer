@@ -1,0 +1,13 @@
+{
+ "version": "1.0.0",
+ "records": 304,
+ "llm_records": 128,
+ "experiments": 6,
+ "queries": 96,
+ "outcomes": {
+  "improved": 59,
+  "worse": 17,
+  "unchanged": 225,
+  "invalid": 3
+ }
+}

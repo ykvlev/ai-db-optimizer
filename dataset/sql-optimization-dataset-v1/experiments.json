@@ -1,0 +1,138 @@
+[
+ {
+  "experiment_id": 1,
+  "name": "Базовая линия rule-based, mysql",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "baseline:rule-based"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 8192
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.1.0",
+  "started_at": "2026-09-26T10:26:52Z",
+  "finished_at": "2026-09-26T10:27:26Z"
+ },
+ {
+  "experiment_id": 2,
+  "name": "Базовая линия rule-based, postgres",
+  "dbms": "postgres",
+  "dbms_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "baseline:rule-based"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 8192
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.1.0",
+  "started_at": "2026-09-26T10:27:28Z",
+  "finished_at": "2026-09-26T10:27:48Z"
+ },
+ {
+  "experiment_id": 3,
+  "name": "qwen2.5-coder:7b vs базовая линия, MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-mini-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "ollama:qwen2.5-coder:7b",
+   "baseline:rule-based"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.1.0",
+  "started_at": "2026-09-26T11:50:44Z",
+  "finished_at": "2026-09-26T12:23:54Z"
+ },
+ {
+  "experiment_id": 4,
+  "name": "Абляция: план выполнения в контексте (с планом / без плана), MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-mini-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "ollama:qwen2.5-coder:7b",
+   "ollama:qwen2.5-coder:7b@optimizer-v1-noplan"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-26T14:38:47Z",
+  "finished_at": "2026-09-26T15:35:32Z"
+ },
+ {
+  "experiment_id": 5,
+  "name": "Полный прогон shop-bench-v1: qwen2.5-coder:7b vs базовая линия, MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "ollama:qwen2.5-coder:7b",
+   "baseline:rule-based"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-26T15:35:42Z",
+  "finished_at": "2026-09-26T16:57:50Z"
+ },
+ {
+  "experiment_id": 6,
+  "name": "Полный прогон shop-bench-v1: qwen2.5-coder:7b vs базовая линия, PostgreSQL",
+  "dbms": "postgres",
+  "dbms_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "ollama:qwen2.5-coder:7b",
+   "baseline:rule-based"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-26T16:58:13Z",
+  "finished_at": "2026-09-26T18:24:12Z"
+ }
+]

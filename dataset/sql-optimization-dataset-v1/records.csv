@@ -1,0 +1,2215 @@
+﻿record_id,experiment_id,dbms,dbms_version,query_set,query_key,category,participant,participant_type,prompt_version,outcome,verdict,proposed,executed,error_types,detected_issues,equivalence_status,rows_original,rows_candidate,speedup,time_before_ms,time_after_ms,plan_cost_original,plan_cost_candidate,latency_ms,prompt_tokens,completion_tokens,original_sql,candidate_sql
+e1-date_function-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,36.246,123.57440000050701,3.4093000012944685,50308.2,294.61,0.8,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2025-03-15' AND created_at < '2025-03-16'
+  )
+ORDER BY
+  id"
+e1-date_function-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,36.712,133.9730999989115,3.6492999988695374,50308.2,294.61,0.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2023-11-02' AND created_at < '2023-11-03'
+  )
+ORDER BY
+  id"
+e1-date_function-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,37.179,122.269999999844,3.2886999997572275,50308.2,296.06,2.5,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2021-07-19' AND created_at < '2021-07-20'
+  )
+ORDER BY
+  id"
+e1-date_function-4-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,33.591,124.9694999987696,3.720300001077703,50308.2,297.51,1.0,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2026-01-05' AND created_at < '2026-01-06'
+  )
+ORDER BY
+  id"
+e1-year_function-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,54.702,270.8536999998614,4.951399998390116,50308.2,50308.2,0.9,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2024-01-01' AND created_at < '2025-01-01'
+  )
+  AND status = 'paid'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e1-year_function-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,106.075,550.6462000012107,5.191099999137805,50308.2,50308.2,1.5,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2022-01-01' AND created_at < '2023-01-01'
+  )
+  AND status = 'delivered'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e1-year_function-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,21.093,111.01220000091416,5.262900000161608,50308.2,60509.96,0.7,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+  AND status = 'cancelled'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e1-year_aggregate-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.949,167.73859999921115,176.82629999944766,548980.2,205768.2,0.7,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2021-01-01' AND created_at < '2022-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e1-year_aggregate-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.845,166.97240000030433,197.49750000119093,548980.2,194975.96,1.2,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e1-correlated_select-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,0.9,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e1-correlated_select-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,0.5,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id",
+e1-correlated_select-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,0.5,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id",
+e1-correlated_exists-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,0.5,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e1-correlated_exists-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,0.4,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e1-not_in-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.3,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e1-not_in-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.4,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e1-not_in-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.3,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e1-distinct_join-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,0.3,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e1-distinct_join-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,0.8,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e1-distinct_join-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,0.4,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e1-or_columns-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,0.2,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e1-or_columns-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,0.2,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e1-type_mismatch-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,1.0,,0.2,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e1-type_mismatch-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10146.95,,0.2,,,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345",
+e1-big_offset-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,0.5,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e1-big_offset-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,0.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e1-big_offset-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,0.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e1-leading_like-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,0.2,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e1-leading_like-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,0.2,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e1-in_subquery_agg-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,210.0,,0.3,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e1-in_subquery_agg-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,210.0,,0.9,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e1-report-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,report-1,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.877,206.31409999987227,235.29000000053202,366687.41,145821.04,1.9,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'refunded'
+  AND (
+    o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e1-report-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,report-2,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,0.933,282.08880000056524,302.34999999993306,229642.72,107428.04,1.3,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'cancelled'
+  AND (
+    o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e1-count_distinct_subquery-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,0.3,,,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e1-max_per_group-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,1.7,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e1-max_per_group-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6208.46,,0.5,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e1-control-1-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,control-1,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,1.0,,0.2,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e1-control-2-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,control-2,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FILESORT,,,,,,,1.75,,0.2,,,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at",
+e1-control-3-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,control-3,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,92.06,,0.2,,,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e1-control-4-baseline:rule-based,1,mysql,8.4.11,shop-bench-v1,control-4,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,3.01,,0.4,,,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e2-date_function-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-1,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,15.575,87.76009999928647,5.634699999063741,8812.41,730.22,0.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2025-03-15' AND created_at < '2025-03-16'
+  )
+ORDER BY
+  id"
+e2-date_function-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-2,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,15.932,89.18979999907606,5.5982000012591016,8812.41,642.83,1.1,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2023-11-02' AND created_at < '2023-11-03'
+  )
+ORDER BY
+  id"
+e2-date_function-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-3,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,204,204,16.124,98.7438000011025,6.124100000306498,8812.41,720.96,0.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2021-07-19' AND created_at < '2021-07-20'
+  )
+ORDER BY
+  id"
+e2-date_function-4-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-4,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,205,205,19.124,94.00259999893024,4.9152999999932945,8812.41,711.61,0.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2026-01-05' AND created_at < '2026-01-06'
+  )
+ORDER BY
+  id"
+e2-year_function-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-1,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,11.53,55.704899999909685,4.831400001421571,2055.27,39.24,0.7,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2024-01-01' AND created_at < '2025-01-01'
+  )
+  AND status = 'paid'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e2-year_function-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-2,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,24.879,118.02399999942281,4.743899999084533,2365.54,45.56,0.7,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2022-01-01' AND created_at < '2023-01-01'
+  )
+  AND status = 'delivered'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e2-year_function-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-3,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,4.255,21.40549999967334,5.030300000726129,7200.69,140.02,0.7,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+  AND status = 'cancelled'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e2-year_aggregate-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-1,year_aggregate,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,equivalent,6,6,4.16,131.3138000004983,31.563799999275943,8581.33,7897.03,0.7,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2021-01-01' AND created_at < '2022-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e2-year_aggregate-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-2,year_aggregate,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,equivalent,6,6,4.603,125.89879999904952,27.350500000466127,8581.33,7788.16,0.7,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e2-correlated_select-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-1,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,290107.97,,0.8,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e2-correlated_select-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-2,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,296565.95,,0.5,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id",
+e2-correlated_select-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-3,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,293536.98,,0.7,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id",
+e2-correlated_exists-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-1,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10923.31,,0.4,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e2-correlated_exists-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-2,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10653.13,,0.4,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e2-not_in-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-1,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10775.3,,0.4,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e2-not_in-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-2,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10712.68,,0.4,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e2-not_in-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-3,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10771.59,,0.3,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e2-distinct_join-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-1,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,9753.05,,0.4,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e2-distinct_join-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-2,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,11650.4,,0.3,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e2-distinct_join-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-3,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10026.39,,0.3,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e2-or_columns-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-1,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,0.2,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e2-or_columns-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-2,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,0.2,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e2-type_mismatch-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-1,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,8.44,,0.2,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e2-type_mismatch-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-2,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN,,,,,,,2835.0,,0.2,,,"SELECT id, name, phone
+FROM users
+WHERE CAST(phone AS TEXT) = '+79000012345'",
+e2-big_offset-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-1,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,3479.32,,0.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e2-big_offset-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-2,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,8696.62,,0.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e2-big_offset-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-3,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,15653.02,,0.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e2-leading_like-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-1,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,2835.19,,0.2,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e2-leading_like-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-2,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD;FULL_TABLE_SCAN,,,,,,,2887.92,,0.2,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e2-in_subquery_agg-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-1,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,0.3,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e2-in_subquery_agg-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-2,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,0.3,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e2-report-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-1,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,6,6,0.518,101.09229999943636,195.1906999984203,9921.98,25710.29,1.5,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND EXTRACT(YEAR FROM o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'refunded'
+  AND (
+    o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e2-report-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-2,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN,equivalent,8,8,0.682,163.46640000119805,239.54159999993863,10770.98,30604.97,1.5,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND EXTRACT(YEAR FROM o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'cancelled'
+  AND (
+    o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e2-count_distinct_subquery-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,13078.17,,0.3,,,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e2-max_per_group-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-1,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,182569.17,,0.5,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e2-max_per_group-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-2,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,183432.25,,0.4,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e2-control-1-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-1,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,8.44,,0.2,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e2-control-2-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-2,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,24.09,,0.2,,,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at",
+e2-control-3-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-3,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,396.16,,0.2,,,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e2-control-4-baseline:rule-based,2,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-4,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,40.47,,0.3,,,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e3-date_function-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,date_function-1,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,35.574,122.45959999927436,3.442400000494672,50308.2,294.61,71686.3,1133,371,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15 00:00:00' AND created_at < '2025-03-16 00:00:00'
+ORDER BY id"
+e3-date_function-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,date_function-1,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,35.377,122.49829999927897,3.4626999986357987,50308.2,294.61,1.8,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2025-03-15' AND created_at < '2025-03-16'
+  )
+ORDER BY
+  id"
+e3-year_function-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,year_function-1,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,55.092,289.6903000000748,5.258299999695737,50308.2,50308.2,108328.1,1135,427,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2024-01-01 00:00:00' AND created_at < '2025-01-01 00:00:00' AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+e3-year_function-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,year_function-1,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,53.377,276.68919999996433,5.183700002817204,50308.2,50308.2,0.9,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2024-01-01' AND created_at < '2025-01-01'
+  )
+  AND status = 'paid'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e3-year_aggregate-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,year_aggregate-1,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,99791.9,1208,339,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status",
+e3-year_aggregate-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,year_aggregate-1,year_aggregate,baseline:rule-based,rule_based,none,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,1.025,200.93199999973876,196.11640000221087,548980.2,205768.2,2.4,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2021-01-01' AND created_at < '2022-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e3-correlated_select-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,correlated_select-1,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,142558.3,1344,411,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e3-correlated_select-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,correlated_select-1,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,0.7,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e3-correlated_exists-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,correlated_exists-1,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,151661.1,1388,417,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e3-correlated_exists-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,correlated_exists-1,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,17.4,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e3-not_in-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,not_in-1,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,137955.7,1430,356,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e3-not_in-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,not_in-1,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,3.1,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e3-distinct_join-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,distinct_join-1,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;TEMPORARY_TABLE,equivalent,5389,5389,1.191,290.0982999999542,243.564399999741,27579.96,27579.96,118417.1,1359,323,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e3-distinct_join-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,distinct_join-1,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,1.0,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e3-or_columns-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,or_columns-1,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.562,43.00839999996242,27.54079999795067,10146.95,,139446.9,1151,437,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru'
+UNION
+SELECT id, name, email, phone
+FROM users
+WHERE phone = '+79000000501'"
+e3-or_columns-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,or_columns-1,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,1.7,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e3-type_mismatch-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,type_mismatch-1,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,1.0,,68139.2,1035,207,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e3-type_mismatch-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,type_mismatch-1,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,1.0,,0.3,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e3-big_offset-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,big_offset-1,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,104681.2,1082,334,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+e3-big_offset-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,big_offset-1,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,0.3,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e3-leading_like-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,leading_like-1,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,91130.8,1059,282,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e3-leading_like-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,leading_like-1,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,1.5,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e3-in_subquery_agg-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,in_subquery_agg-1,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,202.5,,106322.8,1288,288,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e3-in_subquery_agg-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,in_subquery_agg-1,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,202.5,,1.7,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e3-report-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,report-1,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,217181.71,,205817.9,1697,522,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC",
+e3-report-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,report-1,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.809,240.54050000268035,297.43689999668277,217181.71,105507.1,6.6,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'refunded'
+  AND (
+    o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e3-count_distinct_subquery-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,count_distinct_subquery-1,count_distinct_subquery,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,133774.7,1181,377,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e3-count_distinct_subquery-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,count_distinct_subquery-1,count_distinct_subquery,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,1.5,,,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e3-max_per_group-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,max_per_group-1,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,different,1500,100000,0.03,135.3287999991153,4583.867099998315,6394.76,1179809.61,164064.9,1286,424,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT o.user_id, o.id, o.total
+FROM orders o
+JOIN (
+  SELECT user_id, MAX(total) AS max_total
+  FROM orders
+  GROUP BY user_id
+) AS max_orders ON o.user_id = max_orders.user_id AND o.total = max_orders.max_total
+ORDER BY o.user_id, o.id"
+e3-max_per_group-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,max_per_group-1,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,0.6,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e3-control-1-ollama:qwen2.5-coder:7b,3,mysql,8.4.11,shop-bench-mini-v1,control-1,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,72123.3,996,226,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e3-control-1-baseline:rule-based,3,mysql,8.4.11,shop-bench-mini-v1,control-1,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,1.0,,0.3,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e4-date_function-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,date_function-1,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,24.035,181.67019999964396,7.558500001323409,50308.2,294.61,174706.1,1141,371,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15 00:00:00' AND created_at < '2025-03-16 00:00:00'
+ORDER BY id"
+e4-date_function-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,date_function-1,date_function,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,36.254,131.44850000026054,3.625800000008894,50308.2,294.61,121790.4,969,257,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15 00:00:00' AND created_at < '2025-03-16 00:00:00'
+ORDER BY id"
+e4-year_function-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,year_function-1,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,0.991,295.55639999671257,298.1322999985423,50308.2,50308.2,163481.9,1143,407,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE status = 'paid' AND YEAR(created_at) = 2024
+ORDER BY created_at DESC
+LIMIT 50"
+e4-year_function-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,year_function-1,year_function,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,0.986,288.34269999788376,292.4474999999802,50308.2,50308.2,113699.2,1001,407,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE status = 'paid' AND YEAR(created_at) = 2024
+ORDER BY created_at DESC
+LIMIT 50"
+e4-year_aggregate-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,year_aggregate-1,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,123666.1,1228,349,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status",
+e4-year_aggregate-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,year_aggregate-1,year_aggregate,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,119811.6,999,384,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status"
+e4-correlated_select-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,correlated_select-1,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,146173.0,1356,429,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e4-correlated_select-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,correlated_select-1,correlated_select,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,120185.4,1228,374,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e4-correlated_exists-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,correlated_exists-1,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,150060.6,1400,433,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e4-correlated_exists-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,correlated_exists-1,correlated_exists,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,155666.4,1198,513,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e4-not_in-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,not_in-1,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,151401.1,1446,421,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100"
+e4-not_in-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,not_in-1,not_in,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,95190.6,1136,301,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e4-distinct_join-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,distinct_join-1,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;TEMPORARY_TABLE,equivalent,5389,5389,1.168,283.70319999885396,242.81250000058208,27579.96,27579.96,128645.8,1367,370,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e4-distinct_join-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,distinct_join-1,distinct_join,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,112458.3,1112,303,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e4-or_columns-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,or_columns-1,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,105092.6,1163,306,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e4-or_columns-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,or_columns-1,or_columns,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,87781.9,963,278,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e4-type_mismatch-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,type_mismatch-1,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,True,True,,TYPE_MISMATCH,equivalent,1,1,1.038,2.7553999971132725,2.6536999976087827,1.0,1.0,70309.2,1039,197,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total
+FROM orders
+WHERE id = 123457"
+e4-type_mismatch-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,type_mismatch-1,type_mismatch,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,TYPE_MISMATCH,equivalent,1,1,1.079,2.797400000417838,2.5924000001396053,1.0,1.0,68259.5,953,212,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total
+FROM orders
+WHERE id = 123457"
+e4-big_offset-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,big_offset-1,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,99124.3,1090,319,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+e4-big_offset-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,big_offset-1,big_offset,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,78161.1,947,277,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e4-leading_like-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,leading_like-1,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,82078.2,1063,268,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e4-leading_like-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,leading_like-1,leading_like,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,72657.0,933,261,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e4-in_subquery_agg-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,in_subquery_agg-1,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,202.5,,105233.2,1288,288,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e4-in_subquery_agg-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,in_subquery_agg-1,in_subquery_agg,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,,,,,,,,202.5,,90422.4,1060,291,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e4-report-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,report-1,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,276338.45,,161972.0,1721,388,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC",
+e4-report-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,report-1,report,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.837,221.3207999993756,264.3029999999271,276338.45,121458.61,146394.7,1326,450,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01 00:00:00' AND o.created_at < '2026-01-01 00:00:00'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e4-count_distinct_subquery-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,count_distinct_subquery-1,count_distinct_subquery,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,111300.0,1193,345,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e4-count_distinct_subquery-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,count_distinct_subquery-1,count_distinct_subquery,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,74888.1,938,261,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e4-max_per_group-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,max_per_group-1,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,108732.5,1298,325,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e4-max_per_group-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,max_per_group-1,max_per_group,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,104503.0,1067,342,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e4-control-1-ollama:qwen2.5-coder:7b,4,mysql,8.4.11,shop-bench-mini-v1,control-1,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,50484.1,996,116,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e4-control-1-ollama:qwen2.5-coder:7b@optimizer-v1-noplan,4,mysql,8.4.11,shop-bench-mini-v1,control-1,control,ollama:qwen2.5-coder:7b@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,,,,,,,,1.0,,44427.5,910,132,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e5-date_function-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,55.076,305.0828999985242,5.539300000236835,50308.2,294.61,123385.7,1141,413,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15 00:00:00' AND created_at < '2025-03-16 00:00:00'
+ORDER BY id"
+e5-date_function-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,41.84,242.081500000495,5.785900000773836,50308.2,294.61,4.0,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2025-03-15' AND created_at < '2025-03-16'
+  )
+ORDER BY
+  id"
+e5-date_function-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,23.579,133.72140000137733,5.671099999744911,50308.2,294.61,116810.2,1141,381,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2023-11-02 00:00:00' AND created_at < '2023-11-03 00:00:00'
+ORDER BY id"
+e5-date_function-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,24.649,140.65280000068014,5.706200001441175,50308.2,294.61,2.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2023-11-02' AND created_at < '2023-11-03'
+  )
+ORDER BY
+  id"
+e5-date_function-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,25.307,138.25140000335523,5.4629999976896215,50308.2,296.06,117068.5,1141,386,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2021-07-19 00:00:00' AND created_at < '2021-07-20 00:00:00'
+ORDER BY id"
+e5-date_function-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,39.028,214.88249999674736,5.505799999809824,50308.2,296.06,1.5,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2021-07-19' AND created_at < '2021-07-20'
+  )
+ORDER BY
+  id"
+e5-date_function-4-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,43.334,277.0468999988225,6.393299998308066,50308.2,297.51,115505.8,1141,376,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2026-01-05 00:00:00' AND created_at < '2026-01-06 00:00:00'
+ORDER BY id"
+e5-date_function-4-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,26.095,136.8679000006523,5.245000000286382,50308.2,297.51,1.5,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2026-01-05' AND created_at < '2026-01-06'
+  )
+ORDER BY
+  id"
+e5-year_function-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,49.625,313.9268000013544,6.325999998807674,50308.2,50308.2,137071.0,1143,444,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2024-01-01 00:00:00' AND created_at < '2025-01-01 00:00:00' AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+e5-year_function-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,46.007,283.6091999997734,6.164499998703832,50308.2,50308.2,2.0,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2024-01-01' AND created_at < '2025-01-01'
+  )
+  AND status = 'paid'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e5-year_function-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,0.921,653.9168000017526,709.6686999975645,50308.2,50308.2,120350.6,1145,383,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE status = 'delivered' AND YEAR(created_at) = 2022
+ORDER BY created_at DESC
+LIMIT 50"
+e5-year_function-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,95.536,628.2997000016621,6.576600000698818,50308.2,50308.2,1.8,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2022-01-01' AND created_at < '2023-01-01'
+  )
+  AND status = 'delivered'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e5-year_function-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,0.981,139.5042000003741,142.1948000024713,50308.2,50308.2,125482.2,1143,398,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE status = 'cancelled' AND YEAR(created_at) = 2025
+ORDER BY created_at DESC
+LIMIT 50"
+e5-year_function-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,18.733,122.50209999911021,6.539300000440562,50308.2,60509.96,1.8,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+  AND status = 'cancelled'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e5-year_aggregate-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,119768.6,1228,349,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status",
+e5-year_aggregate-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.884,177.192200000718,200.47899999917718,548980.2,205768.2,2.0,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2021-01-01' AND created_at < '2022-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e5-year_aggregate-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,143286.5,1228,432,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status",
+e5-year_aggregate-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.838,171.3275000001886,204.54120000067633,548980.2,194975.96,2.1,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e5-correlated_select-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,150534.5,1356,429,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e5-correlated_select-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,3.7,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e5-correlated_select-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,135159.8,1360,409,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id"
+e5-correlated_select-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,3.2,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id",
+e5-correlated_select-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,127258.7,1356,381,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id"
+e5-correlated_select-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,,,,,,,10146.95,,2.9,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id",
+e5-correlated_exists-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,149292.5,1400,433,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e5-correlated_exists-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,1.5,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e5-correlated_exists-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,141557.3,1404,421,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e5-correlated_exists-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,1.0,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e5-not_in-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,139556.3,1446,399,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e5-not_in-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.8,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e5-not_in-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,139636.1,1449,403,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e5-not_in-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.7,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e5-not_in-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,128822.6,1446,368,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e5-not_in-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,0.7,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e5-distinct_join-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;TEMPORARY_TABLE,equivalent,5389,5389,1.236,271.8936000019312,219.90309999819146,27579.96,27579.96,137936.0,1367,370,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e5-distinct_join-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,1.9,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e5-distinct_join-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,MISSING_INDEX;TEMPORARY_TABLE,different,9449,9741,1.141,316.17240000196034,277.0747999966261,27579.96,27579.96,129367.4,1365,349,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'"
+e5-distinct_join-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,4.3,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e5-distinct_join-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;TEMPORARY_TABLE,equivalent,6019,6019,1.155,287.19480000290787,248.7542000017129,27579.96,27579.96,131096.8,1365,373,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+e5-distinct_join-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,3.5,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e5-or_columns-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.421,44.70510000101058,31.457199998840224,10146.95,,134538.5,1163,426,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru'
+UNION
+SELECT id, name, email, phone
+FROM users
+WHERE phone = '+79000000501'"
+e5-or_columns-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,0.9,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e5-or_columns-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.455,44.761299999663606,30.773900005442556,10146.95,,146112.7,1175,468,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'","SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru'
+UNION
+SELECT id, name, email, phone
+FROM users
+WHERE phone = '+79000077778'"
+e5-or_columns-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,2.3,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e5-type_mismatch-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,TYPE_MISMATCH,equivalent,1,1,0.909,2.730200001678895,3.0030999987502582,1.0,1.0,67574.1,1039,186,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total
+FROM orders
+WHERE id = 123457"
+e5-type_mismatch-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,1.0,,2.5,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e5-type_mismatch-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10146.95,,110993.1,1123,361,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345",
+e5-type_mismatch-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10146.95,,0.6,,,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345",
+e5-big_offset-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,99954.7,1090,319,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000"
+e5-big_offset-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,3.8,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e5-big_offset-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,98072.5,1090,304,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e5-big_offset-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,1.8,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e5-big_offset-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,94628.3,1090,304,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e5-big_offset-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,0.6,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e5-leading_like-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,84576.3,1063,268,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e5-leading_like-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,0.5,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e5-leading_like-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,91645.9,1063,279,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e5-leading_like-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,0.4,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e5-in_subquery_agg-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,202.5,,121351.2,1288,288,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e5-in_subquery_agg-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,202.5,,2.9,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e5-in_subquery_agg-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,202.5,,124847.0,1288,309,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e5-in_subquery_agg-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,202.5,,2.9,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e5-report-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,report-1,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,271073.61,,173902.8,1721,391,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC",
+e5-report-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,report-1,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.8,265.3271000017412,331.5627999982098,271073.61,120038.95,21.1,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'refunded'
+  AND (
+    o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e5-report-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,report-2,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,271073.61,,171452.4,1719,422,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC",
+e5-report-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,report-2,report,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,1.299,413.80560000106925,318.5592999943765,271073.61,120624.19,12.4,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'cancelled'
+  AND (
+    o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e5-count_distinct_subquery-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,106496.6,1193,345,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e5-count_distinct_subquery-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,2.7,,,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e5-max_per_group-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,119986.7,1298,325,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e5-max_per_group-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6394.76,,1.2,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e5-max_per_group-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6208.46,,107474.3,1303,318,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e5-max_per_group-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,6208.46,,1.2,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e5-control-1-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,control-1,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,67661.7,996,226,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e5-control-1-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,control-1,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,1.0,,0.5,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e5-control-2-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,control-2,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FILESORT,,,,,,,1.75,,80796.3,1049,275,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at"
+e5-control-2-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,control-2,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FILESORT,,,,,,,1.75,,0.6,,,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at",
+e5-control-3-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,control-3,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,92.06,,94613.5,1046,343,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100"
+e5-control-3-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,control-3,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,92.06,,0.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e5-control-4-ollama:qwen2.5-coder:7b,5,mysql,8.4.11,shop-bench-v1,control-4,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,3.61,,91991.8,1207,262,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e5-control-4-baseline:rule-based,5,mysql,8.4.11,shop-bench-v1,control-4,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,3.61,,1.0,,,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e6-date_function-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-1,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,15.245,105.82760000397684,6.941799998458009,8812.41,730.22,151607.5,1196,363,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16'
+ORDER BY id"
+e6-date_function-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-1,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,14.934,103.16030000103638,6.907800001499709,8812.41,730.22,3.5,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2025-03-15' AND created_at < '2025-03-16'
+  )
+ORDER BY
+  id"
+e6-date_function-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-2,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,14.956,101.47470000083558,6.785099998523947,8812.41,642.83,120692.2,1196,418,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03'
+ORDER BY id"
+e6-date_function-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-2,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,203,203,16.474,104.14760000276146,6.321799999568611,8812.41,642.83,1.3,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2023-11-02' AND created_at < '2023-11-03'
+  )
+ORDER BY
+  id"
+e6-date_function-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-3,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,204,204,15.735,118.87009999918519,7.554700001492165,8812.41,720.96,116125.4,1196,395,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20'
+ORDER BY id"
+e6-date_function-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-3,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,204,204,13.289,105.6137999985367,7.947500002046581,8812.41,720.96,1.6,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2021-07-19' AND created_at < '2021-07-20'
+  )
+ORDER BY
+  id"
+e6-date_function-4-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-4,date_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,205,205,14.766,110.35730000003241,7.47360000241315,8812.41,711.61,114396.7,1196,380,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06'
+ORDER BY id"
+e6-date_function-4-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,date_function-4,date_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_TABLE_SCAN,equivalent,205,205,14.268,98.41410000080941,6.897399995068554,8812.41,711.61,1.3,,,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT
+  id,
+  user_id,
+  total
+FROM orders
+WHERE
+  (
+    created_at >= '2026-01-05' AND created_at < '2026-01-06'
+  )
+ORDER BY
+  id"
+e6-year_function-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-1,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX,,,,,,,2055.27,,103657.0,1186,301,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50",
+e6-year_function-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-1,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,10.338,60.478499995952006,5.850199995620642,2055.27,39.24,1.5,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2024-01-01' AND created_at < '2025-01-01'
+  )
+  AND status = 'paid'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e6-year_function-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-2,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,20.864,156.42669999942882,7.4976000032620504,2365.54,45.56,133070.5,1188,416,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2022-01-01 00:00:00' AND created_at < '2023-01-01 00:00:00' AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50"
+e6-year_function-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-2,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,20.785,124.01849999878323,5.966700002318248,2365.54,45.56,4.0,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2022-01-01' AND created_at < '2023-01-01'
+  )
+  AND status = 'delivered'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e6-year_function-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-3,year_function,ollama:qwen2.5-coder:7b,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,0.844,22.72909999737749,26.923000004899222,7200.69,7200.69,131500.4,1186,406,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE status = 'cancelled' AND EXTRACT(YEAR FROM created_at) = 2025
+ORDER BY created_at DESC
+LIMIT 50"
+e6-year_function-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_function-3,year_function,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,4.43,26.012700000137556,5.8725000053527765,7200.69,140.02,2.0,,,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT
+  id,
+  user_id,
+  total,
+  created_at
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+  AND status = 'cancelled'
+ORDER BY
+  created_at DESC
+LIMIT 50"
+e6-year_aggregate-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-1,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,equivalent,6,6,4.002,211.95129999978235,52.96680000174092,8581.33,7897.03,144639.2,1278,430,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at >= '2021-01-01 00:00:00' AND created_at < '2022-01-01 00:00:00'
+GROUP BY status
+ORDER BY status"
+e6-year_aggregate-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-1,year_aggregate,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,equivalent,6,6,3.66,168.9260999992257,46.15090000152122,8581.33,7897.03,3.6,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2021-01-01' AND created_at < '2022-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e6-year_aggregate-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-2,year_aggregate,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,,,,,,,8581.33,,121459.4,1278,342,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025
+GROUP BY status
+ORDER BY status",
+e6-year_aggregate-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,year_aggregate-2,year_aggregate,baseline:rule-based,rule_based,none,improved,accepted,True,True,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN,equivalent,6,6,3.608,157.9316999996081,43.77250000106869,8581.33,7788.16,4.5,,,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT
+  status,
+  COUNT(*) AS cnt,
+  SUM(total) AS revenue
+FROM orders
+WHERE
+  (
+    created_at >= '2025-01-01' AND created_at < '2026-01-01'
+  )
+GROUP BY
+  status
+ORDER BY
+  status"
+e6-correlated_select-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-1,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,290107.97,,146584.4,1533,386,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e6-correlated_select-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-1,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,290107.97,,3.0,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id",
+e6-correlated_select-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-2,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,296565.95,,129714.4,1538,340,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id",
+e6-correlated_select-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-2,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,296565.95,,2.8,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id",
+e6-correlated_select-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-3,correlated_select,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,293536.98,,136933.9,1534,380,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id",
+e6-correlated_select-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_select-3,correlated_select,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;CORRELATED_SUBQUERY,,,,,,,293536.98,,3.6,,,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id",
+e6-correlated_exists-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-1,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10923.31,,161960.6,1589,369,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e6-correlated_exists-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-1,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10923.31,,2.0,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e6-correlated_exists-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-2,correlated_exists,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10653.13,,166128.0,1591,338,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e6-correlated_exists-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,correlated_exists-2,correlated_exists,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY;FULL_TABLE_SCAN;FULL_TABLE_SCAN,,,,,,,10653.13,,2.9,,,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e6-not_in-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-1,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10775.3,,121116.9,1392,317,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e6-not_in-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-1,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10775.3,,2.5,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e6-not_in-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-2,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10712.68,,124292.6,1397,351,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e6-not_in-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-2,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10712.68,,2.5,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100",
+e6-not_in-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-3,not_in,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10771.59,,130462.6,1394,358,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e6-not_in-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,not_in-3,not_in,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN,,,,,,,10771.59,,2.1,,,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100",
+e6-distinct_join-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-1,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,9753.05,,144766.5,1520,387,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e6-distinct_join-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-1,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,9753.05,,3.2,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e6-distinct_join-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-2,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,11650.4,,135744.4,1518,377,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id","SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id"
+e6-distinct_join-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-2,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,11650.4,,2.7,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e6-distinct_join-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-3,distinct_join,ollama:qwen2.5-coder:7b,llm,optimizer-v1,invalid,rejected,False,False,INVALID_RESPONSE,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10026.39,,467903.9,1520,1500,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e6-distinct_join-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,distinct_join-3,distinct_join,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10026.39,,5.3,,,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e6-or_columns-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-1,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,99909.8,1120,271,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e6-or_columns-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-1,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,5.8,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e6-or_columns-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-2,or_columns,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,106823.7,1132,288,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e6-or_columns-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,or_columns-2,or_columns,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS,,,,,,,3085.0,,2.9,,,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e6-type_mismatch-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-1,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,8.44,,66027.5,1076,213,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e6-type_mismatch-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-1,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,TYPE_MISMATCH,,,,,,,8.44,,0.4,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'",
+e6-type_mismatch-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-2,type_mismatch,ollama:qwen2.5-coder:7b,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN,equivalent,1,1,1.14,15.089400003489573,13.235300000815187,2835.0,2835.0,73394.2,1090,208,"SELECT id, name, phone
+FROM users
+WHERE CAST(phone AS TEXT) = '+79000012345'","SELECT id, name, phone
+FROM users
+WHERE phone = '+79000012345'"
+e6-type_mismatch-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,type_mismatch-2,type_mismatch,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN,,,,,,,2835.0,,9.8,,,"SELECT id, name, phone
+FROM users
+WHERE CAST(phone AS TEXT) = '+79000012345'",
+e6-big_offset-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-1,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,3479.32,,88703.9,1090,272,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e6-big_offset-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-1,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,3479.32,,2.1,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e6-big_offset-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-2,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,8696.62,,117676.5,1090,305,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e6-big_offset-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-2,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,8696.62,,2.5,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e6-big_offset-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-3,big_offset,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,15653.02,,93905.5,1092,280,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e6-big_offset-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,big_offset-3,big_offset,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LARGE_OFFSET,,,,,,,15653.02,,2.2,,,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e6-leading_like-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-1,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,2835.19,,97222.6,1101,284,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e6-leading_like-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-1,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,2835.19,,3.7,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e6-leading_like-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-2,leading_like,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD;FULL_TABLE_SCAN,,,,,,,2887.92,,113061.5,1138,343,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e6-leading_like-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,leading_like-2,leading_like,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,LEADING_WILDCARD;FULL_TABLE_SCAN,,,,,,,2887.92,,3.3,,,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e6-in_subquery_agg-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-1,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,112466.6,1407,271,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e6-in_subquery_agg-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-1,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,2.9,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id",
+e6-in_subquery_agg-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-2,in_subquery_agg,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,97987.9,1407,253,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e6-in_subquery_agg-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,in_subquery_agg-2,in_subquery_agg,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,FULL_TABLE_SCAN,,,,,,,22567.07,,0.7,,,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id",
+e6-report-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-1,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,6,6,0.483,156.1405999964336,323.42030000290833,9921.98,25710.29,174303.6,1755,449,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND EXTRACT(YEAR FROM o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e6-report-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-1,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,6,6,0.476,149.9896999957855,315.3204000045662,9921.98,25710.29,12.2,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND EXTRACT(YEAR FROM o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'refunded'
+  AND (
+    o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e6-report-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-2,report,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,10770.98,,155995.3,1811,386,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND EXTRACT(YEAR FROM o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC",
+e6-report-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,report-2,report,baseline:rule-based,rule_based,none,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN,equivalent,8,8,0.603,180.31630000041332,299.2560999991838,10770.98,30604.97,9.2,,,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND EXTRACT(YEAR FROM o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT
+  p.category,
+  SUM(oi.quantity * oi.price) AS revenue,
+  COUNT(DISTINCT o.id) AS orders
+FROM order_items AS oi
+JOIN products AS p
+  ON p.id = oi.product_id
+JOIN orders AS o
+  ON o.id = oi.order_id
+WHERE
+  o.status = 'cancelled'
+  AND (
+    o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+  )
+GROUP BY
+  p.category
+ORDER BY
+  revenue DESC"
+e6-count_distinct_subquery-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,13078.17,,92792.6,1150,284,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e6-count_distinct_subquery-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN,,,,,,,13078.17,,0.5,,,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e6-max_per_group-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-1,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,182569.17,,125283.0,1370,325,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e6-max_per_group-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-1,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,182569.17,,6.9,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e6-max_per_group-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-2,max_per_group,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,183432.25,,127586.7,1380,357,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e6-max_per_group-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,max_per_group-2,max_per_group,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,,,,,,,183432.25,,1.0,,,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id",
+e6-control-1-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-1,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,8.44,,46028.4,1030,121,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e6-control-1-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-1,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,8.44,,0.5,,,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e6-control-2-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-2,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,24.09,,89653.7,1091,278,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at",
+e6-control-2-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-2,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,24.09,,2.0,,,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at",
+e6-control-3-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-3,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,396.16,,91632.1,1145,268,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e6-control-3-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-3,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,396.16,,0.7,,,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e6-control-4-ollama:qwen2.5-coder:7b,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-4,control,ollama:qwen2.5-coder:7b,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,40.47,,107424.1,1282,280,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e6-control-4-baseline:rule-based,6,postgres,16.15 (Debian 16.15-1.pgdg13+2),shop-bench-v1,control-4,control,baseline:rule-based,rule_based,none,unchanged,no_change,False,False,,,,,,,,,40.47,,1.0,,,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
