@@ -21,3 +21,6 @@ docs/nir/*.json
 docs/articles/*.docx
 docs/articles/*.pdf
 docs/rospatent/ЗАЯВКА_БД_Роспатент.md
+docs/techreport/*.docx
+docs/techreport/*.pdf
+docs/techreport/*.json
