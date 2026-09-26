@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
@@ -242,7 +243,22 @@ class PostgresConnector(Connector):
 
     def _wrap(self, e: Exception) -> DBError:
         code = getattr(getattr(e, "diag", None), "sqlstate", None) or getattr(e, "sqlstate", None)
-        return DBError(f"PostgreSQL: {str(e).strip()}", code)
+        msg = str(e).strip()
+        if "�" in msg:
+            # локализованный сервер (Windows-1251) до согласования кодировки: текст не декодируется,
+            # поэтому причину определяем по тому, чьё имя в кавычках осталось читаемым
+            quoted = re.findall(r'"([^"]+)"', msg)
+            m = re.search(r'server at "([^"]+)", port (\d+)', msg)
+            where = f"сервер {m.group(1)}:{m.group(2)}" if m else "сервер"
+            if self.cfg.username in quoted:
+                return DBError(f"PostgreSQL: {where}: пользователь «{self.cfg.username}» не прошёл проверку пароля. "
+                               "Проверьте логин и пароль (сервер не различает эти ошибки).", "28P01")
+            if self.cfg.database in quoted:
+                return DBError(f"PostgreSQL: {where}: база данных «{self.cfg.database}» не найдена или к ней нет доступа.",
+                               "3D000")
+            return DBError(f"PostgreSQL: {where}: сервер вернул ошибку в кодировке, которую не удалось прочитать "
+                           "(локализованный PostgreSQL на Windows). Проверьте параметры подключения.", code)
+        return DBError(f"PostgreSQL: {msg}", code)
 
     @contextmanager
     def _session(self, name: str | None = None) -> Iterator[Any]:

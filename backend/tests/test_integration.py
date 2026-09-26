@@ -34,7 +34,7 @@ class ScriptedProvider(LLMProvider):
     models = ["m"]
     answer: dict = {}
 
-    def complete(self, model, system, user, temperature):
+    def complete(self, model, system, user, temperature, json_mode=True):
         return LLMResult(text=json.dumps(self.answer, ensure_ascii=False), provider=self.name, model=model, latency_ms=1)
 
 

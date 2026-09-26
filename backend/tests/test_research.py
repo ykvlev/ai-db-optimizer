@@ -47,7 +47,7 @@ class GoodDateModel(LLMProvider):
     name = "fake"
     models = ["good"]
 
-    def complete(self, model, system, user, temperature):
+    def complete(self, model, system, user, temperature, json_mode=True):
         ctx = json.loads(user.split("\n", 1)[1])
         q = ctx["query"]
         import re

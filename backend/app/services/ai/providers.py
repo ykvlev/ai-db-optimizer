@@ -38,7 +38,7 @@ class LLMProvider(ABC):
     models: list[str]
 
     @abstractmethod
-    def complete(self, model: str, system: str, user: str, temperature: float) -> LLMResult: ...
+    def complete(self, model: str, system: str, user: str, temperature: float, json_mode: bool = True) -> LLMResult: ...
 
 
 def _int(v) -> int | None:
@@ -57,7 +57,7 @@ class OpenAICompatibleProvider(LLMProvider):
     def __init__(self, name: str, base_url: str, api_key: str | None, models: list[str], timeout: float):
         self.name, self.base_url, self.api_key, self.models, self.timeout = name, base_url.rstrip("/"), api_key, models, timeout
 
-    def complete(self, model: str, system: str, user: str, temperature: float) -> LLMResult:
+    def complete(self, model: str, system: str, user: str, temperature: float, json_mode: bool = True) -> LLMResult:
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
         body = {"model": model, "temperature": temperature,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
@@ -102,7 +102,7 @@ class GigaChatProvider(LLMProvider):
             self._expires_at = data.get("expires_at", 0) / 1000 or time.time() + 1500
             return self._token
 
-    def complete(self, model: str, system: str, user: str, temperature: float) -> LLMResult:
+    def complete(self, model: str, system: str, user: str, temperature: float, json_mode: bool = True) -> LLMResult:
         body = {"model": model, "temperature": max(temperature, 0.01),
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
         t0 = time.perf_counter()
@@ -125,7 +125,7 @@ class YandexGPTProvider(LLMProvider):
     def __init__(self, api_key: str, folder_id: str, models: list[str], timeout: float):
         self.name, self.api_key, self.folder_id, self.models, self.timeout = "yandex", api_key, folder_id, models, timeout
 
-    def complete(self, model: str, system: str, user: str, temperature: float) -> LLMResult:
+    def complete(self, model: str, system: str, user: str, temperature: float, json_mode: bool = True) -> LLMResult:
         body = {"modelUri": f"gpt://{self.folder_id}/{model}",
                 "completionOptions": {"stream": False, "temperature": temperature, "maxTokens": "8000"},
                 "messages": [{"role": "system", "text": system}, {"role": "user", "text": user}]}
@@ -150,8 +150,8 @@ class OllamaProvider(LLMProvider):
         self.name, self.base_url, self.models, self.timeout = "ollama", base_url.rstrip("/"), models, timeout
         self.num_ctx, self.num_predict = num_ctx, num_predict
 
-    def complete(self, model: str, system: str, user: str, temperature: float) -> LLMResult:
-        body = {"model": model, "stream": False, "format": "json",
+    def complete(self, model: str, system: str, user: str, temperature: float, json_mode: bool = True) -> LLMResult:
+        body = {"model": model, "stream": False, **({"format": "json"} if json_mode else {}),
                 "options": {"temperature": temperature, "num_ctx": self.num_ctx, "num_predict": self.num_predict, "seed": 42},
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
         t0 = time.perf_counter()

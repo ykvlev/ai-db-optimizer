@@ -101,7 +101,7 @@ class FakeProvider(LLMProvider):
     def __init__(self, answer: str):
         self.answer = answer
 
-    def complete(self, model, system, user, temperature):
+    def complete(self, model, system, user, temperature, json_mode=True):
         assert "must_preserve_result" in user
         return LLMResult(text=self.answer, provider="fake", model=model, latency_ms=1.0)
 
@@ -133,7 +133,7 @@ class CapturingProvider(LLMProvider):
     models = ["m"]
     seen: list[str] = []
 
-    def complete(self, model, system, user, temperature):
+    def complete(self, model, system, user, temperature, json_mode=True):
         CapturingProvider.seen.append(system + "\n" + user)
         return LLMResult(text='{"summary": "ok", "optimized_query": null}', provider="cap", model=model, latency_ms=1)
 
@@ -157,3 +157,13 @@ def test_split_variant():
     from app.research.runner import split_variant
     assert split_variant("ollama:qwen:7b@optimizer-v1-noplan", "optimizer-v1") == ("ollama:qwen:7b", "optimizer-v1-noplan")
     assert split_variant("ollama:qwen:7b", "optimizer-v1") == ("ollama:qwen:7b", "optimizer-v1")
+
+
+def test_validate_accepts_alias_star_and_extract_sql():
+    schema, _ = parse_ddl(DDL, "mysql")
+    resp = AIResponse(optimized_query="SELECT u.*, COALESCE(a.n, 0) AS n FROM users u LEFT JOIN "
+                                      "(SELECT user_id, COUNT(*) AS n FROM orders GROUP BY user_id) a ON a.user_id = u.id")
+    errors, notes, _ = ai.validate_ai_output(resp, "SELECT 1", "mysql", schema)
+    assert errors == [], notes
+    assert ai.extract_sql("Вот:\n```sql\nSELECT 1;\n```") == "SELECT 1"
+    assert ai.extract_sql("DELETE FROM t") is None

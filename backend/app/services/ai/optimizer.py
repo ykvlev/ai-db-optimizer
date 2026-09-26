@@ -28,6 +28,7 @@ class PromptTemplate:
     sha256: str
     exclude_context: tuple[str, ...] = ()  # ключи контекста, которые не передаются модели (абляция)
     exclude_issue_sources: tuple[str, ...] = ()  # источники найденных проблем, которые скрываются (rule/plan)
+    response_format: str = "json"  # json — полный структурированный ответ; sql — только переписанный запрос
 
 
 @lru_cache
@@ -39,7 +40,8 @@ def load_prompt(prompt_id: str = DEFAULT_PROMPT) -> PromptTemplate:
     return PromptTemplate(id=data["id"], system=data["system"], user=data["user"],
                           sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
                           exclude_context=tuple(data.get("exclude_context", ())),
-                          exclude_issue_sources=tuple(data.get("exclude_issue_sources", ())))
+                          exclude_issue_sources=tuple(data.get("exclude_issue_sources", ())),
+                          response_format=data.get("response_format", "json"))
 
 
 def list_prompts() -> list[str]:
@@ -92,6 +94,14 @@ def extract_json(text: str) -> dict:
     return json.loads(t[start:end + 1])
 
 
+def extract_sql(text: str) -> str | None:
+    """SQL из ответа в режиме response_format=sql: блок ```sql```, иначе весь текст; берётся первый оператор."""
+    m = re.search(r"```(?:sql)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    sql = (m.group(1) if m else text).strip()
+    sql = sql.split(";")[0].strip()
+    return sql if re.match(r"(?is)^\s*(with|select)\b", sql) else None
+
+
 @dataclass
 class AIRunResult:
     response: AIResponse | None
@@ -112,7 +122,16 @@ def call_model(context: dict, model_id: str | None, prompt_id: str | None, tempe
     system = prompt.system.replace("{dbms}", context["dbms"]).replace("{version}", str(context["version"]))
     user = prompt.user.replace("{context_json}", json.dumps(context, ensure_ascii=False, separators=(",", ":"), default=str))
     provider, model = get_registry().resolve(model_id)
-    llm = provider.complete(model, system, user, temperature)
+    llm = provider.complete(model, system, user, temperature, json_mode=prompt.response_format == "json")
+    if prompt.response_format == "sql":
+        sql = extract_sql(llm.text)
+        if not sql:
+            return AIRunResult(None, llm, prompt, system, user, error="В ответе модели нет SQL-запроса",
+                               error_types=[ErrorType.INVALID_RESPONSE])
+        resp = AIResponse(summary="Переписанный запрос (режим принудительного переписывания)", optimized_query=sql,
+                          explanation=["Модель получила задачу обязательно переписать запрос; корректность "
+                                       "подтверждается проверками эквивалентности и бенчмарком."])
+        return AIRunResult(resp, llm, prompt, system, user, error_types=[])
     try:
         data = extract_json(llm.text)
         if isinstance(data.get("optimized_query"), str):
@@ -168,7 +187,8 @@ def validate_ai_output(resp: AIResponse, original_sql: str, dialect: Dialect, sc
                 aliases = {a.lower(): r for a, r in p.info.table_aliases.items()}
                 derived = {s.alias_or_name.lower() for s in p.ast.find_all(exp.Subquery) if s.alias_or_name}
                 for c in p.ast.find_all(exp.Column):
-                    if not c.table or c.table.lower() in derived or c.table.lower() in ctes:
+                    if (not c.table or c.table.lower() in derived or c.table.lower() in ctes
+                            or isinstance(c.this, exp.Star)):  # alias.* — все колонки таблицы, а не колонка «*»
                         continue
                     table = schema.table(aliases.get(c.table.lower(), c.table))
                     if table is not None and c.name and table.column(c.name) is None:

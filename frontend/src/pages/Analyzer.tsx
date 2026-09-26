@@ -72,7 +72,9 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
     if (!conn && examples) setDdl(examples.ddl[dbms])
   }
 
-  const run = async (kind: 'analyze' | 'optimize') => {
+  const FORCE_PROMPT = 'optimizer-v2-rewrite'
+
+  const run = async (kind: 'analyze' | 'optimize', promptVersion: string | null = null) => {
     setBusy(kind); setError(null)
     const body = { sql, dbms, ddl: conn ? undefined : ddl, connection_id: connId }
     try {
@@ -89,7 +91,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
       if (kind === 'analyze') {
         setAnalysis(st.analysis); setOpt(null); setRuleCmp(null); setTab('problems')
       } else {
-        const r = await api.optimize({ ...body, sql: sc.statements.length > 1 ? st.sql : sql, model: model || null })
+        const r = await api.optimize({ ...body, sql: sc.statements.length > 1 ? st.sql : sql, model: model || null, prompt_version: promptVersion })
         setAnalysis(r.analysis); setOpt(r); setRuleCmp(null); setTab('ai')
       }
       onRun()
@@ -244,6 +246,12 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
               <div className="flex flex-wrap items-center gap-2">
                 <Tag tone={verdictUi[opt.verdict].tone}>{verdictUi[opt.verdict].label}</Tag>
                 <span className="text-[13px]">{opt.verdict_reason}</span>
+                {opt.verdict === 'no_change' && opt.llm && opt.llm.provider !== 'baseline' && opt.llm.prompt_version !== FORCE_PROMPT && (
+                  <Button variant="primary" onClick={() => run('optimize', FORCE_PROMPT)} disabled={!!busy}
+                    title="Повторный запрос с промптом optimizer-v2-rewrite: модель обязана предложить переписанный запрос, если нашла проблемы в формулировке. Все проверки сохраняются.">
+                    {busy === 'optimize' && <Spinner />} Переписать всё равно
+                  </Button>
+                )}
               </div>
               {opt.ai_error && <ErrorBox>{opt.ai_error}</ErrorBox>}
               {opt.error_types.length > 0 && (
