@@ -79,7 +79,7 @@ const REF = {
   halluc: 'Ji Z. Survey of hallucination in natural language generation / Z. Ji, N. Lee, R. Frieske [et al.] // ACM Computing Surveys. – 2023. – Vol. 55, № 12. – Art. 248.',
   qwen: `Hui B. Qwen2.5-Coder technical report / B. Hui, J. Yang, Z. Cui [et al.] // arXiv. – 2024. – arXiv:2409.12186. – URL: https://arxiv.org/abs/2409.12186 ${ACC}.`,
   cosette: 'Chu S. Cosette: an automated prover for SQL / S. Chu, C. Wang, K. Weitz, A. Cheung // 8th Biennial Conference on Innovative Data Systems Research (CIDR 2017). – Chaminade, 2017.',
-  repo: `Яковлев А. С. AI Database Optimizer : исходный код и данные экспериментов. – 2026. – DOI: 10.5281/zenodo.22982518. – URL: https://github.com/ykvlev/ai-db-optimizer ${ACC}.`,
+  repo: `Яковлев А. С. AI Database Optimizer : исходный код и данные экспериментов. – 2026. – DOI: 10.5281/zenodo.22982517. – URL: https://github.com/ykvlev/ai-db-optimizer ${ACC}.`,
 }
 
 const AUTHOR = 'Яковлев Артём Сергеевич, студент'
@@ -208,7 +208,7 @@ const article2 = [
     REF.halluc,
     `GigaChat API : документация для разработчиков. – URL: https://developers.sber.ru/docs/ru/gigachat/api/main ${ACC}.`,
     REF.qwen,
-    `Яковлев А. С. SQL Optimization Dataset : база данных результатов интеллектуальной оптимизации SQL-запросов. Версия 1.1.0. – 2026. – DOI: 10.5281/zenodo.22982517 ${ACC}.`,
+    `Яковлев А. С. SQL Optimization Dataset : база данных результатов интеллектуальной оптимизации SQL-запросов. Версия 1.1.0. – 2026. – DOI: 10.5281/zenodo.22984197 ${ACC}.`,
     REF.repo,
   ]),
 ]

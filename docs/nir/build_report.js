@@ -502,7 +502,7 @@ const conclusion = [
 const ACC = '(дата обращения: 26.09.2026)'
 const refs = [
   'Дейт К. Дж. Введение в системы баз данных : пер. с англ. / К. Дж. Дейт. – 8-е изд. – Москва : Вильямс, 2005. – 1328 с.',
-  `AI Database Optimizer : исходный код и данные экспериментов / А. Яковлев. – 2026. – DOI: 10.5281/zenodo.22982518. – URL: https://github.com/ykvlev/ai-db-optimizer ${ACC}.`,
+  `AI Database Optimizer : исходный код и данные экспериментов / А. Яковлев. – 2026. – DOI: 10.5281/zenodo.22984197. – URL: https://github.com/ykvlev/ai-db-optimizer ${ACC}.`,
   'Chu S. Cosette: an automated prover for SQL / S. Chu, C. Wang, K. Weitz, A. Cheung // 8th Biennial Conference on Innovative Data Systems Research (CIDR 2017). – Chaminade, 2017.',
   'Efron B. An introduction to the bootstrap / B. Efron, R. J. Tibshirani. – New York : Chapman & Hall, 1993. – 436 p.',
   `Hui B. Qwen2.5-Coder technical report / B. Hui, J. Yang, Z. Cui [et al.] // arXiv. – 2024. – arXiv:2409.12186. – URL: https://arxiv.org/abs/2409.12186 ${ACC}.`,

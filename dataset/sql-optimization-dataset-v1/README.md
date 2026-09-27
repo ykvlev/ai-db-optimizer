@@ -84,7 +84,7 @@
 ## Цитирование
 
 Яковлев А. С. SQL Optimization Dataset : база данных результатов интеллектуальной оптимизации SQL-запросов.
-Версия 1.1.0. – 2026. – DOI всех версий: 10.5281/zenodo.22982517 (версия 1.0.0: 10.5281/zenodo.22982518). – URL: https://github.com/ykvlev/ai-db-optimizer/tree/main/dataset
+Версия 1.1.0. – 2026. – DOI: 10.5281/zenodo.22984197 (все версии: 10.5281/zenodo.22982517). – URL: https://github.com/ykvlev/ai-db-optimizer/tree/main/dataset
 
 ---
 

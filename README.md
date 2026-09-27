@@ -1,6 +1,6 @@
 # AI Database Optimizer
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22982518.svg)](https://doi.org/10.5281/zenodo.22982518)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22982517.svg)](https://doi.org/10.5281/zenodo.22982517)
 
 Интеллектуальная система анализа и оптимизации SQL-запросов в реляционных БД с использованием методов ИИ.
 
@@ -178,6 +178,6 @@ MIT — см. [LICENSE](LICENSE).
 
 ## Цитирование
 
-Яковлев А. С. AI Database Optimizer и SQL Optimization Dataset. Версия 1.0.0. – 2026. – DOI: 10.5281/zenodo.22982518.
+Яковлев А. С. AI Database Optimizer и SQL Optimization Dataset. Версия 1.1.0. – 2026. – DOI: 10.5281/zenodo.22984197.
 
 Все версии: DOI 10.5281/zenodo.22982517 (всегда указывает на последнюю версию).
