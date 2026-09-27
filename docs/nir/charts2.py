@@ -274,7 +274,7 @@ def main():
 
     jobs = {
         "c_funnel": (mf.page(funnel(rows), 1000), 1000),
-        "c_heatmap": (mf.page(heatmap(cats2, [n for _, n in M], cell), 1090), 1090),
+        "c_heatmap": (mf.page(heatmap(cats2, ["GigaChat-2", "Pro", "Max", "Qwen", "Правила"], cell), 1090), 1090),
         "c_tradeoff": (mf.page(tradeoff(pts), 1000), 1000),
         "c_speedups": (mf.page(strip(groups), 1000), 1000),
         "c_cost_time": (mf.page(cost_vs_time(cv), 1000), 1000),

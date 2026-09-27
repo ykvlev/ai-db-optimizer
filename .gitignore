@@ -33,3 +33,5 @@ docs/human_study/*.pdf
 docs/human_study/answers.csv
 docs/human_study/results_humans.csv
 docs/human_study/summary.json
+docs/talk/*.pdf
+docs/talk/talk.html
