@@ -174,9 +174,9 @@ def stability(keys, runs_by_model):
 
 
 # ---------------------------------------------------------------- 7. типы ошибок
-def error_types(rows, types):
+def error_types(rows, types, bw=False):
     w, left, bh, gap = 1000, 250, 40, 16
-    shades = ["#d64545", "#e08a2b", "#8c564b", "#555", "#999"]
+    shades = ["#1a1a1a", "#7a7a7a", "#b5b5b5", "#4d4d4d", "#dcdcdc"] if bw else ["#d64545", "#e08a2b", "#8c564b", "#555", "#999"]
     h = len(rows) * (bh + gap) + 90
     mx = max(sum(c.values()) for _, c in rows) or 1
     p = []
@@ -188,16 +188,19 @@ def error_types(rows, types):
             v = c.get(tp, 0)
             if not v:
                 continue
-            bw = (w - left - 60) * v / mx
-            p.append(f'<rect x="{x:.1f}" y="{y}" width="{bw:.1f}" height="{bh}" fill="{sh}" stroke="#000"/>')
-            if bw > 26:
-                p.append(t(x + bw / 2, y + bh * 0.7, v, 20, fill="#fff"))
-            x += bw
+            bw_ = (w - left - 60) * v / mx
+            p.append(f'<rect x="{x:.1f}" y="{y}" width="{bw_:.1f}" height="{bh}" fill="{sh}" stroke="#000"/>')
+            if bw_ > 26:
+                p.append(t(x + bw_ / 2, y + bh * 0.7, v, 20, fill="#000" if bw and sh in ("#b5b5b5", "#dcdcdc") else "#fff"))
+            x += bw_
         p.append(t(x + 8, y + bh * 0.7, sum(c.values()), 22, "start"))
     lx, ly = 20, h - 40
+    names = {"RESULT_CHANGED": "изменён результат", "PERFORMANCE_REGRESSION": "замедление", "WRONG_COLUMN": "неверная колонка",
+             "SYNTAX_ERROR": "синтаксис", "INVALID_RESPONSE": "формат ответа"}
     for tp, sh in zip(types, shades):
-        p.append(f'<rect x="{lx}" y="{ly}" width="20" height="20" fill="{sh}" stroke="#000"/>' + t(lx + 28, ly + 17, tp, 18, "start"))
-        lx += 44 + len(tp) * 10
+        nm = names.get(tp, tp)
+        p.append(f'<rect x="{lx}" y="{ly}" width="20" height="20" fill="{sh}" stroke="#000"/>' + t(lx + 28, ly + 17, nm, 20, "start"))
+        lx += 50 + len(nm) * 10
     return svg(w, h, "".join(p))
 
 
@@ -277,6 +280,7 @@ def main():
         "c_cost_time": (mf.page(cost_vs_time(cv), 1000), 1000),
         "c_stability": (mf.page(stability(keys, stab), 900), 900),
         "c_errors": (mf.page(error_types(erows, types), 1000), 1000),
+        "c_errors_bw": (mf.page(error_types(erows, types, bw=True), 1000), 1000),
     }
     mf.render(jobs)
     (HERE / "charts2.json").write_text(json.dumps(out, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
