@@ -184,6 +184,14 @@ class AskRequest(BaseModel):
     connection_id: int
     question: str
     model: str | None = None
+    schema_name: str | None = None  # рабочая схема: модель видит только её таблицы
+
+
+class ProfileRequest(BaseModel):
+    connection_id: int
+    schema_name: str
+    model: str | None = None
+    analyze: bool = True  # False — только запомнить рабочую схему
 
 
 class DocsRequest(BaseModel):
@@ -204,7 +212,30 @@ def console_ask(req: AskRequest):
     rec, conn = pipeline.open_connector(req.connection_id)
     with conn:
         schema, version = pipeline.live_schema(conn, req.connection_id)
+        schema = workbench.filter_schema(schema, req.schema_name, conn.default_schema())
         return workbench.ask(conn, rec.dbms, version, schema, req.question, req.model)
+
+
+@app.get("/api/console/overview")
+def console_overview(connection_id: int):
+    """Схемы базы, выбранная рабочая схема и сохранённый анализ — для «знакомства с базой» в консоли."""
+    _, conn = pipeline.open_connector(connection_id)
+    with conn:
+        schema, _ = pipeline.live_schema(conn, connection_id)
+        return workbench.overview(conn, connection_id, schema)
+
+
+@app.post("/api/console/profile")
+def console_profile(req: ProfileRequest):
+    rec, conn = pipeline.open_connector(req.connection_id)
+    prof = None
+    with conn:
+        if req.analyze:
+            schema, _ = pipeline.live_schema(conn, req.connection_id)
+            schema = workbench.filter_schema(schema, req.schema_name, conn.default_schema())
+            prof = workbench.profile(conn, rec.dbms, schema, req.model)
+    workbench.remember(req.connection_id, req.schema_name, prof)
+    return {"selected": req.schema_name, "profile": prof}
 
 
 @app.get("/api/database/{connection_id}/audit")

@@ -271,7 +271,95 @@ export const api = {
   schema: (id: number, refresh = false) => request<SchemaInfo>('GET', `/api/database/${id}/schema?refresh=${refresh}`),
   runs: (limit = 100) => request<RunRow[]>('GET', `/api/runs?limit=${limit}`),
   run: (id: number) => request<{ id: number; kind: string; sql: string; dbms: Dialect; started_at: string; model?: string; prompt_version?: string; app_version: string; dbms_version?: string; result: unknown }>('GET', `/api/runs/${id}`),
+  explain: (b: { sql: string; connection_id: number; analyze?: boolean }) => request<PlanSummary>('POST', '/api/explain', b),
+  // консоль, «Спроси базу», аудит, медленные запросы, документация
+  consoleRun: (b: { connection_id: number; sql: string; limit?: number }) => request<ConsoleResult>('POST', '/api/console/run', b),
+  ask: (b: { connection_id: number; question: string; model?: string | null; schema_name?: string | null }) => request<AskResult>('POST', '/api/console/ask', b),
+  consoleOverview: (id: number) => request<DbOverview>('GET', `/api/console/overview?connection_id=${id}`),
+  consoleProfile: (b: { connection_id: number; schema_name: string; model?: string | null; analyze: boolean }) =>
+    request<{ selected: string; profile: DbProfile | null }>('POST', '/api/console/profile', b),
+  audit: (id: number) => request<AuditReport>('GET', `/api/database/${id}/audit`),
+  topQueries: (id: number, limit = 20) => request<TopQueries>('GET', `/api/database/${id}/top-queries?limit=${limit}`),
+  docs: async (id: number, b: { describe: boolean; model?: string | null; er_png?: string | null }) => {
+    const res = await fetch(`/api/database/${id}/docs`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+    if (!res.ok) {
+      let msg = `${res.status} ${res.statusText}`
+      try { const d = await res.json(); msg = typeof d.detail === 'string' ? d.detail : msg } catch { /* не JSON */ }
+      throw new Error(msg)
+    }
+    return res.blob()
+  },
 }
+
+export interface ConsoleResult {
+  columns: string[]
+  rows: (string | number | boolean | null)[][]
+  row_count: number
+  truncated: boolean
+  elapsed_ms: number
+  executed_sql: string
+  warnings: string[]
+}
+
+export interface ChartSpec { type: 'bar' | 'line'; x: string; y: string }
+
+export interface AskResult {
+  sql: string
+  explanation: string
+  chart: ChartSpec | null
+  result: ConsoleResult
+  model: string
+  latency_ms: number
+  attempts: { sql: string | null; error: string | null }[]
+}
+
+export interface AuditFinding {
+  code: string
+  severity: 'high' | 'medium' | 'low'
+  table: string | null
+  title: string
+  detail: string
+  fix_sql: string | null
+}
+
+export interface AuditReport {
+  score: number
+  tables: number
+  findings: AuditFinding[]
+  counts: { high: number; medium: number; low: number }
+  usage_stats: boolean
+}
+
+export interface TopQuery {
+  query: string
+  normalized: string
+  calls: number
+  total_ms: number
+  mean_ms: number
+  rows_sent: number | null
+  rows_examined: number | null
+  runnable: boolean
+}
+
+export interface TopQueries { available: boolean; reason?: string; queries: TopQuery[]; hint: string[] }
+
+export interface DbSchemaGroup { name: string; tables: number; rows: number; default: boolean }
+
+export interface DbProfile {
+  summary: string
+  entities: { table: string; meaning: string }[]
+  relations: string[]
+  queries: { title: string; description: string; sql: string }[]
+  rejected: number
+  model: string
+  created_at: string
+  tables: number
+}
+
+export interface DbOverview { schemas: DbSchemaGroup[]; default: string; selected: string | null; profile: DbProfile | null }
+
+// черновик для «Анализа запроса» из консоли или списка медленных запросов
+export interface AnalyzerDraft { sql: string; connectionId: number | null; nonce: number }
 
 // ---------------------------------------------------------------- Research Mode
 export interface DatasetInfo {

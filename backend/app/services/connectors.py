@@ -110,6 +110,10 @@ class Connector(ABC):
         """Таблицы, по которым у планировщика нет статистики."""
         return []
 
+    def default_schema(self) -> str:
+        """Схема, таблицы которой introspect() называет без префикса (в MySQL — сама база)."""
+        return self.cfg.database
+
     def top_statements(self, limit: int = 20) -> list[dict]:
         """Самые тяжёлые запросы по суммарному времени выполнения (только SELECT/WITH)."""
         raise DBError("Статистика запросов для этой СУБД не поддерживается", "NO_STATS")
@@ -421,6 +425,9 @@ class PostgresConnector(Connector):
         return [(t, i) for t, i in self._query(
             f"SELECT {q}, s.indexrelname FROM pg_stat_user_indexes s JOIN pg_index x ON x.indexrelid = s.indexrelid "
             "WHERE s.idx_scan = 0 AND NOT x.indisunique AND NOT x.indisprimary")]
+
+    def default_schema(self) -> str:
+        return self._query("SELECT current_schema()")[0][0] or "public"
 
     def never_analyzed(self) -> list[str]:
         return [r[0] for r in self._query(

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { CompareDraft, Connection, Examples, ModelsInfo, Stats } from './api'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { AnalyzerDraft, CompareDraft, Connection, Examples, ModelsInfo, Stats } from './api'
 import { api } from './api'
 import { Analyzer } from './pages/Analyzer'
 import { Compare } from './pages/Compare'
+import { Console } from './pages/Console'
 import { Dashboard } from './pages/Dashboard'
 import { Databases } from './pages/Databases'
 import { Experiments } from './pages/Experiments'
@@ -16,9 +17,10 @@ const SERVER_HOST = window.location.port === '5173' ? 'localhost:8000' : window.
 
 const pages = [
   { id: 'start', label: 'Начало', group: 'Главная', desc: 'Состояние программы и быстрые действия' },
+  { id: 'console', label: 'Консоль', group: 'Работа', desc: 'Запросы к вашей базе и вопросы на русском: ИИ составит SQL по структуре базы, результат — таблицей или графиком' },
   { id: 'analyzer', label: 'Анализ запроса', group: 'Работа', desc: 'Вставьте SQL — программа найдёт проблемы, а ИИ предложит более быструю версию и проверит её на базе' },
   { id: 'compare', label: 'Сравнение запросов', group: 'Работа', desc: 'Два варианта запроса: совпадает ли результат и какой из них быстрее' },
-  { id: 'databases', label: 'Базы данных', group: 'Работа', desc: 'Подключения к базам и их структура: таблицы, колонки, индексы' },
+  { id: 'databases', label: 'Базы данных', group: 'Работа', desc: 'Подключения, структура, аудит, медленные запросы, ER-диаграмма и описание базы в Word' },
   { id: 'experiments', label: 'Эксперименты', group: 'Исследования', desc: 'Набор запросов × несколько моделей: статистика, сравнение и отчёт' },
   { id: 'history', label: 'История', group: 'Исследования', desc: 'Все запуски анализа и оптимизации, выгрузка результатов' },
   { id: 'dashboard', label: 'Обзор', group: 'Исследования', desc: 'Сводные показатели по всем запускам' },
@@ -71,8 +73,13 @@ export default function App() {
   }, [backendOk, probe])
 
   const go = (p: string) => { window.location.hash = `#/${p}` }
+  // новый раздел открывается с начала, а не с прокрутки предыдущего
+  const scrollRef = useRef<HTMLDivElement>(null)
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }) }, [page])
   const [compareDraft, setCompareDraft] = useState<CompareDraft | null>(null)
   const sendToCompare = (d: Omit<CompareDraft, 'nonce'>) => { setCompareDraft({ ...d, nonce: Date.now() }); go('compare') }
+  const [analyzerDraft, setAnalyzerDraft] = useState<AnalyzerDraft | null>(null)
+  const sendToAnalyzer = (sql: string, connectionId: number | null) => { setAnalyzerDraft({ sql, connectionId, nonce: Date.now() }); go('analyzer') }
   const meta = pages.find(p => p.id === page)!
   const llm = models?.providers.filter(p => p !== 'baseline') ?? []
 
@@ -136,7 +143,7 @@ export default function App() {
           <span>optimizer</span><span className="text-ash">/</span><span className="text-obsidian">{meta.label.toLowerCase()}</span>
           <span className="ml-auto hidden text-ash md:inline">{meta.group !== 'Главная' ? meta.group.toLowerCase() : 'рабочий стол'}</span>
         </header>
-        <div className="min-h-0 flex-1 overflow-auto">
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
           <div className="px-6 pb-16 pt-6">
             {page !== 'setup' && (
               <div className="mb-6">
@@ -156,10 +163,11 @@ export default function App() {
             )}
             <div hidden={page !== 'start'}><Start backendOk={backendOk} models={models} connections={connections} stats={stats} onNavigate={go} onConnectionsChange={loadConnections} /></div>
             <div hidden={page !== 'dashboard'}><Dashboard stats={stats} onNavigate={go} /></div>
-            <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} onSendToCompare={sendToCompare} onNavigate={go} /></div>
+            <div hidden={page !== 'console'}><Console connections={connections} models={models} onOptimize={sendToAnalyzer} onNavigate={go} /></div>
+            <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} onSendToCompare={sendToCompare} onNavigate={go} draft={analyzerDraft} /></div>
             <div hidden={page !== 'compare'}><Compare connections={connections} onRun={refresh} draft={compareDraft} /></div>
             <div hidden={page !== 'experiments'}><Experiments connections={connections} models={models} onRun={refresh} /></div>
-            <div hidden={page !== 'databases'}><Databases connections={connections} onChange={loadConnections} /></div>
+            <div hidden={page !== 'databases'}><Databases connections={connections} onChange={loadConnections} models={models} onOptimize={sendToAnalyzer} /></div>
             <div hidden={page !== 'history'}><History refreshKey={refreshKey} /></div>
             <div hidden={page !== 'setup'}><Setup /></div>
           </div>

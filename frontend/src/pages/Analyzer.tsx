@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { AnalyzeResponse, CompareDraft, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo, ScriptAnalyzeResponse } from '../api'
+import type { AnalyzeResponse, AnalyzerDraft, CompareDraft, Comparison, Connection, Dialect, Examples, ModelsInfo, OptimizeResponse, SchemaInfo, ScriptAnalyzeResponse } from '../api'
 import { api } from '../api'
 import { ComparisonView } from '../components/ComparisonView'
 import { IssueList } from '../components/IssueList'
@@ -27,9 +27,10 @@ const factorNames: Record<string, string> = {
   plan_confirmed: 'Подтверждение планом', benchmark_stability: 'Стабильность бенчмарка',
 }
 
-export function Analyzer({ connections, models, examples, onRun, onSendToCompare, onNavigate }: {
+export function Analyzer({ connections, models, examples, onRun, onSendToCompare, onNavigate, draft }: {
   connections: Connection[]; models: ModelsInfo | null; examples: Examples | null; onRun: () => void
   onSendToCompare: (d: Omit<CompareDraft, 'nonce'>) => void; onNavigate: (p: string) => void
+  draft?: AnalyzerDraft | null  // запрос из консоли или списка медленных запросов
 }) {
   const [dbms, setDbms] = useState<Dialect>('mysql')
   const [connId, setConnId] = useState<number | null>(null)
@@ -64,6 +65,13 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
       setDdl(examples.ddl.mysql)
     }
   }, [examples, sql])
+
+  useEffect(() => {
+    if (!draft) return
+    changeSql(draft.sql)
+    if (draft.connectionId != null) { setConnTouched(true); setConnId(draft.connectionId) }
+    setAnalysis(null); setOpt(null); setRuleCmp(null); setError(null)
+  }, [draft?.nonce])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadExample = (id: string) => {
     const ex = examples?.queries.find(q => q.id === id)

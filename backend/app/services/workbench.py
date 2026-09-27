@@ -102,10 +102,21 @@ def _complete(system: str, user: str, model_id: str | None, json_mode: bool = Tr
     reg = get_registry()
     try:
         provider, model = reg.resolve(model_id)
-        return provider.complete(model, system, user, get_settings().llm_temperature, json_mode=json_mode), \
-            f"{provider.name}:{model}"
     except LLMError as e:
         raise WorkbenchError(str(e)) from e
+    for attempt in range(3):
+        try:
+            return provider.complete(model, system, user, get_settings().llm_temperature, json_mode=json_mode), \
+                f"{provider.name}:{model}"
+        except LLMError as e:
+            # лимит частоты запросов (HTTP 429, у GigaChat на личном тарифе — один запрос одновременно): ждём и повторяем
+            if "429" in str(e) and attempt < 2:
+                time.sleep(3 * (attempt + 1))
+                continue
+            if "429" in str(e):
+                raise WorkbenchError(f"{provider.name}: сервис ограничивает частоту запросов — повторите через "
+                                     "несколько секунд") from e
+            raise WorkbenchError(str(e)) from e
 
 
 # ---------------------------------------------------------------- «Спроси базу»: вопрос на русском → SQL
@@ -152,6 +163,112 @@ def ask(conn: Connector, dialect: Dialect, version: str | None, schema: SchemaIn
             user = json.dumps({"schema": _schema_for_llm(schema), "question": question, "previous_sql": sql,
                                "error": str(e), "task": "Исправь запрос с учётом ошибки"}, ensure_ascii=False)
     raise WorkbenchError("Не удалось составить рабочий запрос: " + "; ".join(a["error"] for a in attempts if a["error"]))
+
+
+# ---------------------------------------------------------------- рабочая схема и «знакомство с базой»
+def schema_of(table_name: str, default: str) -> str:
+    return table_name.rsplit(".", 1)[0] if "." in table_name else default
+
+
+def list_schemas(schema: SchemaInfo, default: str) -> list[dict]:
+    groups: dict[str, dict] = {}
+    for t in schema.tables:
+        g = groups.setdefault(schema_of(t.name, default), {"tables": 0, "rows": 0})
+        g["tables"] += 1
+        g["rows"] += t.row_count or 0
+    return sorted(({"name": k, **v, "default": k == default} for k, v in groups.items()),
+                  key=lambda s: (-s["tables"], s["name"]))
+
+
+def filter_schema(schema: SchemaInfo, name: str | None, default: str) -> SchemaInfo:
+    """Только таблицы рабочей схемы — модель и автодополнение не путаются в чужих таблицах."""
+    if not name:
+        return schema
+    return SchemaInfo(tables=[t for t in schema.tables if schema_of(t.name, default) == name], source=schema.source)
+
+
+PROFILE_SYSTEM = """Ты — опытный аналитик баз данных. Тебе дана структура базы {dialect_name} (таблицы, столбцы, ключи,
+число строк). Разберись, что это за база, и помоги человеку, который открыл её впервые.
+
+Ответь строго JSON-объектом:
+{{"summary": "2–3 предложения по-русски: что хранит база, для какой предметной области",
+  "entities": [{{"table": "имя таблицы как в схеме", "meaning": "что хранит, несколько слов"}}],
+  "relations": ["короткое описание ключевой связи, например: сотрудник → отдел"],
+  "queries": [{{"title": "короткое название", "description": "что покажет запрос", "sql": "SELECT ..."}}]}}
+
+Требования к queries: 6–8 полезных запросов на чтение для знакомства с данными и типичных отчётов этой предметной
+области (сводки, топы, распределения, связи между таблицами). Имена таблиц и столбцов — точно как в схеме, диалект
+{dialect_name}, у запросов со списками — LIMIT. Только SELECT."""
+
+
+def profile(conn: Connector, dialect: Dialect, schema: SchemaInfo, model_id: str | None) -> dict:
+    if not schema.tables:
+        raise WorkbenchError("В выбранной схеме нет таблиц")
+    dialect_name = "MySQL" if dialect == "mysql" else "PostgreSQL"
+    llm, used_model = _complete(PROFILE_SYSTEM.format(dialect_name=dialect_name),
+                                json.dumps({"schema": _schema_for_llm(schema, 80)}, ensure_ascii=False), model_id)
+    try:
+        data = extract_json(llm.text)
+    except ValueError as e:
+        raise WorkbenchError(f"Модель вернула ответ не в том формате: {e}") from e
+    queries, rejected = [], 0
+    for q in data.get("queries") or []:
+        sql = str(q.get("sql", "")).strip().rstrip(";")
+        if not sql or not safety.check(sql, dialect).allowed:
+            rejected += 1
+            continue
+        try:
+            conn.explain(sql)  # запрос должен быть корректным для этой базы: план строится без выполнения
+        except DBError:
+            rejected += 1
+            continue
+        queries.append({"title": str(q.get("title", "")), "description": str(q.get("description", "")), "sql": sql})
+    names = {t.name.lower() for t in schema.tables}
+    return {"summary": str(data.get("summary", "")),
+            "entities": [e for e in data.get("entities") or [] if isinstance(e, dict)
+                         and str(e.get("table", "")).lower() in names],
+            "relations": [str(r) for r in data.get("relations") or []][:10],
+            "queries": queries, "rejected": rejected, "model": used_model,
+            "created_at": dt.datetime.now().isoformat(timespec="seconds"), "tables": len(schema.tables)}
+
+
+def _profiles_file():
+    from app.config import DATA_DIR
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    return DATA_DIR / "console_profiles.json"
+
+
+def load_profiles() -> dict:
+    f = _profiles_file()
+    try:
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def save_profiles(data: dict) -> None:
+    _profiles_file().write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def overview(conn: Connector, connection_id: int, schema: SchemaInfo) -> dict:
+    """Схемы базы, выбранная рабочая схема и сохранённый анализ (если база уже открывалась в консоли)."""
+    default = conn.default_schema()
+    schemas = list_schemas(schema, default)
+    store = load_profiles().get(str(connection_id), {})
+    selected = store.get("selected")
+    if selected not in {s["name"] for s in schemas}:
+        selected = None
+    return {"schemas": schemas, "default": default, "selected": selected,
+            "profile": store.get("profiles", {}).get(selected) if selected else None}
+
+
+def remember(connection_id: int, schema_name: str, prof: dict | None = None) -> None:
+    data = load_profiles()
+    entry = data.setdefault(str(connection_id), {"profiles": {}})
+    entry["selected"] = schema_name
+    if prof is not None:
+        entry.setdefault("profiles", {})[schema_name] = prof
+    save_profiles(data)
 
 
 # ---------------------------------------------------------------- аудит структуры базы
@@ -315,6 +432,25 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
     st.paragraph_format.line_spacing = 1.5
     st.paragraph_format.space_after = Pt(0)
     descriptions = descriptions or {}
+    # номер страницы — вверху по центру (ГОСТ 2.105)
+    hp = sec.header.paragraphs[0]
+    hp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = hp.add_run()
+    for tag, text in (("begin", None), (None, "PAGE"), ("end", None)):
+        if tag:
+            el = run._r.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): tag})
+        else:
+            el = run._r.makeelement(qn("w:instrText"), {qn("xml:space"): "preserve"})
+            el.text = text
+        run._r.append(el)
+
+    def short_type(t: str) -> str:
+        t = t.lower()
+        for long, short in (("character varying", "varchar"), ("timestamp without time zone", "timestamp"),
+                            ("timestamp with time zone", "timestamptz"), ("double precision", "double"),
+                            ("time without time zone", "time"), ("character", "char")):
+            t = t.replace(long, short)
+        return t
 
     def para(text, center=False, indent=True, size=None, before=0, after=0, keep=False):
         p = doc.add_paragraph()
@@ -357,9 +493,14 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
     n = 1
     para("1 Перечень таблиц", indent=True, before=24, after=12, keep=True)
     para(f"Таблица {n} – Перечень таблиц базы данных", indent=False, keep=True)
-    table(["№", "Таблица", "Назначение", "Строк"],
-          [[i + 1, t.name, descriptions.get(t.name, {}).get("description", ""), t.row_count if t.row_count is not None else "—"]
-           for i, t in enumerate(schema.tables)], [1.0, 4.5, 9.0, 2.5])
+    rows_fmt = lambda t: f"{t.row_count:,}".replace(",", " ") if t.row_count is not None else "—"  # noqa: E731
+    if descriptions:
+        table(["№", "Таблица", "Назначение", "Строк"],
+              [[i + 1, t.name, descriptions.get(t.name, {}).get("description", ""), rows_fmt(t)]
+               for i, t in enumerate(schema.tables)], [1.0, 4.5, 9.0, 2.5])
+    else:  # без описаний столбец «Назначение» остался бы пустым
+        table(["№", "Таблица", "Полей", "Строк"],
+              [[i + 1, t.name, len(t.columns), rows_fmt(t)] for i, t in enumerate(schema.tables)], [1.0, 9.5, 3.0, 3.5])
     n += 1
     para("2 Структура таблиц", indent=True, before=24, after=12, keep=True)
     for t in schema.tables:
@@ -368,9 +509,14 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
             para(f"Таблица {t.name}: {d['description'][0].lower() + d['description'][1:]}", before=6)
         para(f"Таблица {n} – Структура таблицы {t.name}", indent=False, keep=True, before=6)
         cols = d.get("columns", {}) if isinstance(d.get("columns"), dict) else {}
-        table(["Поле", "Тип", "NULL", "Ключ", "Описание"],
-              [[c.name, c.type.lower(), "да" if c.nullable else "нет", _key_mark(t, c.name), cols.get(c.name, "")]
-               for c in t.columns], [3.8, 3.4, 1.4, 3.4, 5.0])
+        if descriptions:
+            table(["Поле", "Тип", "NULL", "Ключ", "Описание"],
+                  [[c.name, short_type(c.type), "да" if c.nullable else "нет", _key_mark(t, c.name), cols.get(c.name, "")]
+                   for c in t.columns], [3.8, 3.4, 1.4, 3.4, 5.0])
+        else:
+            table(["Поле", "Тип", "NULL", "Ключ"],
+                  [[c.name, short_type(c.type), "да" if c.nullable else "нет", _key_mark(t, c.name)]
+                   for c in t.columns], [5.5, 4.5, 2.0, 5.0])
         idx = [i for i in t.indexes if not i.primary]
         if idx:
             para("Индексы: " + "; ".join(f"{i.name} ({', '.join(i.columns)}){' — уникальный' if i.unique else ''}"
@@ -383,8 +529,9 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
         doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
         para("Рисунок 1 – Схема связей таблиц базы данных", center=True, after=12)
     if links:
-        for tname, fk in links:
-            para(f"– {tname} ({', '.join(fk.columns)}) ссылается на {fk.ref_table} ({', '.join(fk.ref_columns)});")
+        for k, (tname, fk) in enumerate(links):
+            end = "." if k == len(links) - 1 else ";"
+            para(f"– {tname} ({', '.join(fk.columns)}) ссылается на {fk.ref_table} ({', '.join(fk.ref_columns)}){end}")
     else:
         para("Внешние ключи в базе не объявлены.")
     buf = io.BytesIO()

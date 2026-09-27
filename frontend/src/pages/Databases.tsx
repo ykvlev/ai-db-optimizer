@@ -1,15 +1,28 @@
-import { useEffect, useState } from 'react'
-import type { Connection, Dialect, SchemaInfo } from '../api'
+import { useEffect, useRef, useState } from 'react'
+import type { Connection, Dialect, ModelsInfo, SchemaInfo } from '../api'
 import { api } from '../api'
-import { Button, Card, Empty, ErrorBox, Spinner, Tag } from '../components/ui'
+import { AuditView, DocsView, TopQueriesView } from '../components/DbTools'
+import { ErDiagram, svgToPng } from '../components/ErDiagram'
+import { Button, Card, Empty, ErrorBox, Spinner, Tabs, Tag } from '../components/ui'
 import { SchemaView } from './Analyzer'
+
+type Tool = 'schema' | 'audit' | 'slow' | 'er' | 'docs'
+const TOOL_TABS: { id: Tool; label: string }[] = [
+  { id: 'schema', label: 'Структура' }, { id: 'audit', label: 'Аудит' }, { id: 'slow', label: 'Медленные запросы' },
+  { id: 'er', label: 'ER-диаграмма' }, { id: 'docs', label: 'Описание (.docx)' },
+]
 
 const presets: Record<string, Record<string, unknown>> = {
   'Демо MySQL (docker)': { dbms: 'mysql', host: '127.0.0.1', port: 3307, database: 'shop', username: 'optimizer_ro', password: 'optimizer_ro' },
   'Демо PostgreSQL (docker)': { dbms: 'postgres', host: '127.0.0.1', port: 5434, database: 'shop', username: 'optimizer_ro', password: 'optimizer_ro' },
 }
 
-export function Databases({ connections, onChange }: { connections: Connection[]; onChange: () => void }) {
+export function Databases({ connections, onChange, models, onOptimize }: {
+  connections: Connection[]; onChange: () => void; models: ModelsInfo | null
+  onOptimize: (sql: string, connectionId: number | null) => void
+}) {
+  const [tool, setTool] = useState<Tool>('schema')
+  const erRef = useRef<SVGSVGElement>(null)
   const [form, setForm] = useState<Record<string, unknown>>({ dbms: 'mysql', host: '127.0.0.1', port: 3306, database: '', username: '', password: '', ssl: false, name: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,6 +49,7 @@ export function Databases({ connections, onChange }: { connections: Connection[]
   }
 
   useEffect(() => { if (selected != null) loadSchema(selected) }, [selected])
+  useEffect(() => { if (selected == null && connections.length) setSelected(connections[0].id) }, [connections, selected])
 
   const remove = async (id: number) => {
     await api.deleteConnection(id)
@@ -85,9 +99,27 @@ export function Databases({ connections, onChange }: { connections: Connection[]
         </Card>
       </div>
 
-      <Card title="Структура базы" actions={selected != null && <Button variant="ghost" onClick={() => loadSchema(selected, true)}>{schemaBusy && <Spinner />} Обновить</Button>}>
-        {schema ? <SchemaView schema={schema} /> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Выберите подключение'}</Empty>}
-      </Card>
+      <div className="min-w-0 space-y-3">
+        {selected != null && <Tabs tabs={TOOL_TABS} active={tool} onChange={setTool} />}
+        <div hidden={tool !== 'schema'}>
+          <Card title="Структура базы" actions={selected != null && <Button variant="ghost" onClick={() => loadSchema(selected, true)}>{schemaBusy && <Spinner />} Обновить</Button>}>
+            {schema ? <SchemaView schema={schema} /> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Выберите подключение слева — здесь появятся его структура, аудит, медленные запросы, ER-диаграмма и описание базы'}</Empty>}
+          </Card>
+        </div>
+        {selected != null && <>
+          <div hidden={tool !== 'audit'}><Card title="Аудит базы"><AuditView key={selected} connectionId={selected} /></Card></div>
+          <div hidden={tool !== 'slow'}><Card title="Медленные запросы"><TopQueriesView key={selected} connectionId={selected} onOptimize={sql => onOptimize(sql, selected)} /></Card></div>
+          <div hidden={tool !== 'er'}>
+            <Card title="Схема связей" actions={schema && <Button variant="ghost" onClick={async () => { if (erRef.current) { const png = await svgToPng(erRef.current); const a = document.createElement('a'); a.href = png; a.download = 'er_diagram.png'; a.click() } }}>PNG</Button>}>
+              {schema?.tables.length ? <>
+                <p className="mb-3 text-[12.5px] text-stone">Таблицы можно перетаскивать мышью. PK — первичный ключ, FK — внешний; линии идут от внешнего ключа к таблице, на которую он ссылается.</p>
+                <div className="max-h-[720px] overflow-auto rounded-md shadow-[0_0_0_1px_#ebebeb]"><ErDiagram ref={erRef} schema={schema} /></div>
+              </> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'В базе нет таблиц'}</Empty>}
+            </Card>
+          </div>
+          <div hidden={tool !== 'docs'}><Card title="Описание базы"><DocsView connectionId={selected} models={models} getErPng={async () => erRef.current && schema?.tables.length ? svgToPng(erRef.current) : null} /></Card></div>
+        </>}
+      </div>
     </div>
   )
 }
