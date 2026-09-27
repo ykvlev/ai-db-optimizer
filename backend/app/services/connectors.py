@@ -311,11 +311,27 @@ class PostgresConnector(Connector):
     def introspect(self) -> SchemaInfo:
         tables: dict[str, TableInfo] = {}
         q = self._QNAME
-        for name, rows, size in self._query(
-                f"SELECT {q.format(rel='c.relname')}, GREATEST(c.reltuples, 0)::bigint, pg_total_relation_size(c.oid) "
+        # reltuples — оценка планировщика: до первого ANALYZE/автовакуума она −1 (или 0), хотя данные есть.
+        # Тогда берём n_live_tup (статистика активности растёт при каждой вставке), а если и там 0 при непустом
+        # файле таблицы — точный count(*) для таблиц до 100 МБ, к которым есть право SELECT.
+        exact = []
+        for name, rows, size, heap, schema, rel, can_read in self._query(
+                f"SELECT {q.format(rel='c.relname')}, "
+                "CASE WHEN c.reltuples > 0 THEN c.reltuples ELSE COALESCE(s.n_live_tup, 0) END::bigint, "
+                "pg_total_relation_size(c.oid), pg_relation_size(c.oid), n.nspname, c.relname, "
+                "has_table_privilege(c.oid, 'SELECT') "
                 f"FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+                "LEFT JOIN pg_stat_user_tables s ON s.relid = c.oid "
                 f"WHERE {self._USER_SCHEMAS} AND c.relkind IN ('r','p') ORDER BY 1"):
             tables[name] = TableInfo(name=name, row_count=int(rows), size_bytes=int(size))
+            if not rows and 0 < heap <= 100 * 1024 * 1024 and can_read:
+                exact.append((name, schema, rel))
+        if exact:
+            ident = lambda s: '"' + s.replace('"', '""') + '"'  # noqa: E731
+            counts = self._query(" UNION ALL ".join(
+                f"SELECT {i}, count(*) FROM {ident(schema)}.{ident(rel)}" for i, (_, schema, rel) in enumerate(exact)))
+            for i, n in counts:
+                tables[exact[i][0]].row_count = int(n)
         for t, col, ctype, nullable in self._query(
                 "SELECT CASE WHEN table_schema = current_schema() THEN table_name ELSE table_schema || '.' || table_name END, "
                 "column_name, "
