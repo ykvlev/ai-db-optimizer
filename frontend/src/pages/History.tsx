@@ -31,16 +31,16 @@ export function History({ refreshKey }: { refreshKey: number }) {
         {!rows.length ? <Empty>История пуста</Empty> : (
           <div className="max-h-[calc(100vh-180px)] overflow-auto">
             <table className="w-full text-[12.5px]">
-              <thead className="sticky top-0 bg-panel text-left text-muted">
+              <thead className="sticky top-0 bg-panel text-left text-stone">
                 <tr><th className="py-1.5 font-normal">#</th><th className="font-normal">Тип</th><th className="font-normal">Запрос</th><th className="font-normal">Итог</th><th className="font-normal">Ускорение</th></tr>
               </thead>
               <tbody>
                 {rows.map(r => (
                   <tr key={r.id} onClick={() => open(r.id)} className={`cursor-pointer border-t border-line hover:bg-panel-2 ${detail?.id === r.id ? 'bg-panel-2' : ''}`}>
-                    <td className="py-1.5 pr-2 text-muted">{r.id}</td>
-                    <td className="pr-2">{kindName[r.kind] ?? r.kind}<div className="text-[11px] text-muted">{r.dbms}{r.model ? ` · ${r.model}` : ''}</div></td>
+                    <td className="py-1.5 pr-2 text-stone">{r.id}</td>
+                    <td className="pr-2">{kindName[r.kind] ?? r.kind}<div className="text-[11px] text-stone">{r.dbms}{r.model ? ` · ${r.model}` : ''}</div></td>
                     <td className="mono max-w-[280px] truncate pr-2 text-[11.5px]" title={r.sql}>{r.sql}</td>
-                    <td className="pr-2">{r.verdict ? <Tag tone={verdictTone(r.verdict)}>{r.verdict}</Tag> : r.equivalent != null ? <Tag tone={r.equivalent ? 'good' : 'bad'}>{r.equivalent ? 'эквивалентен' : 'отличается'}</Tag> : <span className="text-muted">{r.issues} пробл.</span>}</td>
+                    <td className="pr-2">{r.verdict ? <Tag tone={verdictTone(r.verdict)}>{r.verdict}</Tag> : r.equivalent != null ? <Tag tone={r.equivalent ? 'good' : 'bad'}>{r.equivalent ? 'эквивалентен' : 'отличается'}</Tag> : <span className="text-stone">{r.issues} пробл.</span>}</td>
                     <td className="tabular-nums">{r.speedup != null ? `${r.speedup.toFixed(2)}x` : '—'}</td>
                   </tr>
                 ))}
@@ -63,7 +63,7 @@ export function History({ refreshKey }: { refreshKey: number }) {
               </div>
               <Code>{detail.sql}</Code>
               {result?.verdict_reason && <p className="mt-2 text-[13px]"><Tag tone={verdictTone(result.verdict)}>{result.verdict}</Tag> {result.verdict_reason}</p>}
-              {result?.optimized_query && <div className="mt-3"><div className="mb-1 text-[12px] text-muted">Оптимизированный запрос</div><Code>{result.optimized_query}</Code></div>}
+              {result?.optimized_query && <div className="mt-3"><div className="mb-1 text-[12px] text-stone">Оптимизированный запрос</div><Code>{result.optimized_query}</Code></div>}
             </Card>
             {detail.kind === 'analyze' && Array.isArray((result as { issues?: unknown })?.issues) && (
               <Card title="Проблемы"><IssueList issues={(result as unknown as { issues: never[] }).issues} /></Card>

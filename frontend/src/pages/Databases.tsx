@@ -48,23 +48,23 @@ export function Databases({ connections, onChange }: { connections: Connection[]
       <div className="space-y-4">
         <Card title="Новое подключение">
           <div className="mb-3 flex flex-wrap gap-2">
-            {Object.entries(presets).map(([name, p]) => <Button key={name} variant="ghost" onClick={() => setForm(f => ({ ...f, ...p, name }))}>{name}</Button>)}
+            {Object.entries(presets).map(([name, p]) => <Button key={name} onClick={() => setForm(f => ({ ...f, ...p, name }))}>{name}</Button>)}
           </div>
           <div className="grid grid-cols-[90px_1fr] items-center gap-2 text-[13px]">
-            <label className="text-muted">СУБД</label>
+            <label className="text-stone">СУБД</label>
             <select value={form.dbms as string} onChange={e => { const d = e.target.value as Dialect; set('dbms', d); set('port', d === 'mysql' ? 3306 : 5432) }}>
               <option value="mysql">MySQL 8+</option><option value="postgres">PostgreSQL 14+</option>
             </select>
-            <label className="text-muted">Название</label><input value={form.name as string} onChange={e => set('name', e.target.value)} placeholder="необязательно" />
-            <label className="text-muted">Host</label><input value={form.host as string} onChange={e => set('host', e.target.value)} />
-            <label className="text-muted">Port</label><input type="number" value={form.port as number} onChange={e => set('port', Number(e.target.value))} />
-            <label className="text-muted">Database</label><input value={form.database as string} onChange={e => set('database', e.target.value)} />
-            <label className="text-muted">User</label><input value={form.username as string} onChange={e => set('username', e.target.value)} />
-            <label className="text-muted">Password</label><input type="password" value={form.password as string} onChange={e => set('password', e.target.value)} />
-            <label className="text-muted">SSL</label><input type="checkbox" className="h-4 w-4 justify-self-start" checked={form.ssl as boolean} onChange={e => set('ssl', e.target.checked)} />
+            <label className="text-stone">Название</label><input value={form.name as string} onChange={e => set('name', e.target.value)} placeholder="необязательно" />
+            <label className="text-stone">Host</label><input value={form.host as string} onChange={e => set('host', e.target.value)} />
+            <label className="text-stone">Port</label><input type="number" value={form.port as number} onChange={e => set('port', Number(e.target.value))} />
+            <label className="text-stone">Database</label><input value={form.database as string} onChange={e => set('database', e.target.value)} />
+            <label className="text-stone">User</label><input value={form.username as string} onChange={e => set('username', e.target.value)} />
+            <label className="text-stone">Password</label><input type="password" value={form.password as string} onChange={e => set('password', e.target.value)} />
+            <label className="text-stone">SSL</label><input type="checkbox" className="h-4 w-4 justify-self-start" checked={form.ssl as boolean} onChange={e => set('ssl', e.target.checked)} />
           </div>
           <div className="mt-4"><Button variant="primary" onClick={submit} disabled={busy}>{busy && <Spinner />} Проверить и сохранить</Button></div>
-          <p className="mt-3 text-[12px] text-muted">
+          <p className="mt-3 text-[12px] text-stone">
             Все запросы выполняются в READ ONLY транзакции с таймаутом. Рекомендуется пользователь только с правом SELECT. Пароль хранится зашифрованным.
           </p>
           {warnings.map((w, i) => <p key={i} className="mt-2 text-[12px] text-warn">⚠ {w}</p>)}
@@ -76,8 +76,8 @@ export function Databases({ connections, onChange }: { connections: Connection[]
             <ul className="space-y-2">{connections.map(c => (
               <li key={c.id} onClick={() => setSelected(c.id)}
                 className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === c.id ? 'border-text bg-panel-2' : 'border-line bg-panel-2 hover:border-muted'}`}>
-                <div className="flex items-center gap-2"><span className="font-semibold">{c.name}</span><span className="ml-auto" /><Button variant="danger" onClick={() => remove(c.id)}>Удалить</Button></div>
-                <div className="mono mt-1 text-[11.5px] text-muted">{c.dbms} {c.server_version} · {c.username}@{c.host}:{c.port}/{c.database}</div>
+                <div className="flex items-center gap-2"><span className="font-medium">{c.name}</span><span className="ml-auto" /><Button variant="danger" onClick={() => remove(c.id)}>Удалить</Button></div>
+                <div className="mono mt-1 text-[11.5px] text-stone">{c.dbms} {c.server_version} · {c.username}@{c.host}:{c.port}/{c.database}</div>
                 <div className="mt-1">{c.read_only_user ? <Tag tone="good">только чтение</Tag> : c.read_only_user === false ? <Tag tone="warn">есть права на запись</Tag> : null}</div>
               </li>
             ))}</ul>
@@ -85,7 +85,7 @@ export function Databases({ connections, onChange }: { connections: Connection[]
         </Card>
       </div>
 
-      <Card title="Database Explorer" actions={selected != null && <Button variant="ghost" onClick={() => loadSchema(selected, true)}>{schemaBusy && <Spinner />} Обновить</Button>}>
+      <Card title="Структура базы" actions={selected != null && <Button variant="ghost" onClick={() => loadSchema(selected, true)}>{schemaBusy && <Spinner />} Обновить</Button>}>
         {schema ? <SchemaView schema={schema} /> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Выберите подключение'}</Empty>}
       </Card>
     </div>

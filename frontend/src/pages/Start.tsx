@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Connection, ModelsInfo, Stats } from '../api'
 import { api } from '../api'
-import { Button, Card, Spinner } from '../components/ui'
+import { Button, Spinner } from '../components/ui'
 
 export const DEMO_CONNECTIONS = {
   mysql: { name: 'Демо MySQL', dbms: 'mysql', host: '127.0.0.1', port: 3307, database: 'shop', username: 'optimizer_ro', password: 'optimizer_ro' },
@@ -10,33 +10,38 @@ export const DEMO_CONNECTIONS = {
 
 type State = 'ok' | 'todo' | 'optional' | 'wait'
 
+/** Строка чек-листа в стиле CLI-вывода: ✓ зелёным для готового, › для того, что нужно сделать. */
 function Check({ state, title, children, action }: { state: State; title: string; children: React.ReactNode; action?: React.ReactNode }) {
-  const label = { ok: 'Готово', todo: 'Нужно сделать', optional: 'Необязательно', wait: 'Проверка…' }[state]
-  const tone = { ok: 'text-good', todo: 'text-accent', optional: 'text-muted', wait: 'text-muted' }[state]
+  const mark = { ok: '✓', todo: '›', optional: '○', wait: '…' }[state]
+  const tone = { ok: 'text-terminal-green', todo: 'text-obsidian', optional: 'text-smoke', wait: 'text-smoke' }[state]
+  const label = { ok: 'готово', todo: 'нужно сделать', optional: 'необязательно', wait: 'проверка' }[state]
   return (
-    <div className="grid items-start gap-3 border-t border-line py-4 sm:grid-cols-[130px_1fr_auto]">
-      <div className={`kicker pt-0.5 ${tone}`}>{state === 'ok' ? '■ ' : '□ '}{label}</div>
-      <div className="min-w-0 flex-1">
-        <div className="text-[13.5px] font-semibold">{title}</div>
-        <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted">{children}</div>
+    <div className="grid items-start gap-x-3 gap-y-2 border-t border-line px-4 py-3 [header+&]:border-t-0 sm:grid-cols-[16px_1fr_auto]">
+      <span className={`font-mono text-[14px] leading-6 ${tone}`}>{mark}</span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-baseline gap-x-3">
+          <span className="text-[14px] font-medium text-obsidian">{title}</span>
+          <span className={`kicker ${state === 'ok' ? 'text-terminal-green' : 'text-smoke'}`}>{label}</span>
+        </div>
+        <div className="mt-1 text-[13px] leading-[1.54] text-charcoal">{children}</div>
       </div>
-      {action && <div className="shrink-0 self-center">{action}</div>}
+      {action && <div className="sm:self-center">{action}</div>}
     </div>
   )
 }
 
 const STEPS = [
-  { t: 'Вставьте запрос', d: 'SQL-запрос или целый скрипт. Можно взять готовый пример.' },
-  { t: 'Система ищет проблемы', d: 'Разбирает запрос, смотрит схему и план выполнения, проверяет 17 правил.' },
-  { t: 'ИИ предлагает ускорение', d: 'Языковая модель переписывает запрос с учётом найденных проблем.' },
-  { t: 'Всё проверяется на базе', d: 'Совпадает ли результат и стал ли запрос быстрее — по реальным замерам.' },
+  ['Вставьте запрос', 'SQL-запрос или целый скрипт. Можно взять готовый пример.'],
+  ['Система ищет проблемы', 'Разбирает запрос, смотрит схему и план выполнения, проверяет 17 правил.'],
+  ['ИИ предлагает ускорение', 'Языковая модель переписывает запрос с учётом найденных проблем.'],
+  ['Всё проверяется на базе', 'Совпадает ли результат и стал ли запрос быстрее — по реальным замерам.'],
 ]
 
 const VERDICTS = [
-  ['Оптимизация принята', 'good', 'результат совпал с исходным, запрос стал быстрее минимум на 5 %. Можно применять.'],
-  ['Оптимизация отклонена', 'bad', 'модель ошиблась: изменился результат, запрос замедлился или обратился к несуществующим данным. Применять нельзя.'],
+  ['Принята', 'good', 'результат совпал с исходным, запрос быстрее минимум на 5 %. Можно применять.'],
+  ['Отклонена', 'bad', 'модель ошиблась: изменился результат, запрос замедлился или обратился к несуществующим данным.'],
   ['Без изменений', 'muted', 'проблем не найдено или ускорение в пределах погрешности.'],
-  ['Не проверено на БД', 'warn', 'база не подключена, поэтому результат и скорость не проверялись. Подключите базу, чтобы получить надёжный вердикт.'],
+  ['Не проверено', 'warn', 'база не подключена — результат и скорость не проверялись.'],
 ] as const
 
 export function Start({ backendOk, models, connections, stats, onNavigate, onConnectionsChange }: {
@@ -54,54 +59,24 @@ export function Start({ backendOk, models, connections, stats, onNavigate, onCon
     catch (e) { setDemoError((e as Error).message) } finally { setBusy(null) }
   }
 
+  const median = stats?.median_speedup
   return (
-    <div className="mx-auto max-w-5xl space-y-12 pb-16">
-      <section className="grid gap-8 pt-2 lg:grid-cols-[1fr_280px]">
-        <div>
-        <div className="kicker text-accent">Оптимизация SQL-запросов с проверкой</div>
-        <h2 className="mt-3 text-[44px] font-bold leading-[1.02] tracking-[-0.02em]">Ускоряйте SQL-запросы с&nbsp;ИИ.<br /><span className="text-muted">Точно зная, что ничего не сломалось.</span></h2>
-        <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-muted">
-          Программа находит причины медленной работы запроса, просит языковую модель предложить более быструю версию
-          и проверяет её на вашей базе данных: совпадает ли результат и насколько запрос реально ускорился.
-          Базы данных только читаются — ничего не изменяется.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Button variant="primary" onClick={() => onNavigate('analyzer')}>Попробовать на примере →</Button>
-          <Button onClick={() => onNavigate('setup')}>Как установить и настроить</Button>
-        </div>
-        </div>
-        <div className="space-y-5 border-l border-line pl-6 lg:pt-8">
-          {[['17', 'правил анализа'], ['2', 'СУБД: MySQL и PostgreSQL'], ['4', 'проверки каждой рекомендации ИИ']].map(([v, l]) => (
-            <div key={l}><div className="text-[40px] font-bold leading-none tracking-tight">{v}</div><div className="mt-1 text-[12.5px] text-muted">{l}</div></div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h3 className="kicker mb-4">Как это работает</h3>
-        <div className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s, i) => (
-            <div key={s.t} className="bg-bg p-5 pl-0 pr-6 sm:pl-5 first:sm:pl-0">
-              <div className="text-[32px] font-bold leading-none tabular-nums text-accent">{String(i + 1).padStart(2, '0')}</div>
-              <div className="mt-4 text-[15px] font-semibold leading-snug">{s.t}</div>
-              <div className="mt-2 text-[12.5px] leading-relaxed text-muted">{s.d}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h3 className="kicker mb-1">Готовность к работе</h3>
-        <div className="border-b border-line">
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+        <section className="card">
+          <header className="flex items-center justify-between border-b border-line px-4 py-3">
+            <h3 className="kicker text-obsidian">Готовность к работе</h3>
+            <span className="kicker text-smoke">обновляется само</span>
+          </header>
           <Check state={backendOk == null ? 'wait' : backendOk ? 'ok' : 'todo'} title="Сервер программы"
             action={backendOk === false && <Button onClick={() => onNavigate('setup')}>Инструкция</Button>}>
-            {backendOk == null ? 'Проверяем…' : backendOk ? 'Запущен и отвечает.' : 'Не отвечает. Запустите сервер (backend) — инструкция в разделе «Установка».'}
+            {backendOk == null ? 'Проверяем…' : backendOk ? 'Запущен локально и отвечает.' : 'Не отвечает. Запустите сервер — шаг 04 в разделе «Установка и помощь».'}
           </Check>
-          <Check state={!models ? 'wait' : llm.length ? 'ok' : 'optional'} title="Модель искусственного интеллекта"
+          <Check state={!models ? 'wait' : llm.length ? 'ok' : 'optional'} title="Модель ИИ"
             action={models && !llm.length && <Button onClick={() => onNavigate('setup')}>Настроить</Button>}>
             {!models ? 'Проверяем…' : llm.length
-              ? <>Подключено: {llm.join(', ')} · моделей: {models.models.filter(m => m !== models.baseline).length}. По умолчанию — <span className="mono">{models.default ?? '—'}</span>.</>
-              : 'Не настроена. Анализ, поиск проблем и оптимизация по правилам работают и без неё; для ИИ-оптимизации укажите ключ GigaChat, YandexGPT или локальную модель Ollama.'}
+              ? <>Подключено: {llm.join(', ')}. По умолчанию — <span className="font-mono text-[12px]">{models.default ?? '—'}</span>.</>
+              : 'Не настроена. Анализ и оптимизация по правилам работают и без неё; для ИИ укажите ключ GigaChat или локальную модель.'}
           </Check>
           <Check state={connections.length ? 'ok' : 'todo'} title="База данных"
             action={!connections.length && backendOk && <div className="flex gap-2">
@@ -110,40 +85,76 @@ export function Start({ backendOk, models, connections, stats, onNavigate, onCon
             </div>}>
             {connections.length
               ? <>Подключено: {connections.map(c => c.name).join(', ')}.</>
-              : <>Без базы программа только ищет проблемы в тексте запроса. Подключите демо-базу интернет-магазина одной кнопкой (нужен запущенный Docker) или свою в разделе «Базы данных».</>}
-            {demoError && <div className="mt-1 text-bad">Не удалось подключиться: {demoError}. Проверьте, что Docker запущен и выполнена команда из шага 3 инструкции.</div>}
+              : 'Без базы программа проверяет только текст запроса. Подключите демо-базу одной кнопкой (нужен Docker) или свою в разделе «Базы данных».'}
+            {demoError && <div className="mt-1 text-obsidian">✕ Не удалось подключиться: {demoError}. Проверьте, что Docker запущен (шаг 03 инструкции).</div>}
           </Check>
           <Check state={runs ? 'ok' : 'optional'} title="Первый анализ"
             action={!runs && <Button variant="primary" onClick={() => onNavigate('analyzer')}>Открыть</Button>}>
-            {runs ? `Выполнено запусков: ${runs}. Результаты — в разделах «История» и «Обзор».` : 'Откройте «Анализ запроса»: там уже вставлен пример. Нажмите «Анализировать», затем «Оптимизировать с помощью ИИ».'}
+            {runs ? `Выполнено запусков: ${runs}.` : 'Откройте «Анализ запроса»: там уже вставлен пример. Нажмите «Анализировать», затем «Оптимизировать с ИИ».'}
           </Check>
-        </div>
-      </section>
+        </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card title="Что означают результаты">
-          <ul className="space-y-2.5">
+        <section className="card flex flex-col">
+          <header className="border-b border-line px-4 py-3"><h3 className="kicker text-obsidian">Быстрые действия</h3></header>
+          <div className="flex flex-1 flex-col divide-y divide-line">
+            {[
+              ['analyzer', 'Проанализировать запрос', 'найти проблемы и ускорить', 'alt 2'],
+              ['compare', 'Сравнить два запроса', 'результат и скорость', 'alt 3'],
+              ['databases', 'Подключить базу данных', 'MySQL или PostgreSQL', 'alt 4'],
+              ['experiments', 'Запустить эксперимент', 'набор запросов × модели', 'alt 5'],
+            ].map(([id, t, d, k]) => (
+              <button key={id} onClick={() => onNavigate(id)} className="group flex items-center gap-3 px-4 py-3 text-left hover:bg-paper-white">
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] text-obsidian">{t}</span>
+                  <span className="block text-[13px] text-stone">{d}</span>
+                </span>
+                <span className="font-mono text-[11px] text-ash">{k}</span>
+                <span className="text-stone transition-transform group-hover:translate-x-0.5">→</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ['запусков', stats ? String(stats.runs_total) : '…', 'анализ и оптимизация'],
+          ['принято', stats ? String(stats.successful_optimizations) : '…', 'результат совпал, быстрее ≥ 5 %'],
+          ['медиана ускорения', median != null ? `${median.toFixed(1).replace('.', ',')}x` : '—', 'по измеренным на базе'],
+          ['проверено на базе', stats ? String(stats.verified_runs) : '…', 'с проверкой результата'],
+        ].map(([l, v, h]) => (
+          <div key={l} className="card p-4">
+            <div className="kicker text-stone">{l}</div>
+            <div className="mt-3 text-[30px] font-[450] leading-none tracking-[-0.05em] tabular-nums text-obsidian">{v}</div>
+            <div className="mt-2 text-[13px] text-stone">{h}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+        <section className="card">
+          <header className="border-b border-line px-4 py-3"><h3 className="kicker text-obsidian">Как это работает</h3></header>
+          <ol className="grid sm:grid-cols-2 xl:grid-cols-4">
+            {STEPS.map(([t, d], i) => (
+              <li key={t} className="border-line p-4 sm:[&:nth-child(n+2)]:border-l">
+                <div className="font-mono text-[11px] text-stone">{String(i + 1).padStart(2, '0')}</div>
+                <div className="mt-2 text-[14px] font-medium text-obsidian">{t}</div>
+                <div className="mt-1 text-[13px] leading-[1.54] text-charcoal">{d}</div>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section className="card">
+          <header className="border-b border-line px-4 py-3"><h3 className="kicker text-obsidian">Что означает вердикт</h3></header>
+          <ul className="space-y-2.5 p-4">
             {VERDICTS.map(([name, tone, d]) => (
-              <li key={name} className="text-[13px] leading-relaxed">
-                <span className={`mr-1.5 border px-1.5 py-0.5 text-[11px] font-semibold ${tone === 'good' ? 'border-good text-good' : tone === 'bad' ? 'border-bad text-bad' : tone === 'warn' ? 'border-warn text-warn' : 'border-line text-muted'}`}>{name}</span>
-                <span className="text-muted">— {d}</span>
+              <li key={name} className="grid grid-cols-[120px_1fr] gap-3 text-[13px] leading-[1.54]">
+                <span className={`kicker self-start justify-self-start whitespace-nowrap rounded-sm px-1.5 py-px ${tone === 'good' ? 'text-terminal-green shadow-[0_0_0_1px_#297a3a]' : tone === 'bad' ? 'bg-obsidian text-white' : tone === 'warn' ? 'text-charcoal shadow-[0_0_0_1px_#c9c9c9]' : 'text-stone shadow-[0_0_0_1px_#ebebeb]'}`}>{name}</span>
+                <span className="text-charcoal">{d}</span>
               </li>
             ))}
           </ul>
-        </Card>
-        <Card title="Разделы программы">
-          <ul className="space-y-2 text-[13px]">
-            {[
-              ['analyzer', 'Анализ запроса', 'главный инструмент: найти проблемы и ускорить запрос'],
-              ['compare', 'Сравнение запросов', 'проверить свой вариант запроса против исходного'],
-              ['databases', 'Базы данных', 'подключить базу и посмотреть её таблицы и индексы'],
-              ['experiments', 'Эксперименты', 'прогнать набор запросов через несколько моделей и получить отчёт'],
-              ['history', 'История', 'все запуски, выгрузка результатов'],
-            ].map(([id, t, d]) => (
-              <li key={id}><button className="font-semibold text-text underline decoration-line underline-offset-4 hover:decoration-accent" onClick={() => onNavigate(id)}>{t}</button><span className="text-muted"> — {d}</span></li>
-            ))}
-          </ul>
-        </Card>
+        </section>
       </div>
     </div>
   )

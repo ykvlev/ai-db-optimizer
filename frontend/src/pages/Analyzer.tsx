@@ -134,7 +134,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
       {/* ------------------------------------------------ левая колонка */}
       <div className="flex min-w-0 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <select value={connId ?? ''} onChange={e => { setConnTouched(true); setConnId(e.target.value ? Number(e.target.value) : null) }} className={`min-w-0 flex-1 ${conn ? '' : 'border-warn text-warn'}`}>
+          <select value={connId ?? ''} onChange={e => { setConnTouched(true); setConnId(e.target.value ? Number(e.target.value) : null) }} className={`min-w-[220px] flex-1 ${conn ? '' : 'text-stone'}`}>
             <option value="">Без подключения (офлайн-анализ)</option>
             {connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -143,7 +143,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
             <option value="postgres">PostgreSQL</option>
           </select>
           {examples && (
-            <select value="" onChange={e => loadExample(e.target.value)}>
+            <select value="" onChange={e => loadExample(e.target.value)} className="w-40 shrink-0">
               <option value="">Примеры…</option>
               {examples.queries.map(q => <option key={q.id} value={q.id}>{q.title}</option>)}
             </select>
@@ -154,7 +154,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
 
         {!conn && (
           <div>
-            <button className="text-[12px] text-muted hover:text-text" onClick={() => setShowDdl(!showDdl)}>
+            <button className="text-[12px] text-stone hover:text-text" onClick={() => setShowDdl(!showDdl)}>
               {showDdl ? '▾' : '▸'} DDL-схема таблиц {ddl.trim() ? '(задана)' : '(не задана)'}
             </button>
             {showDdl && <div className="mt-2"><SqlEditor value={ddl} onChange={setDdl} height={220} /></div>}
@@ -175,24 +175,24 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
           </select>
         </div>
         {busy === 'optimize' && (
-          <p className="text-[12px] text-muted">
+          <p className="text-[12px] text-stone">
             {conn ? 'Анализ → запрос к модели → проверки → эквивалентность → бенчмарк. С локальной моделью на CPU это занимает 2–5 минут.' : 'Анализ → запрос к модели → статические проверки. С локальной моделью на CPU это занимает 2–5 минут.'}
           </p>
         )}
         {!conn && (
           <div className="border-l-2 border-warn bg-warn/5 px-3 py-2 text-[12.5px] leading-relaxed">
-            <span className="font-semibold text-warn">База не выбрана.</span>{' '}
-            <span className="text-muted">Программа проверит только текст запроса: без базы нет плана выполнения, проверки результата и замеров скорости.
+            <span className="font-medium text-warn">База не выбрана.</span>{' '}
+            <span className="text-stone">Программа проверит только текст запроса: без базы нет плана выполнения, проверки результата и замеров скорости.
             {connections.length > 0 ? ' Выберите базу в списке выше.' : ''}</span>
-            {!connections.length && <button className="ml-1 font-semibold text-text underline underline-offset-4 hover:text-accent" onClick={() => onNavigate('start')}>Подключить демо-базу</button>}
+            {!connections.length && <button className="ml-1 font-medium text-text underline underline-offset-4 hover:text-obsidian" onClick={() => onNavigate('start')}>Подключить демо-базу</button>}
           </div>
         )}
         {!a && (
           <ol className="border-b border-line text-[12.5px]">
             {[['Выберите базу', 'и СУБД — или оставьте офлайн-режим'], ['Анализировать', 'быстро, без ИИ: проблемы, план выполнения, схема'], ['Оптимизировать с ИИ', 'новый запрос с проверкой результата и скорости']].map(([t, d], i) => (
               <li key={t} className="flex gap-3 border-t border-line py-2">
-                <span className="w-5 shrink-0 font-bold tabular-nums text-accent">{String(i + 1).padStart(2, '0')}</span>
-                <span className="w-40 shrink-0 font-semibold">{t}</span><span className="text-muted">{d}</span>
+                <span className="w-5 shrink-0 font-[450] tabular-nums text-obsidian">{String(i + 1).padStart(2, '0')}</span>
+                <span className="w-40 shrink-0 font-medium">{t}</span><span className="text-stone">{d}</span>
               </li>
             ))}
           </ol>
@@ -204,16 +204,16 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
       <div className="min-w-0 rounded-lg border border-line bg-panel">
         {multi && (
           <div className="border-b border-line p-3">
-            <div className="mb-2 text-[12px] text-muted">В тексте {plural(script!.statements.length, 'запрос', 'запроса', 'запросов')} — выберите запрос для анализа и оптимизации:</div>
+            <div className="mb-2 text-[12px] text-stone">В тексте {plural(script!.statements.length, 'запрос', 'запроса', 'запросов')} — выберите запрос для анализа и оптимизации:</div>
             <div className="flex max-h-44 flex-col gap-1 overflow-y-auto">
               {script!.statements.map((st, i) => {
                 const n = st.analysis.issues.filter(x => x.code !== 'RULE_ERROR').length
                 return (
                   <button key={i} onClick={() => selectStatement(i)}
                     className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left text-[12.5px] ${i === selIdx ? 'border-text bg-panel-2' : 'border-line hover:border-muted'}`}>
-                    <span className="shrink-0 text-muted">#{i + 1}</span>
+                    <span className="shrink-0 text-stone">#{i + 1}</span>
                     <span className="min-w-0 flex-1 truncate">{st.title ?? st.sql.replace(/\s+/g, ' ').slice(0, 90)}</span>
-                    <span className="shrink-0 text-[11px] text-muted">стр. {st.start_line}</span>
+                    <span className="shrink-0 text-[11px] text-stone">стр. {st.start_line}</span>
                     {!st.analysis.safety.allowed ? <Tag tone="muted">не выполняется</Tag> : <Tag tone={n ? 'warn' : 'good'}>{n}</Tag>}
                   </button>
                 )
@@ -239,7 +239,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
                   {conn && <Button onClick={verifyRewrite} disabled={cmpBusy}>{cmpBusy && <Spinner />} Проверить на БД</Button>}
                   <Button variant="ghost" onClick={() => onSendToCompare({ original: currentSql, optimized: a.rule_rewrite!, connectionId: connId, source: 'rule-based переписывание' })}>Отправить в сравнение</Button>
                 </>}>
-                  <ul className="mb-2 text-[13px] text-muted">{a.rule_rewrite_notes.map((n, i) => <li key={i}>• {n}</li>)}</ul>
+                  <ul className="mb-2 text-[13px] text-stone">{a.rule_rewrite_notes.map((n, i) => <li key={i}>• {n}</li>)}</ul>
                   <SqlDiff original={currentSql} modified={a.rule_rewrite} height={200} />
                 </Card>
               )}
@@ -277,7 +277,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
                     <p className="text-[13.5px] leading-relaxed">{plain && opt.ai.plain_explanation ? opt.ai.plain_explanation : opt.ai.summary}</p>
                     {!plain && opt.ai.issues.length > 0 && (
                       <ul className="mt-3 space-y-1.5">{opt.ai.issues.map((i, k) => (
-                        <li key={k} className="flex gap-2 text-[13px]"><SeverityBadge severity={(i.severity as never)} /><span><span className="mono text-[11px] text-muted">{i.type}</span> {i.description}</span></li>
+                        <li key={k} className="flex gap-2 text-[13px]"><SeverityBadge severity={(i.severity as never)} /><span><span className="mono text-[11px] text-stone">{i.type}</span> {i.description}</span></li>
                       ))}</ul>
                     )}
                   </Card>
@@ -290,9 +290,9 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
                   )}
                   {opt.ai.recommended_indexes.length > 0 && (
                     <Card title="Рекомендованные индексы">
-                      <p className="mb-2 text-[12px] text-muted">Индексы не создаются автоматически: система работает в режиме только чтения. Бенчмарк выполнен без них.</p>
+                      <p className="mb-2 text-[12px] text-stone">Индексы не создаются автоматически: система работает в режиме только чтения. Бенчмарк выполнен без них.</p>
                       <div className="space-y-2">{opt.ai.recommended_indexes.map((r, i) => (
-                        <div key={i}><Code>{r.sql ?? `CREATE INDEX ON ${r.table} (${r.columns.join(', ')});`}</Code>{r.reason && <p className="mt-1 text-[12px] text-muted">{r.reason}</p>}</div>
+                        <div key={i}><Code>{r.sql ?? `CREATE INDEX ON ${r.table} (${r.columns.join(', ')});`}</Code>{r.reason && <p className="mt-1 text-[12px] text-stone">{r.reason}</p>}</div>
                       ))}</div>
                     </Card>
                   )}
@@ -301,23 +301,23 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
               <div className="grid gap-4 lg:grid-cols-2">
                 <Card title="AI Confidence">
                   {opt.confidence?.confidence != null
-                    ? <div className="text-3xl font-semibold">{Math.round(opt.confidence.confidence * 100)}%</div>
-                    : <p className="text-[13px] text-muted">Не рассчитывается без фактической проверки результата на БД.</p>}
+                    ? <div className="text-3xl font-medium">{Math.round(opt.confidence.confidence * 100)}%</div>
+                    : <p className="text-[13px] text-stone">Не рассчитывается без фактической проверки результата на БД.</p>}
                   {opt.confidence && opt.confidence.factors.length > 0 && (
                     <ul className="mt-2 space-y-1 text-[12.5px]">{opt.confidence.factors.map(f => (
-                      <li key={f.name} className="flex justify-between gap-3"><span className="text-muted">{factorNames[f.name] ?? f.name}: {f.detail}</span><span className="tabular-nums">{Math.round(f.value * 100)}%</span></li>
+                      <li key={f.name} className="flex justify-between gap-3"><span className="text-stone">{factorNames[f.name] ?? f.name}: {f.detail}</span><span className="tabular-nums">{Math.round(f.value * 100)}%</span></li>
                     ))}</ul>
                   )}
-                  {opt.ai?.confidence != null && <p className="mt-2 text-[12px] text-muted">Самооценка модели (не учитывается): {Math.round(opt.ai.confidence * 100)}%</p>}
+                  {opt.ai?.confidence != null && <p className="mt-2 text-[12px] text-stone">Самооценка модели (не учитывается): {Math.round(opt.ai.confidence * 100)}%</p>}
                 </Card>
                 {opt.llm && (
                   <Card title="Вызов модели">
                     <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[12.5px]">
-                      <dt className="text-muted">Модель</dt><dd className="mono">{opt.llm.provider}:{opt.llm.model}</dd>
-                      <dt className="text-muted">Промпт</dt><dd className="mono">{opt.llm.prompt_version}</dd>
-                      <dt className="text-muted">Время ответа</dt><dd>{(opt.llm.latency_ms / 1000).toFixed(1)} с</dd>
-                      <dt className="text-muted">Токены</dt><dd>{opt.llm.prompt_tokens ?? '—'} → {opt.llm.completion_tokens ?? '—'}</dd>
-                      <dt className="text-muted">Запуск</dt><dd>#{opt.run_id}</dd>
+                      <dt className="text-stone">Модель</dt><dd className="mono">{opt.llm.provider}:{opt.llm.model}</dd>
+                      <dt className="text-stone">Промпт</dt><dd className="mono">{opt.llm.prompt_version}</dd>
+                      <dt className="text-stone">Время ответа</dt><dd>{(opt.llm.latency_ms / 1000).toFixed(1)} с</dd>
+                      <dt className="text-stone">Токены</dt><dd>{opt.llm.prompt_tokens ?? '—'} → {opt.llm.completion_tokens ?? '—'}</dd>
+                      <dt className="text-stone">Запуск</dt><dd>#{opt.run_id}</dd>
                     </dl>
                   </Card>
                 )}
@@ -334,7 +334,7 @@ export function Analyzer({ connections, models, examples, onRun, onSendToCompare
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return <><dt className="py-1 text-muted">{label}</dt><dd className="mono py-1 text-[12.5px]">{children}</dd></>
+  return <><dt className="py-1 text-stone">{label}</dt><dd className="mono py-1 text-[12.5px]">{children}</dd></>
 }
 
 function ParsedView({ a }: { a: AnalyzeResponse }) {
@@ -358,7 +358,7 @@ function ParsedView({ a }: { a: AnalyzeResponse }) {
         <Row label="Колонки">{list(p.columns)}</Row>
         <Row label="Узлов AST">{p.node_count}</Row>
       </dl>
-      <div><div className="mb-1 text-[12px] text-muted">Нормализованный SQL</div><Code>{p.normalized_sql}</Code></div>
+      <div><div className="mb-1 text-[12px] text-stone">Нормализованный SQL</div><Code>{p.normalized_sql}</Code></div>
     </div>
   )
 }
@@ -369,27 +369,27 @@ export function SchemaView({ schema, tables }: { schema: SchemaInfo; tables?: st
   const sorted = [...schema.tables].sort((x, y) => Number(used.has(y.name.toLowerCase())) - Number(used.has(x.name.toLowerCase())))
   return (
     <div className="space-y-3">
-      <div className="text-[12px] text-muted">Источник: {schema.source === 'live' ? 'подключение к БД' : 'DDL'}</div>
+      <div className="text-[12px] text-stone">Источник: {schema.source === 'live' ? 'подключение к БД' : 'DDL'}</div>
       {sorted.map(t => (
         <details key={t.name} open={used.has(t.name.toLowerCase())} className="rounded-md border border-line bg-panel-2">
           <summary className="flex cursor-pointer flex-wrap items-center gap-2 px-3 py-2">
-            <span className="mono font-semibold">{t.name}</span>
+            <span className="mono font-medium">{t.name}</span>
             {used.has(t.name.toLowerCase()) && <Tag tone="accent">в запросе</Tag>}
-            {t.row_count != null && <span className="text-[12px] text-muted">~{fmtNum(t.row_count)} строк</span>}
-            {t.size_bytes != null && <span className="text-[12px] text-muted">{(t.size_bytes / 1048576).toFixed(1)} МБ</span>}
+            {t.row_count != null && <span className="text-[12px] text-stone">~{fmtNum(t.row_count)} строк</span>}
+            {t.size_bytes != null && <span className="text-[12px] text-stone">{(t.size_bytes / 1048576).toFixed(1)} МБ</span>}
           </summary>
           <div className="grid gap-4 border-t border-line p-3 lg:grid-cols-2">
             <table className="text-[12.5px]"><tbody>
               {t.columns.map(c => (
-                <tr key={c.name}><td className="mono pr-3">{c.name}</td><td className="mono pr-3 text-muted">{c.type}</td><td className="text-muted">{c.nullable ? 'NULL' : 'NOT NULL'}</td></tr>
+                <tr key={c.name}><td className="mono pr-3">{c.name}</td><td className="mono pr-3 text-stone">{c.type}</td><td className="text-stone">{c.nullable ? 'NULL' : 'NOT NULL'}</td></tr>
               ))}
             </tbody></table>
             <div className="space-y-1 text-[12.5px]">
               {t.indexes.map(i => (
-                <div key={i.name} className="mono"><span className={i.primary ? 'text-warn' : i.unique ? 'text-accent' : 'text-good'}>{i.primary ? 'PK' : i.unique ? 'UQ' : 'IX'}</span> {i.name} ({i.columns.join(', ')})</div>
+                <div key={i.name} className="mono"><span className={i.primary ? 'text-warn' : i.unique ? 'text-obsidian' : 'text-good'}>{i.primary ? 'PK' : i.unique ? 'UQ' : 'IX'}</span> {i.name} ({i.columns.join(', ')})</div>
               ))}
-              {t.foreign_keys.map((f, k) => <div key={k} className="mono text-muted">FK ({f.columns.join(', ')}) → {f.ref_table}({f.ref_columns.join(', ')})</div>)}
-              {!t.indexes.length && <div className="text-muted">Индексов нет</div>}
+              {t.foreign_keys.map((f, k) => <div key={k} className="mono text-stone">FK ({f.columns.join(', ')}) → {f.ref_table}({f.ref_columns.join(', ')})</div>)}
+              {!t.indexes.length && <div className="text-stone">Индексов нет</div>}
             </div>
           </div>
         </details>

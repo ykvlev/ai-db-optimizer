@@ -1,34 +1,59 @@
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 @import "tailwindcss";
 
-/* Швейцарский минимализм: чёрный фон, гротеск, прямые углы, тонкие линейки, один акцент — красный. */
+/* Дизайн-система «Typeset terminal on white paper»: бумажно-белый холст, монохромная типографика,
+   тонкие линии вместо теней, единственный хроматический цвет — Terminal Green для подтверждений. */
 @theme {
-  --font-sans: "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --color-bg: #000000;
-  --color-panel: #0a0a0a;
-  --color-panel-2: #141414;
-  --color-line: #262626;
-  --color-text: #f2f2f2;
-  --color-muted: #8f8f8f;
-  --color-accent: #ff3b30;
-  --color-good: #34d17a;
-  --color-warn: #ffb020;
-  --color-bad: #ff5c52;
-  --color-crit: #ff5c52;
+  /* палитра дизайн-системы */
+  --color-paper-white: #fafafa;
+  --color-pure-white: #ffffff;
+  --color-hairline: #ebebeb;
+  --color-ash: #c9c9c9;
+  --color-smoke: #a8a8a8;
+  --color-graphite: #8f8f8f;
+  --color-slate: #7d7d7d;
+  --color-stone: #666666;
+  --color-charcoal: #4d4d4d;
+  --color-obsidian: #171717;
+  --color-carbon: #000000;
+  --color-terminal-green: #297a3a;
 
-  --radius-xs: 0;
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-  --radius-2xl: 0;
+  /* семантические имена, которые используют компоненты */
+  --color-bg: #fafafa;
+  --color-panel: #ffffff;
+  --color-panel-2: #fafafa;
+  --color-line: #ebebeb;
+  --color-text: #171717;
+  --color-muted: #666666;
+  --color-accent: #171717;
+  --color-good: #297a3a;
+  --color-warn: #7d7d7d;
+  --color-bad: #171717;
+  --color-crit: #171717;
+
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius: 6px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+
+  --text-eyebrow: 11px;
+  --text-caption: 13px;
+  --text-heading: 30px;
+  --text-heading-lg: 56px;
+  --text-display: 64px;
+
+  --shadow-subtle: rgba(0, 0, 0, 0.08) 0px 0px 0px 1px, #fafafa 0px 0px 0px 2px;
+  --shadow-subtle-2: #ebebeb 0px 0px 0px 1px;
 }
 
-html, body, #root {
-  height: 100%;
-}
+html, body, #root { height: 100%; }
 
 body {
   margin: 0;
@@ -36,32 +61,42 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 14px;
-  font-feature-settings: "tnum" 0, "cv11" 1;
-  letter-spacing: -0.005em;
+  line-height: 1.43;
+  font-feature-settings: "calt" 0, "rlig", "ss11";
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: var(--color-accent); color: #000; }
+::selection { background: #171717; color: #fafafa; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #2e2e2e; }
-::-webkit-scrollbar-thumb:hover { background: #444; }
+::-webkit-scrollbar-thumb { background: #c9c9c9; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-code, pre, .mono { font-family: var(--font-mono); }
+code, pre, .mono { font-family: var(--font-mono); font-feature-settings: "calt" 0, "rlig", "ss11"; }
 
 input, select, textarea {
-  background: var(--color-bg);
+  background: #ffffff;
   border: 1px solid var(--color-line);
-  border-radius: 0;
+  border-radius: 6px;
   color: var(--color-text);
   padding: 6px 10px;
   outline: none;
+  font-size: 14px;
 }
-input:hover, select:hover, textarea:hover { border-color: #3d3d3d; }
-input:focus, select:focus, textarea:focus { border-color: var(--color-text); }
-input[type="checkbox"] { accent-color: var(--color-accent); }
-select option { background: var(--color-panel-2); }
+input:hover, select:hover, textarea:hover { border-color: #c9c9c9; }
+input:focus, select:focus, textarea:focus { border-color: #171717; box-shadow: 0 0 0 1px #171717; }
+input[type="checkbox"] { accent-color: #171717; }
+input::placeholder { color: #a8a8a8; }
 
-/* подпись-«кикер» в швейцарской типографике */
-.kicker { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; }
+/* Eyebrow: Geist Mono 11px, капс, разрядка 0.071em — «штамп» для подписей и метаданных */
+.kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.071em; }
+
+/* Bordered Card: глубина двойным кольцом-обводкой, никогда тенью */
+.card { background: #ffffff; border-radius: 6px; box-shadow: var(--shadow-subtle); }
+
+/* Заголовки: вес 400–450, плотная разрядка */
+.display { font-size: 56px; font-weight: 450; line-height: 1; letter-spacing: -0.06em; }
+.heading { font-size: 30px; font-weight: 450; line-height: 1.1; letter-spacing: -0.05em; }
+
+b, strong { font-weight: 500; }

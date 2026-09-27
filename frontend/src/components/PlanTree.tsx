@@ -15,17 +15,17 @@ function Node({ node, depth }: { node: PlanNode; depth: number }) {
     <div className={depth ? 'ml-5 border-l border-line pl-4' : ''}>
       <div className={`my-1.5 rounded-md border-l-4 ${color} bg-panel-2 px-3 py-2`}>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold">{node.type}</span>
-          {node.table && <span className="mono text-accent">{node.table}</span>}
+          <span className="font-medium">{node.type}</span>
+          {node.table && <span className="mono text-obsidian">{node.table}</span>}
           {node.index && <Tag tone="good">idx: {node.index}</Tag>}
         </div>
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-muted">
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-stone">
           {node.rows != null && <span>строк (оценка): <b className="text-text">{fmtNum(node.rows)}</b></span>}
           {node.actual_rows != null && <span>строк (факт): <b className="text-text">{fmtNum(node.actual_rows)}</b></span>}
           {node.cost != null && <span>cost: <b className="text-text">{node.cost.toLocaleString('ru-RU')}</b></span>}
           {node.time_ms != null && <span>время: <b className="text-text">{fmtMs(node.time_ms)}</b></span>}
         </div>
-        {node.filter && <div className="mono mt-1 break-all text-[11.5px] text-muted">условие: {node.filter}</div>}
+        {node.filter && <div className="mono mt-1 break-all text-[11.5px] text-stone">условие: {node.filter}</div>}
         {node.extra.length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">{node.extra.map((e, i) => <Tag key={i}>{e}</Tag>)}</div>
         )}
@@ -48,7 +48,7 @@ export function PlanView({ plan }: { plan: PlanSummary }) {
       </div>
       {plan.root && <Node node={plan.root} depth={0} />}
       <details className="mt-3">
-        <summary className="cursor-pointer text-[12px] text-muted">Исходный план (JSON)</summary>
+        <summary className="cursor-pointer text-[12px] text-stone">Исходный план (JSON)</summary>
         <pre className="mono mt-2 max-h-96 overflow-auto rounded-md border border-line bg-bg p-3 text-[11.5px]">{JSON.stringify(plan.raw, null, 2)}</pre>
       </details>
     </div>

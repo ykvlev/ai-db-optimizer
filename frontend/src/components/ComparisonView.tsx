@@ -51,10 +51,10 @@ function StatsTable({ a, b }: { a: BenchmarkStats; b: BenchmarkStats }) {
   ]
   return (
     <table className="w-full text-[13px]">
-      <thead><tr className="text-left text-muted"><th className="py-1 font-normal"></th><th className="font-normal">Исходный</th><th className="font-normal">Оптимизированный</th></tr></thead>
+      <thead><tr className="text-left text-stone"><th className="py-1 font-normal"></th><th className="font-normal">Исходный</th><th className="font-normal">Оптимизированный</th></tr></thead>
       <tbody>
         {rows.filter(([, f]) => f(a) !== '—' || f(b) !== '—').map(([label, f]) => (
-          <tr key={label} className="border-t border-line"><td className="py-1.5 text-muted">{label}</td><td className="tabular-nums">{f(a)}</td><td className="tabular-nums">{f(b)}</td></tr>
+          <tr key={label} className="border-t border-line"><td className="py-1.5 text-stone">{label}</td><td className="tabular-nums">{f(a)}</td><td className="tabular-nums">{f(b)}</td></tr>
         ))}
       </tbody>
     </table>
@@ -73,13 +73,13 @@ export function ComparisonView({ cmp }: { cmp: Comparison }) {
       {a && b && cmp.speedup != null && (
         <div className="rounded-lg border border-line bg-panel-2 p-5">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span className="text-3xl font-semibold tabular-nums">{fmtMs(a.median_ms)} → {fmtMs(b.median_ms)}</span>
-            <span className={`text-xl font-semibold ${faster ? 'text-good' : 'text-bad'}`}>
+            <span className="text-3xl font-medium tabular-nums">{fmtMs(a.median_ms)} → {fmtMs(b.median_ms)}</span>
+            <span className={`text-xl font-medium ${faster ? 'text-good' : 'text-bad'}`}>
               {faster ? `${cmp.speedup.toFixed(2)}x быстрее` : `${(1 / cmp.speedup).toFixed(2)}x медленнее`}
             </span>
-            {cmp.improvement_pct != null && <span className="text-muted">({cmp.improvement_pct > 0 ? '−' : '+'}{Math.abs(cmp.improvement_pct)}% времени)</span>}
+            {cmp.improvement_pct != null && <span className="text-stone">({cmp.improvement_pct > 0 ? '−' : '+'}{Math.abs(cmp.improvement_pct)}% времени)</span>}
           </div>
-          <div className="mt-1 text-[12px] text-muted">
+          <div className="mt-1 text-[12px] text-stone">
             Медиана {a.runs} прогонов после {a.warmup} прогревочных; запуски исходного и оптимизированного запроса чередовались.
             Время измерено на клиенте и включает передачу результата.
           </div>
@@ -101,21 +101,21 @@ export function ComparisonView({ cmp }: { cmp: Comparison }) {
             )}
           </div>
           {eq.checksum_original && (
-            <div className="mono mt-3 space-y-0.5 text-[12px] text-muted">
+            <div className="mono mt-3 space-y-0.5 text-[12px] text-stone">
               <div>исходный: {eq.rows_original} строк, checksum {eq.checksum_original}</div>
               <div>оптимизированный: {eq.rows_optimized} строк, checksum {eq.checksum_optimized}</div>
             </div>
           )}
           {eq.details.map((d, i) => <p key={i} className="mt-2 text-[13px] text-warn">{d}</p>)}
           {eq.sample_only_in_original.length > 0 && (
-            <div className="mt-2 text-[12px]"><div className="text-muted">Только в исходном (пример):</div>
+            <div className="mt-2 text-[12px]"><div className="text-stone">Только в исходном (пример):</div>
               <pre className="mono overflow-x-auto text-[11.5px]">{eq.sample_only_in_original.map(r => JSON.stringify(r)).join('\n')}</pre></div>
           )}
           {eq.sample_only_in_optimized.length > 0 && (
-            <div className="mt-2 text-[12px]"><div className="text-muted">Только в оптимизированном (пример):</div>
+            <div className="mt-2 text-[12px]"><div className="text-stone">Только в оптимизированном (пример):</div>
               <pre className="mono overflow-x-auto text-[11.5px]">{eq.sample_only_in_optimized.map(r => JSON.stringify(r)).join('\n')}</pre></div>
           )}
-          <p className="mt-3 text-[12px] text-muted">
+          <p className="mt-3 text-[12px] text-stone">
             Проверка эмпирическая — на текущих данных БД: сравниваются мультимножества строк (контрольная сумма), число колонок и порядок при ORDER BY.
           </p>
         </Card>
@@ -123,13 +123,13 @@ export function ComparisonView({ cmp }: { cmp: Comparison }) {
         <Card title="Optimization Score">
           {cmp.score?.score != null ? (
             <>
-              <div className="text-3xl font-semibold tabular-nums">{cmp.score.score}<span className="text-base text-muted"> / 100</span></div>
+              <div className="text-3xl font-medium tabular-nums">{cmp.score.score}<span className="text-base text-stone"> / 100</span></div>
               <div className="mt-3 space-y-2">
                 {cmp.score.components.map(c => (
                   <div key={c.name}>
-                    <div className="flex justify-between text-[12px]"><span>{scoreNames[c.name] ?? c.name} <span className="text-muted">· вес {Math.round(c.weight * 100)}%</span></span><span className="tabular-nums">{c.value}</span></div>
+                    <div className="flex justify-between text-[12px]"><span>{scoreNames[c.name] ?? c.name} <span className="text-stone">· вес {Math.round(c.weight * 100)}%</span></span><span className="tabular-nums">{c.value}</span></div>
                     <div className="mt-0.5 h-1.5 rounded bg-line"><div className="h-1.5 rounded bg-text" style={{ width: `${c.value}%` }} /></div>
-                    <div className="text-[11.5px] text-muted">{c.detail}</div>
+                    <div className="text-[11.5px] text-stone">{c.detail}</div>
                   </div>
                 ))}
               </div>
@@ -142,7 +142,7 @@ export function ComparisonView({ cmp }: { cmp: Comparison }) {
         <Card title="Бенчмарк">
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
-              <div className="mb-2 flex gap-3 text-[12px] text-muted">
+              <div className="mb-2 flex gap-3 text-[12px] text-stone">
                 <span><span className="mr-1 inline-block h-2 w-2 rounded-sm bg-muted" />исходный</span>
                 <span><span className="mr-1 inline-block h-2 w-2 rounded-sm bg-accent" />оптимизированный</span>
               </div>

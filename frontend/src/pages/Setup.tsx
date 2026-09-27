@@ -7,10 +7,10 @@ const REPO = 'https://github.com/ykvlev/ai-db-optimizer'
 
 function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
-    <section className="grid gap-4 border-t border-line pt-6 md:grid-cols-[180px_1fr]">
+    <section className="grid gap-6 border-t border-line pt-8 md:grid-cols-[220px_1fr]">
       <div>
-        <div className="text-[44px] font-bold leading-none tabular-nums text-accent">{n}</div>
-        <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-text">{title}</div>
+        <div className="font-mono text-[12px] text-stone">{n}</div>
+        <div className="mt-2 text-[20px] font-[450] leading-[1.2] tracking-[-0.03em] text-obsidian">{title}</div>
       </div>
       <div className="min-w-0 space-y-4">{children}</div>
     </section>
@@ -39,18 +39,18 @@ export function Setup() {
   const venvBin = w ? '.venv\\Scripts\\' : '.venv/bin/'
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 pb-16">
+    <div className="max-w-5xl space-y-10">
       <header className="space-y-3">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">Установка</div>
-        <h2 className="max-w-3xl text-[34px] font-bold leading-[1.05] tracking-tight">Как поставить программу себе на компьютер</h2>
-        <p className="max-w-3xl text-[14px] leading-relaxed text-muted">
+        <div className="kicker text-stone">15 минут · Windows, Linux, macOS</div>
+        <h1 className="text-[24px] font-[450] leading-[1.15] tracking-[-0.04em] text-obsidian">Установка и помощь</h1>
+        <p className="max-w-2xl text-[16px] leading-[1.5] text-charcoal">
           Около 15 минут. Нужны Python, Node.js и Docker. Программа работает на вашем компьютере: данные и запросы
           никуда не отправляются, кроме выбранной вами модели ИИ.
         </p>
-        <div className="flex gap-0 pt-1">
+        <div className="inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_0_0_1px_#ebebeb]">
           {(['windows', 'unix'] as OS[]).map(o => (
             <button key={o} onClick={() => setOs(o)}
-              className={`border px-4 py-1.5 text-[12px] font-semibold uppercase tracking-wider ${os === o ? 'border-text bg-text text-bg' : 'border-line text-muted hover:text-text'}`}>
+              className={`rounded-full px-3.5 py-1 text-[13px] transition-colors ${os === o ? 'bg-obsidian text-white' : 'text-stone hover:text-obsidian'}`}>
               {o === 'windows' ? 'Windows' : 'Linux / macOS'}
             </button>
           ))}
@@ -58,9 +58,10 @@ export function Setup() {
       </header>
 
       {w && (
-        <section className="border border-accent p-5">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">Быстрый способ</div>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-muted">
+        <section className="rounded-md bg-obsidian p-6 text-white">
+          <div className="kicker text-smoke">Быстрый способ</div>
+          <div className="mt-3 text-[20px] font-[450] tracking-[-0.03em]">Две команды — и всё работает</div>
+          <p className="mt-2 max-w-2xl text-[14px] leading-[1.5] text-ash">
             Установите программы из шага 1, скачайте проект и выполните два скрипта в PowerShell из папки проекта.
             Первый всё установит, второй запустит базы данных, сервер, интерфейс и откроет браузер.
           </p>
@@ -73,21 +74,21 @@ export function Setup() {
 
       <Section n="01" title="Что нужно">
         <ul className="space-y-2 text-[13.5px]">
-          <li><b>Python 3.11 или новее</b> — <span className="text-muted">python.org/downloads. {w && 'При установке отметьте «Add python.exe to PATH».'}</span></li>
-          <li><b>Node.js 20 или новее</b> — <span className="text-muted">nodejs.org, версия LTS.</span></li>
-          <li><b>Docker Desktop</b> — <span className="text-muted">docker.com. Нужен для демонстрационных баз данных; для своей базы не обязателен.</span></li>
-          <li><b>Git</b> — <span className="text-muted">git-scm.com, или скачайте проект архивом ZIP.</span></li>
-          <li className="text-muted">Необязательно: <b className="text-text">Ollama</b> (ollama.com) — если хотите запускать модель ИИ локально, без интернета.</li>
+          <li><b>Python 3.11 или новее</b> — <span className="text-stone">python.org/downloads. {w && 'При установке отметьте «Add python.exe to PATH».'}</span></li>
+          <li><b>Node.js 20 или новее</b> — <span className="text-stone">nodejs.org, версия LTS.</span></li>
+          <li><b>Docker Desktop</b> — <span className="text-stone">docker.com. Нужен для демонстрационных баз данных; для своей базы не обязателен.</span></li>
+          <li><b>Git</b> — <span className="text-stone">git-scm.com, или скачайте проект архивом ZIP.</span></li>
+          <li className="text-stone">Необязательно: <b className="text-text">Ollama</b> (ollama.com) — если хотите запускать модель ИИ локально, без интернета.</li>
         </ul>
       </Section>
 
       <Section n="02" title="Скачать проект">
         <CopyBlock>{`git clone ${REPO}.git\ncd ai-db-optimizer`}</CopyBlock>
-        <p className="text-[13px] text-muted">Или на странице {REPO} нажмите Code → Download ZIP и распакуйте архив.</p>
+        <p className="text-[13px] text-stone">Или на странице {REPO} нажмите Code → Download ZIP и распакуйте архив.</p>
       </Section>
 
       <Section n="03" title="Базы данных">
-        <p className="text-[13.5px] text-muted">
+        <p className="text-[13.5px] text-stone">
           Запускает демонстрационную базу интернет-магазина в MySQL (порт 3307) и PostgreSQL (порт 5434).
           Первый запуск занимает несколько минут: скачиваются образы и генерируются данные — 2 млн строк.
         </p>
@@ -95,20 +96,20 @@ export function Setup() {
       </Section>
 
       <Section n="04" title="Сервер">
-        <p className="text-[13.5px] text-muted">В папке backend создаётся изолированное окружение Python и устанавливаются библиотеки. Последняя команда запускает сервер — не закрывайте это окно.</p>
+        <p className="text-[13.5px] text-stone">В папке backend создаётся изолированное окружение Python и устанавливаются библиотеки. Последняя команда запускает сервер — не закрывайте это окно.</p>
         <CopyBlock>{`cd backend
 ${py} -m venv .venv
 ${venvBin}pip install -r requirements.txt
 ${w ? 'copy' : 'cp'} .env.example .env
 ${venvBin}python -m uvicorn app.main:app --port 8000`}</CopyBlock>
-        <p className="text-[13px] text-muted">Проверка: откройте http://localhost:8000/docs — должна появиться документация API.</p>
+        <p className="text-[13px] text-stone">Проверка: откройте http://localhost:8000/docs — должна появиться документация API.</p>
       </Section>
 
       <Section n="05" title="Модель ИИ">
-        <p className="text-[13.5px] text-muted">Без модели работают анализ, поиск проблем и оптимизация по правилам. Для ИИ-оптимизации выберите вариант и допишите строки в файл <span className="mono text-text">backend/.env</span>, затем перезапустите сервер.</p>
+        <p className="text-[13.5px] text-stone">Без модели работают анализ, поиск проблем и оптимизация по правилам. Для ИИ-оптимизации выберите вариант и допишите строки в файл <span className="mono text-text">backend/.env</span>, затем перезапустите сервер.</p>
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="space-y-2 border border-line p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em]">GigaChat · облако, бесплатно</div>
+          <div className="card space-y-3 p-4">
+            <div className="kicker text-stone">GigaChat · облако, бесплатно</div>
             <Step n={1} title="Получите ключ">developers.sber.ru → GigaChat API → создайте проект для физического лица → скопируйте «Authorization key».</Step>
             <Step n={2} title="Добавьте в backend/.env">
               <CopyBlock label="backend/.env">{`GIGACHAT_AUTH_KEY=ваш_ключ
@@ -116,8 +117,8 @@ GIGACHAT_CA_BUNDLE=config/russian_trusted_root_ca.pem
 DEFAULT_MODEL=gigachat:GigaChat-2-Pro`}</CopyBlock>
             </Step>
           </div>
-          <div className="space-y-2 border border-line p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em]">Ollama · локально, без интернета</div>
+          <div className="card space-y-3 p-4">
+            <div className="kicker text-stone">Ollama · локально, без интернета</div>
             <Step n={1} title="Скачайте модель">
               <CopyBlock label="Терминал">{`ollama pull qwen2.5-coder:7b`}</CopyBlock>
             </Step>
@@ -127,14 +128,14 @@ OLLAMA_MODELS=qwen2.5-coder:7b
 OLLAMA_NUM_CTX=4096
 LLM_TIMEOUT_S=900`}</CopyBlock>
             </Step>
-            <p className="text-[12px] text-muted">Нужно около 5 ГБ свободной памяти; ответ на процессоре — 1–3 минуты.</p>
+            <p className="text-[12px] text-stone">Нужно около 5 ГБ свободной памяти; ответ на процессоре — 1–3 минуты.</p>
           </div>
         </div>
-        <p className="text-[12.5px] text-muted">Также поддерживаются YandexGPT и любые сервисы с API, совместимым с OpenAI (DeepSeek, OpenRouter, LM Studio) — все параметры описаны в backend/.env.example.</p>
+        <p className="text-[12.5px] text-stone">Также поддерживаются YandexGPT и любые сервисы с API, совместимым с OpenAI (DeepSeek, OpenRouter, LM Studio) — все параметры описаны в backend/.env.example.</p>
       </Section>
 
       <Section n="06" title="Интерфейс">
-        <p className="text-[13.5px] text-muted">В новом окне терминала, из папки проекта:</p>
+        <p className="text-[13.5px] text-stone">В новом окне терминала, из папки проекта:</p>
         <CopyBlock>{`cd frontend
 npm install
 npm run dev`}</CopyBlock>
@@ -145,10 +146,10 @@ npm run dev`}</CopyBlock>
         <div className="divide-y divide-line border-y border-line">
           {FAQ.map(([q, a]) => (
             <details key={q} className="group py-3">
-              <summary className="cursor-pointer list-none text-[13.5px] font-semibold">
-                <span className="mr-2 inline-block w-3 text-accent group-open:rotate-45">+</span>{q}
+              <summary className="cursor-pointer list-none text-[13.5px] font-medium">
+                <span className="mr-2 inline-block w-3 font-mono text-stone transition-transform group-open:rotate-45">+</span>{q}
               </summary>
-              <div className="mt-2 pl-5 text-[13px] leading-relaxed text-muted">{a}</div>
+              <div className="mt-2 pl-5 text-[13px] leading-relaxed text-stone">{a}</div>
             </details>
           ))}
         </div>

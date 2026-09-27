@@ -6,36 +6,38 @@ import editorWorker from 'monaco-editor/editor/editor.worker?worker'
 self.MonacoEnvironment = { getWorker: () => new editorWorker() }
 loader.config({ monaco })
 
-// Чёрная тема в швейцарском стиле: без подсветки фона строк, акцент — красный курсор
-monaco.editor.defineTheme('swiss', {
-  base: 'vs-dark', inherit: true,
+// Светлая тема «бумага»: монохромная подсветка, строки — Terminal Green, как в дизайн-системе
+monaco.editor.defineTheme('paper', {
+  base: 'vs', inherit: true,
   rules: [
-    { token: 'keyword', foreground: 'ffffff', fontStyle: 'bold' },
-    { token: 'string', foreground: 'b5b5b5' },
-    { token: 'string.sql', foreground: 'b5b5b5' },
-    { token: 'predefined', foreground: 'e6e6e6' },
-    { token: 'predefined.sql', foreground: 'e6e6e6' },
-    { token: 'identifier', foreground: 'e6e6e6' },
-    { token: 'identifier.quote', foreground: 'e6e6e6' },
-    { token: 'type', foreground: 'e6e6e6' },
+    { token: '', foreground: '171717' },
+    { token: 'keyword', foreground: '171717', fontStyle: 'bold' },
+    { token: 'string', foreground: '297a3a' },
+    { token: 'string.sql', foreground: '297a3a' },
+    { token: 'number', foreground: '4d4d4d' },
+    { token: 'comment', foreground: 'a8a8a8', fontStyle: 'italic' },
+    { token: 'operator', foreground: '666666' },
     { token: 'delimiter', foreground: '8f8f8f' },
-    { token: 'number', foreground: 'ff6b61' },
-    { token: 'comment', foreground: '6b6b6b', fontStyle: 'italic' },
-    { token: 'operator', foreground: 'd0d0d0' },
+    { token: 'predefined', foreground: '171717' },
+    { token: 'predefined.sql', foreground: '171717' },
+    { token: 'identifier', foreground: '171717' },
+    { token: 'identifier.quote', foreground: '171717' },
+    { token: 'type', foreground: '171717' },
   ],
   colors: {
-    'editor.background': '#000000', 'editor.foreground': '#e6e6e6', 'editorLineNumber.foreground': '#4a4a4a',
-    'editorLineNumber.activeForeground': '#ff3b30', 'editorCursor.foreground': '#ff3b30',
-    'editor.lineHighlightBackground': '#0d0d0d', 'editor.lineHighlightBorder': '#00000000',
-    'editor.selectionBackground': '#3a1512', 'editorGutter.background': '#000000',
-    'diffEditor.insertedTextBackground': '#1f5a3a66', 'diffEditor.removedTextBackground': '#6e1f1a66',
+    'editor.background': '#ffffff', 'editor.foreground': '#171717', 'editorLineNumber.foreground': '#c9c9c9',
+    'editorLineNumber.activeForeground': '#171717', 'editorCursor.foreground': '#171717',
+    'editor.lineHighlightBackground': '#fafafa', 'editor.lineHighlightBorder': '#00000000',
+    'editor.selectionBackground': '#ebebeb', 'editorGutter.background': '#ffffff',
+    'editorOverviewRuler.border': '#00000000', 'scrollbarSlider.background': '#c9c9c966',
+    'diffEditor.insertedTextBackground': '#297a3a22', 'diffEditor.removedTextBackground': '#17171714',
   },
 })
 
 const options: monaco.editor.IStandaloneEditorConstructionOptions = {
   minimap: { enabled: false },
   fontSize: 13,
-  fontFamily: 'JetBrains Mono, Cascadia Code, Consolas, monospace',
+  fontFamily: '"Geist Mono Variable", Consolas, monospace',
   scrollBeyondLastLine: false,
   wordWrap: 'on',
   lineNumbersMinChars: 3,
@@ -48,8 +50,8 @@ const options: monaco.editor.IStandaloneEditorConstructionOptions = {
 
 export function SqlEditor({ value, onChange, height = 260, readOnly = false }: { value: string; onChange?: (v: string) => void; height?: number | string; readOnly?: boolean }) {
   return (
-    <div className="overflow-hidden border border-line">
-      <Editor height={height} language="sql" theme="swiss" value={value}
+    <div className="card overflow-hidden">
+      <Editor height={height} language="sql" theme="paper" value={value}
         onChange={v => onChange?.(v ?? '')} options={{ ...options, readOnly }} />
     </div>
   )
@@ -57,8 +59,8 @@ export function SqlEditor({ value, onChange, height = 260, readOnly = false }: {
 
 export function SqlDiff({ original, modified, height = 280 }: { original: string; modified: string; height?: number }) {
   return (
-    <div className="overflow-hidden border border-line">
-      <DiffEditor height={height} language="sql" theme="swiss" original={original} modified={modified}
+    <div className="card overflow-hidden">
+      <DiffEditor height={height} language="sql" theme="paper" original={original} modified={modified}
         keepCurrentOriginalModel keepCurrentModifiedModel
         options={{ ...options, readOnly: true, renderSideBySide: true, originalEditable: false }} />
     </div>

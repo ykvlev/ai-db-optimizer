@@ -22,7 +22,7 @@ export function Dashboard({ stats, onNavigate }: { stats: Stats | null; onNaviga
 
       {stats.runs_total === 0 && (
         <Empty>
-          Пока нет ни одного запуска. Откройте <button className="text-accent" onClick={() => onNavigate('analyzer')}>SQL Analyzer</button>, вставьте запрос и нажмите «Анализировать».
+          Пока нет ни одного запуска. Откройте <button className="text-obsidian" onClick={() => onNavigate('analyzer')}>SQL Analyzer</button>, вставьте запрос и нажмите «Анализировать».
           Все показатели на этой странице рассчитываются только по фактически выполненным запускам.
         </Empty>
       )}

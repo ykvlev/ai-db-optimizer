@@ -5,7 +5,9 @@ import { Button, Card, Code, Empty, ErrorBox, Spinner, Tag, fmtMs } from '../com
 
 const OUTCOMES: Outcome[] = ['improved', 'unchanged', 'worse', 'invalid', 'error']
 const outcomeName: Record<Outcome, string> = { improved: 'Улучшено', unchanged: 'Без изменений', worse: 'Ухудшено', invalid: 'Некорректно', error: 'Сбой вызова' }
-const outcomeColor: Record<Outcome, string> = { improved: 'var(--color-good)', unchanged: 'var(--color-muted)', worse: 'var(--color-warn)', invalid: 'var(--color-bad)', error: '#8b7fe0' }
+// монохромная шкала дизайн-системы; хроматический только Terminal Green для улучшений
+const outcomeColor: Record<Outcome, string> = { improved: '#297a3a', unchanged: '#ebebeb', worse: '#8f8f8f', invalid: '#171717', error: '#c9c9c9' }
+const outcomeText: Record<Outcome, string> = { improved: '#ffffff', unchanged: '#4d4d4d', worse: '#ffffff', invalid: '#ffffff', error: '#171717' }
 const statusName: Record<ExperimentMeta['status'], string> = { pending: 'в очереди', running: 'выполняется', done: 'завершён', cancelled: 'отменён', failed: 'ошибка', interrupted: 'прерван' }
 const statusTone = (s: ExperimentMeta['status']) => s === 'done' ? 'good' : s === 'running' || s === 'pending' ? 'accent' : s === 'failed' ? 'bad' : 'warn'
 const x = (v?: number | null) => v == null ? '—' : `${v.toFixed(2)}x`
@@ -60,10 +62,10 @@ export function Experiments({ connections, models, onRun }: { connections: Conne
               <li key={e.id} onClick={() => setSelected(e.id)}
                 className={`cursor-pointer rounded-md border p-2.5 text-[13px] ${selected === e.id ? 'border-text bg-panel-2' : 'border-line bg-panel-2 hover:border-muted'}`}>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted">#{e.id}</span><span className="truncate font-semibold">{e.name}</span>
+                  <span className="text-stone">#{e.id}</span><span className="truncate font-medium">{e.name}</span>
                   <span className="ml-auto"><Tag tone={statusTone(e.status)}>{statusName[e.status]}</Tag></span>
                 </div>
-                <div className="mt-1 text-[11.5px] text-muted">{e.dataset_version} · {e.dbms} · {e.models.join(', ')}</div>
+                <div className="mt-1 text-[11.5px] text-stone">{e.dataset_version} · {e.dbms} · {e.models.join(', ')}</div>
                 <Progress done={e.progress_done} total={e.progress_total} />
               </li>
             ))}</ul>
@@ -74,8 +76,8 @@ export function Experiments({ connections, models, onRun }: { connections: Conne
           {showImport && <ImportDataset onDone={() => { setShowImport(false); loadLists() }} onError={setError} />}
           <ul className="space-y-1.5 text-[13px]">{datasets.map(d => (
             <li key={d.id} className="rounded-md border border-line bg-panel-2 p-2.5">
-              <div className="flex items-center gap-2"><span className="font-semibold">{d.version}</span><Tag>{d.dbms}</Tag>{d.builtin && <Tag tone="accent">встроенный</Tag>}<span className="ml-auto text-muted">{d.size} запр.</span></div>
-              {d.description && <div className="mt-1 text-[12px] text-muted">{d.description}</div>}
+              <div className="flex items-center gap-2"><span className="font-medium">{d.version}</span><Tag>{d.dbms}</Tag>{d.builtin && <Tag tone="accent">встроенный</Tag>}<span className="ml-auto text-stone">{d.size} запр.</span></div>
+              {d.description && <div className="mt-1 text-[12px] text-stone">{d.description}</div>}
             </li>
           ))}</ul>
         </Card>
@@ -102,7 +104,7 @@ function Progress({ done, total }: { done: number; total: number }) {
   return (
     <div className="mt-1.5 flex items-center gap-2">
       <div className="h-1.5 flex-1 rounded bg-line"><div className="h-1.5 rounded bg-text transition-all" style={{ width: `${p}%` }} /></div>
-      <span className="text-[11px] tabular-nums text-muted">{done}/{total}</span>
+      <span className="text-[11px] tabular-nums text-stone">{done}/{total}</span>
     </div>
   )
 }
@@ -145,29 +147,29 @@ function NewExperiment({ datasets, connections, models, onCreated, onError }: {
     <Card title="Новый эксперимент">
       {!connections.length ? <Empty>Нужно подключение к БД (раздел «Базы данных»)</Empty> : (
         <div className="grid grid-cols-[90px_minmax(0,1fr)] items-center gap-2 text-[13px]">
-          <label className="text-muted">Название</label><input value={name} onChange={e => setName(e.target.value)} placeholder="авто" />
-          <label className="text-muted">БД</label>
+          <label className="text-stone">Название</label><input value={name} onChange={e => setName(e.target.value)} placeholder="авто" />
+          <label className="text-stone">БД</label>
           <select value={connId ?? ''} onChange={e => setConnId(Number(e.target.value))}>{connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
-          <label className="text-muted">Датасет</label>
+          <label className="text-stone">Датасет</label>
           <select value={datasetId ?? ''} onChange={e => setDatasetId(Number(e.target.value))}>{fitting.map(d => <option key={d.id} value={d.id}>{d.version} ({d.size})</option>)}</select>
-          <label className="self-start pt-1 text-muted">Модели</label>
+          <label className="self-start pt-1 text-stone">Модели</label>
           <div className="min-w-0 space-y-1">{models?.models.map(m => (
             <label key={m} className="flex items-start gap-2"><input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0" checked={chosen.includes(m)} onChange={() => toggle(m)} />
               <span className="min-w-0"><span className="mono break-all text-[12.5px]">{m}</span>
-                {m === models.baseline && <span className="block text-[11px] text-muted">без ИИ, базовая линия</span>}</span></label>
+                {m === models.baseline && <span className="block text-[11px] text-stone">без ИИ, базовая линия</span>}</span></label>
           ))}</div>
-          <label className="text-muted">Промпт</label>
+          <label className="text-stone">Промпт</label>
           <select value={prompt} onChange={e => setPrompt(e.target.value)}>{models?.prompts.map(p => <option key={p}>{p}</option>)}</select>
-          <label className="text-muted">Бенчмарк</label>
-          <div className="flex gap-2 text-muted">прогонов <input type="number" min={1} max={50} value={runs} onChange={e => setRuns(Number(e.target.value))} className="w-14" />
+          <label className="text-stone">Бенчмарк</label>
+          <div className="flex gap-2 text-stone">прогонов <input type="number" min={1} max={50} value={runs} onChange={e => setRuns(Number(e.target.value))} className="w-14" />
             прогрев <input type="number" min={0} max={10} value={warmup} onChange={e => setWarmup(Number(e.target.value))} className="w-14" /></div>
         </div>
       )}
       <div className="mt-3 flex items-center gap-3">
         <Button variant="primary" onClick={submit} disabled={busy || !chosen.length || datasetId == null || connId == null}>{busy && <Spinner />} Запустить</Button>
-        {calls > 0 && <span className="text-[12px] text-muted">{calls} пар «запрос × модель»</span>}
+        {calls > 0 && <span className="text-[12px] text-stone">{calls} пар «запрос × модель»</span>}
       </div>
-      <p className="mt-2 text-[12px] text-muted">Эксперимент выполняется в фоне. Прерванный эксперимент можно продолжить — выполненные пары не повторяются.</p>
+      <p className="mt-2 text-[12px] text-stone">Эксперимент выполняется в фоне. Прерванный эксперимент можно продолжить — выполненные пары не повторяются.</p>
     </Card>
   )
 }
@@ -204,12 +206,12 @@ function OutcomeBars({ d }: { d: ExperimentDetail }) {
           <div className="flex h-6 overflow-hidden rounded">
             {OUTCOMES.map(o => s.outcomes[o] > 0 && (
               <div key={o} title={`${outcomeName[o]}: ${s.outcomes[o]}`} style={{ width: `${(s.outcomes[o] / s.n) * 100}%`, background: outcomeColor[o] }}
-                className="flex items-center justify-center text-[11px] font-semibold text-white">{s.outcomes[o]}</div>
+                className="flex items-center justify-center text-[11px] font-medium text-white">{s.outcomes[o]}</div>
             ))}
           </div>
         </div>
       ))}
-      <div className="flex flex-wrap gap-3 pt-1 text-[11.5px] text-muted">{OUTCOMES.map(o => <span key={o}><span className="mr-1 inline-block h-2 w-2 rounded-sm" style={{ background: outcomeColor[o] }} />{outcomeName[o]}</span>)}</div>
+      <div className="flex flex-wrap gap-3 pt-1 text-[11.5px] text-stone">{OUTCOMES.map(o => <span key={o}><span className="mr-1 inline-block h-2 w-2 rounded-sm" style={{ background: outcomeColor[o] }} />{outcomeName[o]}</span>)}</div>
     </div>
   )
 }
@@ -234,7 +236,7 @@ function ExperimentView({ d, onAction }: { d: ExperimentDetail; onAction: (a: 'c
           {m.models.some(mm => !mm.startsWith('baseline:')) && <Tag>prompt {m.prompt_version}</Tag>}<Tag>прогрев {m.warmup}, прогонов {m.runs}</Tag><Tag>seed {m.database_seed}</Tag><Tag>app v{m.app_version}</Tag>
         </div>
         <Progress done={m.progress_done} total={m.progress_total} />
-        {m.running && m.current_item && <p className="mt-1 text-[12px] text-muted"><Spinner /> {m.current_item}</p>}
+        {m.running && m.current_item && <p className="mt-1 text-[12px] text-stone"><Spinner /> {m.current_item}</p>}
         {m.error && <div className="mt-2"><ErrorBox>{m.error.split('\n')[0]}</ErrorBox></div>}
         <div className="mt-3 flex flex-wrap gap-2">
           <a href={`${base}/report`} target="_blank" rel="noreferrer"><Button variant="primary">Научный отчёт (HTML / PDF)</Button></a>
@@ -252,7 +254,7 @@ function ExperimentView({ d, onAction }: { d: ExperimentDetail; onAction: (a: 'c
         <Card title="Сравнение моделей">
           <div className="overflow-x-auto">
             <table className="w-full text-[12.5px]">
-              <thead className="text-left text-muted"><tr>
+              <thead className="text-left text-stone"><tr>
                 <th className="py-1 pr-3 font-normal">Метрика</th>{models.map(mm => <th key={mm} className="mono pr-3 font-normal">{mm}</th>)}
               </tr></thead>
               <tbody>{([
@@ -271,11 +273,11 @@ function ExperimentView({ d, onAction }: { d: ExperimentDetail; onAction: (a: 'c
                 ['Токены (вход → выход)', s => s.prompt_tokens ? `${s.prompt_tokens.toLocaleString('ru-RU')} → ${s.completion_tokens.toLocaleString('ru-RU')}` : '—'],
                 ['Типы ошибок', s => Object.entries(s.error_types).map(([k, v]) => `${k}: ${v}`).join(', ') || '—'],
               ] as [string, (s: ExperimentDetail['summary']['models'][string]) => string][]).map(([label, f]) => (
-                <tr key={label} className="border-t border-line"><td className="py-1.5 pr-3 text-muted">{label}</td>{models.map(mm => <td key={mm} className="pr-3 tabular-nums">{f(d.summary.models[mm])}</td>)}</tr>
+                <tr key={label} className="border-t border-line"><td className="py-1.5 pr-3 text-stone">{label}</td>{models.map(mm => <td key={mm} className="pr-3 tabular-nums">{f(d.summary.models[mm])}</td>)}</tr>
               ))}</tbody>
             </table>
           </div>
-          <p className="mt-2 text-[11.5px] text-muted">* доля среди запросов, где модель предложила изменённый SQL. Ускорение считается по кандидатам с эквивалентным результатом; в скобках — 95% bootstrap-интервал медианы.</p>
+          <p className="mt-2 text-[11.5px] text-stone">* доля среди запросов, где модель предложила изменённый SQL. Ускорение считается по кандидатам с эквивалентным результатом; в скобках — 95% bootstrap-интервал медианы.</p>
         </Card>
 
         <Card title="Результаты по запросам" actions={
@@ -284,14 +286,14 @@ function ExperimentView({ d, onAction }: { d: ExperimentDetail; onAction: (a: 'c
           </select>}>
           <div className="max-h-[560px] overflow-auto">
             <table className="w-full text-[12.5px]">
-              <thead className="sticky top-0 bg-panel text-left text-muted"><tr>
+              <thead className="sticky top-0 bg-panel text-left text-stone"><tr>
                 <th className="py-1 font-normal">Запрос</th><th className="font-normal">Модель</th><th className="font-normal">Исход</th><th className="font-normal">До → после</th><th className="font-normal">Ускорение</th><th className="font-normal">Ошибки</th>
               </tr></thead>
               <tbody>{rows.map(r => (<Fragment key={r.id}>
                 <tr onClick={() => setOpen(open === r.id ? null : r.id)} className="cursor-pointer border-t border-line hover:bg-panel-2">
-                  <td className="py-1.5 pr-2"><div className="mono text-[11.5px]">{r.key}</div><div className="text-[11px] text-muted">{r.title}</div></td>
+                  <td className="py-1.5 pr-2"><div className="mono text-[11.5px]">{r.key}</div><div className="text-[11px] text-stone">{r.title}</div></td>
                   <td className="mono pr-2 text-[11.5px]">{r.model}</td>
-                  <td className="pr-2"><span className="rounded px-1.5 py-0.5 text-[11px] font-semibold text-white" style={{ background: outcomeColor[r.outcome] }}>{outcomeName[r.outcome]}</span></td>
+                  <td className="pr-2"><span className="rounded-sm px-1.5 py-px font-mono text-[11px]" style={{ background: outcomeColor[r.outcome], color: outcomeText[r.outcome] }}>{outcomeName[r.outcome]}</span></td>
                   <td className="pr-2 tabular-nums">{r.time_before_ms != null ? `${fmtMs(r.time_before_ms)} → ${fmtMs(r.time_after_ms)}` : '—'}</td>
                   <td className="pr-2 tabular-nums">{x(r.speedup)}</td>
                   <td className="text-[11px] text-bad">{r.error_types.join(', ')}</td>
@@ -318,9 +320,9 @@ function ResultDetail({ runId, message }: { runId?: number | null; message?: str
   return (
     <div className="space-y-2 rounded-md bg-bg p-3">
       {message && <p className="text-[12.5px]">{message}</p>}
-      {sqls?.summary && <p className="text-[12.5px] text-muted">Модель: {sqls.summary}</p>}
+      {sqls?.summary && <p className="text-[12.5px] text-stone">Модель: {sqls.summary}</p>}
       {sqls && <div className="grid gap-2 lg:grid-cols-2"><Code>{sqls.original}</Code><Code>{sqls.optimized ?? '— запрос не предложен —'}</Code></div>}
-      {runId != null && <p className="text-[11px] text-muted">Запуск #{runId} — полные данные в «Истории».</p>}
+      {runId != null && <p className="text-[11px] text-stone">Запуск #{runId} — полные данные в «Истории».</p>}
     </div>
   )
 }

@@ -9,9 +9,10 @@ import { Experiments } from './pages/Experiments'
 import { History } from './pages/History'
 import { Setup } from './pages/Setup'
 import { Start } from './pages/Start'
+import { Logo } from './components/Logo'
 
 const pages = [
-  { id: 'start', label: 'Начало', group: 'Работа', desc: 'Что умеет программа и готова ли она к работе' },
+  { id: 'start', label: 'Начало', group: 'Главная', desc: 'Состояние программы и быстрые действия' },
   { id: 'analyzer', label: 'Анализ запроса', group: 'Работа', desc: 'Вставьте SQL — программа найдёт проблемы, а ИИ предложит более быструю версию и проверит её на базе' },
   { id: 'compare', label: 'Сравнение запросов', group: 'Работа', desc: 'Два варианта запроса: совпадает ли результат и какой из них быстрее' },
   { id: 'databases', label: 'Базы данных', group: 'Работа', desc: 'Подключения к базам и их структура: таблицы, колонки, индексы' },
@@ -21,7 +22,6 @@ const pages = [
   { id: 'setup', label: 'Установка и помощь', group: 'Справка', desc: 'Как поставить программу на компьютер и подключить модель ИИ' },
 ] as const
 type PageId = typeof pages[number]['id']
-const groups = ['Работа', 'Исследования', 'Справка'] as const
 
 function currentPage(): PageId {
   const h = window.location.hash.replace('#/', '').split('/')[0] as PageId
@@ -29,7 +29,7 @@ function currentPage(): PageId {
 }
 
 function Dot({ ok }: { ok: boolean | null }) {
-  return <span className={`inline-block h-1.5 w-1.5 ${ok == null ? 'bg-muted' : ok ? 'bg-good' : 'bg-accent'}`} />
+  return <span className={`inline-block h-1.5 w-1.5 rounded-full ${ok == null ? 'bg-ash' : ok ? 'bg-terminal-green' : 'bg-obsidian'}`} />
 }
 
 export default function App() {
@@ -73,59 +73,93 @@ export default function App() {
   const meta = pages.find(p => p.id === page)!
   const llm = models?.providers.filter(p => p !== 'baseline') ?? []
 
+  // быстрый переход Alt+1…8 между разделами, как в настольных инструментах
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey) return
+      const n = Number(e.key)
+      if (n >= 1 && n <= pages.length) { e.preventDefault(); window.location.hash = `#/${pages[n - 1].id}` }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  const groups = ['Главная', 'Работа', 'Исследования', 'Справка'] as const
+
   return (
     <div className="flex h-full">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-line bg-bg">
-        <button onClick={() => go('start')} className="px-5 pb-6 pt-5 text-left">
-          <div className="text-[19px] font-bold leading-[1.05] tracking-tight">AI Database<br />Optimizer</div>
-          <div className="mt-2 h-[3px] w-8 bg-accent" />
-        </button>
-        <nav className="flex flex-col gap-5 px-3">
-          {groups.map(g => (
-            <div key={g}>
-              <div className="kicker px-2 pb-1.5 text-muted">{g}</div>
-              {pages.filter(p => p.group === g).map(p => {
-                const active = page === p.id
-                return (
-                  <button key={p.id} onClick={() => go(p.id)}
-                    className={`flex w-full items-center gap-3 border-l-2 px-2 py-1.5 text-left text-[13.5px] transition ${active ? 'border-accent font-semibold text-text' : 'border-transparent text-muted hover:text-text'}`}>
-                    <span className="w-5 text-[11px] tabular-nums text-muted">{String(pages.indexOf(p) + 1).padStart(2, '0')}</span>{p.label}
-                  </button>
-                )
-              })}
+      <aside className="flex w-[232px] shrink-0 flex-col border-r border-line bg-white">
+        <div className="flex h-12 items-center border-b border-line px-4">
+          <button onClick={() => go('start')} aria-label="Начало"><Logo /></button>
+        </div>
+        <div className="border-b border-line px-3 py-3">
+          <div className="flex items-center gap-2 rounded-md bg-paper-white px-2.5 py-2 shadow-[0_0_0_1px_#ebebeb]">
+            <Dot ok={backendOk} />
+            <div className="min-w-0 flex-1 leading-tight">
+              <div className="truncate text-[13px] text-obsidian">Локальная установка</div>
+              <div className="truncate font-mono text-[11px] text-stone">localhost:8000</div>
             </div>
-          ))}
+          </div>
+        </div>
+        <nav className="flex-1 overflow-y-auto px-2 py-3">
+          {groups.map(g => {
+            const items = pages.filter(p => p.group === g)
+            return (
+              <div key={g} className="mb-3">
+                {g !== 'Главная' && <div className="kicker px-2 pb-1 pt-2 text-smoke">{g}</div>}
+                {items.map(p => {
+                  const active = page === p.id
+                  return (
+                    <button key={p.id} onClick={() => go(p.id)}
+                      className={`group flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[14px] transition-colors ${active ? 'bg-paper-white text-obsidian shadow-[0_0_0_1px_#ebebeb]' : 'text-charcoal hover:bg-paper-white hover:text-obsidian'}`}>
+                      <span className="flex-1">{p.label}</span>
+                      <span className={`font-mono text-[10.5px] ${active ? 'text-stone' : 'text-ash group-hover:text-smoke'}`}>alt {pages.indexOf(p) + 1}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )
+          })}
         </nav>
-        <div className="mt-auto space-y-1.5 border-t border-line px-5 py-4 text-[12px] text-muted">
-          <div className="flex items-center gap-2"><Dot ok={backendOk} /> Сервер: {backendOk == null ? '…' : backendOk ? 'работает' : 'недоступен'}</div>
-          <div className="flex items-center gap-2"><Dot ok={models ? llm.length > 0 : null} /> ИИ: {models ? (llm.length ? llm.join(', ') : 'не настроен') : '…'}</div>
-          <div className="flex items-center gap-2"><Dot ok={backendOk ? connections.length > 0 : null} /> Баз данных: {connections.length}</div>
+        <div className="space-y-1.5 border-t border-line px-4 py-3 font-mono text-[11px] text-stone">
+          <div className="flex items-center gap-2"><Dot ok={backendOk} /><span className="flex-1">сервер</span><span>{backendOk == null ? '…' : backendOk ? 'online' : 'offline'}</span></div>
+          <div className="flex items-center gap-2"><Dot ok={models ? llm.length > 0 : null} /><span className="flex-1">модель</span><span className="truncate">{models?.default?.split(':').slice(1).join(':') || (models ? '—' : '…')}</span></div>
+          <div className="flex items-center gap-2"><Dot ok={backendOk ? connections.length > 0 : null} /><span className="flex-1">базы</span><span>{connections.length}</span></div>
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 overflow-auto">
-        <header className="sticky top-0 z-10 border-b border-line bg-bg/95 px-8 pb-4 pt-6 backdrop-blur">
-          <h1 className="text-[26px] font-bold leading-none tracking-tight">{meta.label}</h1>
-          <p className="mt-2 text-[13px] text-muted">{meta.desc}</p>
+      <main className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-bg/80 px-6 font-mono text-[12px] text-stone backdrop-blur-xl">
+          <span>optimizer</span><span className="text-ash">/</span><span className="text-obsidian">{meta.label.toLowerCase()}</span>
+          <span className="ml-auto hidden text-ash md:inline">{meta.group !== 'Главная' ? meta.group.toLowerCase() : 'рабочий стол'}</span>
         </header>
-        <div className="p-8">
-          {backendOk === false && page !== 'setup' && (
-            <div className="mb-6 flex flex-wrap items-center gap-4 border-l-2 border-accent bg-panel px-4 py-3">
-              <div className="min-w-0 flex-1 text-[13px]">
-                <div className="font-semibold">Сервер программы не запущен</div>
-                <div className="text-muted">Запустите его (шаг 4 инструкции или scripts\start.ps1). Страница обновится сама, как только сервер ответит.</div>
+        <div className="min-h-0 flex-1 overflow-auto">
+          <div className="px-6 pb-16 pt-6">
+            {page !== 'setup' && (
+              <div className="mb-6">
+                <h1 className="text-[24px] font-[450] leading-[1.15] tracking-[-0.04em] text-obsidian">{meta.label}</h1>
+                <p className="mt-1 text-[14px] text-charcoal">{meta.desc}</p>
               </div>
-              <button className="border border-text px-3 py-1.5 text-[13px] font-semibold hover:border-accent hover:text-accent" onClick={() => go('setup')}>Открыть инструкцию</button>
-            </div>
-          )}
-          <div hidden={page !== 'start'}><Start backendOk={backendOk} models={models} connections={connections} stats={stats} onNavigate={go} onConnectionsChange={loadConnections} /></div>
-          <div hidden={page !== 'dashboard'}><Dashboard stats={stats} onNavigate={go} /></div>
-          <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} onSendToCompare={sendToCompare} onNavigate={go} /></div>
-          <div hidden={page !== 'compare'}><Compare connections={connections} onRun={refresh} draft={compareDraft} /></div>
-          <div hidden={page !== 'experiments'}><Experiments connections={connections} models={models} onRun={refresh} /></div>
-          <div hidden={page !== 'databases'}><Databases connections={connections} onChange={loadConnections} /></div>
-          <div hidden={page !== 'history'}><History refreshKey={refreshKey} /></div>
-          <div hidden={page !== 'setup'}><Setup /></div>
+            )}
+            {backendOk === false && page !== 'setup' && (
+              <div className="card mb-6 flex flex-wrap items-center gap-4 px-4 py-3">
+                <span className="font-mono text-[12px]">✕</span>
+                <div className="min-w-0 flex-1 text-[14px]">
+                  <div className="font-medium text-obsidian">Сервер программы не запущен</div>
+                  <div className="text-charcoal">Запустите его (шаг 04 инструкции или scripts\start.ps1). Интерфейс оживёт сам, как только сервер ответит.</div>
+                </div>
+                <button className="h-8 rounded-md bg-obsidian px-3 text-[14px] text-white hover:bg-charcoal" onClick={() => go('setup')}>Инструкция</button>
+              </div>
+            )}
+            <div hidden={page !== 'start'}><Start backendOk={backendOk} models={models} connections={connections} stats={stats} onNavigate={go} onConnectionsChange={loadConnections} /></div>
+            <div hidden={page !== 'dashboard'}><Dashboard stats={stats} onNavigate={go} /></div>
+            <div hidden={page !== 'analyzer'}><Analyzer connections={connections} models={models} examples={examples} onRun={refresh} onSendToCompare={sendToCompare} onNavigate={go} /></div>
+            <div hidden={page !== 'compare'}><Compare connections={connections} onRun={refresh} draft={compareDraft} /></div>
+            <div hidden={page !== 'experiments'}><Experiments connections={connections} models={models} onRun={refresh} /></div>
+            <div hidden={page !== 'databases'}><Databases connections={connections} onChange={loadConnections} /></div>
+            <div hidden={page !== 'history'}><History refreshKey={refreshKey} /></div>
+            <div hidden={page !== 'setup'}><Setup /></div>
+          </div>
         </div>
       </main>
     </div>

@@ -45,15 +45,15 @@ export function Compare({ connections, onRun, draft }: { connections: Connection
           {!connections.length && <option value="">Нет подключений</option>}
           {connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <label className="text-[13px] text-muted">прогонов <input type="number" min={1} max={50} value={runs} onChange={e => setRuns(Number(e.target.value))} className="w-16" /></label>
-        <label className="text-[13px] text-muted">прогрев <input type="number" min={0} max={10} value={warmup} onChange={e => setWarmup(Number(e.target.value))} className="w-16" /></label>
+        <label className="text-[13px] text-stone">прогонов <input type="number" min={1} max={50} value={runs} onChange={e => setRuns(Number(e.target.value))} className="w-16" /></label>
+        <label className="text-[13px] text-stone">прогрев <input type="number" min={0} max={10} value={warmup} onChange={e => setWarmup(Number(e.target.value))} className="w-16" /></label>
         <Button variant="primary" onClick={() => run()} disabled={busy || connId == null}>{busy && <Spinner />} Сравнить</Button>
       </div>
-      {from && <p className="text-[12px] text-muted">Запросы переданы из SQL Analyzer ({from}).{busy ? ' Выполняется сравнение: проверка эквивалентности и бенчмарк…' : ''}</p>}
+      {from && <p className="text-[12px] text-stone">Запросы переданы из SQL Analyzer ({from}).{busy ? ' Выполняется сравнение: проверка эквивалентности и бенчмарк…' : ''}</p>}
       {!connections.length && <Empty>Сравнение выполняет оба запроса на реальной БД. Добавьте подключение в разделе «Базы данных».</Empty>}
       <div className="grid gap-4 lg:grid-cols-2">
-        <div><div className="mb-1 text-[12px] font-semibold tracking-wider text-muted">ORIGINAL</div><SqlEditor value={original} onChange={setOriginal} height={220} /></div>
-        <div><div className="mb-1 text-[12px] font-semibold tracking-wider text-muted">OPTIMIZED</div><SqlEditor value={optimized} onChange={setOptimized} height={220} /></div>
+        <div><div className="mb-1 text-[12px] font-medium tracking-wider text-stone">ORIGINAL</div><SqlEditor value={original} onChange={setOriginal} height={220} /></div>
+        <div><div className="mb-1 text-[12px] font-medium tracking-wider text-stone">OPTIMIZED</div><SqlEditor value={optimized} onChange={setOptimized} height={220} /></div>
       </div>
       {error && <ErrorBox>{error}</ErrorBox>}
       {result && <ComparisonView cmp={result} />}
