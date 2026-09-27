@@ -6,7 +6,7 @@ import io
 
 import pytest
 
-from app.services import workbench
+from app.services import audit, workbench
 from app.services.connectors import ExecResult
 from app.services.schema_ddl import parse_ddl
 
@@ -23,6 +23,8 @@ CREATE TABLE emp (
 CREATE TABLE pays (id INT PRIMARY KEY, emp_id INT, amount DECIMAL(10,2), created_at DATETIME);
 CREATE INDEX i_emp ON pays (emp_id);
 CREATE INDEX i_emp_date ON pays (emp_id, created_at);
+CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100));
+CREATE TABLE orders (id INT PRIMARY KEY, user_id INT, total DECIMAL(10,2));
 """
 
 
@@ -40,6 +42,18 @@ class FakeConn:
 
     def index_usage(self):
         return self.unused
+
+    def _query(self, sql, args=None):
+        """Ответы на проверки аудита по данным: значения уникальны, даты в ISO, «висячих» ссылок нет."""
+        if "count(DISTINCT" in sql:
+            return [(3, 3, 3)]
+        if "REGEXP" in sql or " ~ " in sql:
+            return [(2, 2, 0, 0)]
+        if "max(abs(" in sql:
+            return [(1000.0,)]
+        if "NOT EXISTS" in sql:
+            return [(0,)]
+        return []
 
     def never_analyzed(self):
         return []
@@ -65,25 +79,38 @@ def test_console_blocks_writes():
         workbench.run_console(FakeConn(), "mysql", "DELETE FROM t")
 
 
-def test_audit_finds_design_problems():
+def test_audit_finds_and_verifies_problems():
     schema, _ = parse_ddl(BAD_DDL, "mysql")
-    a = workbench.audit(FakeConn(unused=[]), "mysql", schema)
-    got = {(f["code"], f["table"]) for f in a["findings"]}
-    assert ("NO_PRIMARY_KEY", "emp") in got
-    assert ("FK_WITHOUT_INDEX", "emp") not in got  # MySQL сам создаёт индекс под внешний ключ
-    assert ("DATE_AS_TEXT", "emp") in got
-    assert ("MONEY_AS_FLOAT", "emp") in got
-    assert ("REDUNDANT_INDEX", "pays") in got
-    assert ("MONEY_AS_FLOAT", "pays") not in got  # DECIMAL — правильно
-    fix = next(f["fix_sql"] for f in a["findings"] if f["code"] == "REDUNDANT_INDEX")
-    assert fix == "DROP INDEX `i_emp` ON `pays`;"
-    assert 0 <= a["score"] < 100
+    r = audit.run(FakeConn(unused=[]), "mysql", schema)
+    by = {(f["code"], f["table"]): f for f in r["findings"]}
+    pk = by[("NO_PRIMARY_KEY", "emp")]
+    assert pk["fix_kind"] == "safe" and pk["fix_sql"] == "ALTER TABLE `emp` ADD PRIMARY KEY (`id`);"
+    assert ("FK_WITHOUT_INDEX", "emp") not in by  # MySQL сам создаёт индекс под внешний ключ
+    date = by[("DATE_AS_TEXT", "emp")]
+    assert date["fix_sql"] == "ALTER TABLE `emp` MODIFY `hire_date` DATE;" and date["fix_kind"] == "safe"
+    assert by[("MONEY_AS_FLOAT", "emp")]["fix_sql"].endswith("DECIMAL(14,2);")
+    assert ("MONEY_AS_FLOAT", "pays") not in by  # DECIMAL — правильно
+    assert by[("REDUNDANT_INDEX", "pays")]["fix_sql"] == "DROP INDEX `i_emp` ON `pays`;"
+    fk = by[("MISSING_FOREIGN_KEY", "orders")]  # user_id без объявленной связи с users
+    assert "REFERENCES `users` (`id`)" in fk["fix_sql"] and fk["fix_kind"] == "safe"
+    assert all(f["why"] and f["effect"] for f in r["findings"])
+    assert 0 < r["score"] < 100 and set(r["categories"]) == {"integrity", "indexes", "types", "stats"}
+
+
+def test_audit_score_does_not_collapse_on_small_tables():
+    # 30 маленьких таблиц без статистики и с внешними ключами без индекса — это не «ноль из ста»
+    ddl = "CREATE TABLE ref (id INT PRIMARY KEY);\n" + "\n".join(
+        f"CREATE TABLE t{i} (id INT PRIMARY KEY, ref_id INT, FOREIGN KEY (ref_id) REFERENCES ref(id));" for i in range(30))
+    schema, _ = parse_ddl(ddl, "postgres")
+    r = audit.run(FakeConn(unused=None), "postgres", schema)
+    assert r["categories"]["indexes"]["issues"] == 30
+    assert r["score"] >= 80  # мелкие замечания (low) снимают по 15 % с таблицы в своём направлении
 
 
 def test_audit_fk_without_index_postgres():
     schema, _ = parse_ddl(BAD_DDL.replace("DATETIME", "TIMESTAMP"), "postgres")
-    a = workbench.audit(FakeConn(unused=None), "postgres", schema)
-    fix = next(f["fix_sql"] for f in a["findings"] if f["code"] == "FK_WITHOUT_INDEX")
+    r = audit.run(FakeConn(unused=None), "postgres", schema)
+    fix = next(f["fix_sql"] for f in r["findings"] if f["code"] == "FK_WITHOUT_INDEX")
     assert fix == 'CREATE INDEX "idx_emp_dept_id" ON "emp" ("dept_id");'
 
 
@@ -94,6 +121,6 @@ def test_data_dictionary_docx():
                                           {"emp": {"description": "Сотрудники", "columns": {"salary": "Оклад"}}})
     doc = Document(io.BytesIO(data))
     text = "\n".join(p.text for p in doc.paragraphs)
-    assert "Таблица 2 – Структура таблицы dept" in text
+    assert "– Структура таблицы dept" in text and "1 Общие сведения" in text
     cells = [c.text for t in doc.tables for row in t.rows for c in row.cells]
     assert "Оклад" in cells and "FK → dept" in cells

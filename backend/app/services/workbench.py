@@ -13,7 +13,6 @@ import decimal
 import io
 import json
 import math
-import re
 import time
 import uuid
 
@@ -271,111 +270,6 @@ def remember(connection_id: int, schema_name: str, prof: dict | None = None) -> 
     save_profiles(data)
 
 
-# ---------------------------------------------------------------- аудит структуры базы
-def _ident(name: str, dialect: Dialect) -> str:
-    q = "`" if dialect == "mysql" else '"'
-    return ".".join(q + part.replace(q, q * 2) + q for part in name.split("."))
-
-
-_DATE_NAME = re.compile(r"(^|_)(date|dt|time|created|updated|deleted|birth|дата)(_|$)|_(at|on)$", re.I)
-_MONEY_NAME = re.compile(r"(price|amount|cost|sum|total|salary|balance|fee|oklad|summa|стоимость|цена|сумма)", re.I)
-_TEXT_TYPE = re.compile(r"^(VARCHAR|CHARACTER VARYING|CHAR|CHARACTER|TEXT|TINYTEXT|MEDIUMTEXT)", re.I)
-_FLOAT_TYPE = re.compile(r"^(FLOAT|DOUBLE|REAL)", re.I)
-
-SEVERITY_PENALTY = {"high": 12, "medium": 5, "low": 1}
-
-
-def _find(code, severity, table, title, detail, fix=None):
-    return {"code": code, "severity": severity, "table": table, "title": title, "detail": detail, "fix_sql": fix}
-
-
-def audit(conn: Connector, dialect: Dialect, schema: SchemaInfo) -> dict:
-    findings: list[dict] = []
-    for t in schema.tables:
-        tn = _ident(t.name, dialect)
-        short = t.name.split(".")[-1]
-        # 1. первичный ключ
-        if not any(i.primary for i in t.indexes):
-            idcol = next((c.name for c in t.columns if c.name.lower() == "id"), None)
-            findings.append(_find(
-                "NO_PRIMARY_KEY", "high", t.name, "Нет первичного ключа",
-                "Без первичного ключа строки нельзя однозначно адресовать, InnoDB создаёт скрытый ключ, а репликация "
-                "и поиск по строке работают медленнее.",
-                f"ALTER TABLE {tn} ADD PRIMARY KEY ({_ident(idcol, dialect)});" if idcol
-                else f"-- добавьте в {t.name} столбец-идентификатор и объявите его первичным ключом"))
-        # 2. внешние ключи без индекса
-        for fk in t.foreign_keys:
-            n = len(fk.columns)
-            if not any([c.lower() for c in i.columns[:n]] == [c.lower() for c in fk.columns] for i in t.indexes):
-                cols = ", ".join(_ident(c, dialect) for c in fk.columns)
-                findings.append(_find(
-                    "FK_WITHOUT_INDEX", "high", t.name, f"Внешний ключ ({', '.join(fk.columns)}) без индекса",
-                    f"Соединения {short} с {fk.ref_table} и удаление строк из {fk.ref_table} будут читать "
-                    f"{short} целиком.",
-                    f"CREATE INDEX {_ident('idx_' + short + '_' + '_'.join(fk.columns), dialect)} ON {tn} ({cols});"))
-        # 3. дублирующиеся и избыточные индексы (один — префикс другого)
-        idx = [i for i in t.indexes if not i.primary]
-        for a in idx:
-            for b in t.indexes:
-                if a is b or a.unique:
-                    continue
-                ca, cb = [c.lower() for c in a.columns], [c.lower() for c in b.columns]
-                if ca == cb[:len(ca)] and (len(ca) < len(cb) or b.primary or b.unique or b.name < a.name):
-                    drop = (f"DROP INDEX {_ident(a.name, dialect)} ON {tn};" if dialect == "mysql"
-                            else f"DROP INDEX {_ident('.'.join(t.name.split('.')[:-1] + [a.name]), dialect)};")
-                    findings.append(_find(
-                        "REDUNDANT_INDEX", "medium", t.name, f"Лишний индекс {a.name}",
-                        f"Его столбцы ({', '.join(a.columns)}) — начало индекса {b.name} ({', '.join(b.columns)}). "
-                        "Он только замедляет вставки и занимает место.", drop))
-                    break
-        if len(t.indexes) > 8:
-            findings.append(_find("TOO_MANY_INDEXES", "low", t.name, f"{len(t.indexes)} индексов на одной таблице",
-                                  "Каждый индекс замедляет INSERT и UPDATE. Проверьте, все ли они нужны."))
-        # 4. типы данных
-        for c in t.columns:
-            if _DATE_NAME.search(c.name) and _TEXT_TYPE.match(c.type):
-                findings.append(_find(
-                    "DATE_AS_TEXT", "medium", t.name, f"Дата в текстовом столбце {c.name} ({c.type})",
-                    "Сравнения и сортировка по строке работают неверно для разных форматов, индекс по диапазону дат "
-                    "не используется, а функции дат требуют преобразования.",
-                    f"-- ALTER TABLE {tn} ... {_ident(c.name, dialect)} → DATE / TIMESTAMP (после проверки формата данных)"))
-            if _MONEY_NAME.search(c.name) and _FLOAT_TYPE.match(c.type):
-                findings.append(_find(
-                    "MONEY_AS_FLOAT", "medium", t.name, f"Денежная сумма {c.name} в типе {c.type}",
-                    "Числа с плавающей точкой хранят суммы приближённо: 0,1 + 0,2 ≠ 0,3. Для денег нужен DECIMAL/NUMERIC.",
-                    (f"ALTER TABLE {tn} MODIFY {_ident(c.name, dialect)} DECIMAL(12,2);" if dialect == "mysql"
-                     else f"ALTER TABLE {tn} ALTER COLUMN {_ident(c.name, dialect)} TYPE NUMERIC(12,2);")))
-        if t.columns and all(c.nullable for c in t.columns if not any(c.name in i.columns for i in t.indexes if i.primary)) \
-                and len(t.columns) >= 4:
-            findings.append(_find("ALL_NULLABLE", "low", t.name, "Все столбцы допускают NULL",
-                                  "Обязательные поля лучше объявить NOT NULL: это защищает данные и помогает планировщику."))
-
-    # 5. статистика СУБД: неиспользуемые индексы и таблицы без статистики
-    usage = conn.index_usage()
-    by_name = {t.name: t for t in schema.tables}
-    for table, index in usage or []:
-        t = by_name.get(table)
-        if t is None or (t.row_count or 0) < 1000:
-            continue
-        drop = (f"DROP INDEX {_ident(index, dialect)} ON {_ident(table, dialect)};" if dialect == "mysql"
-                else f"DROP INDEX {_ident('.'.join(table.split('.')[:-1] + [index]), dialect)};")
-        findings.append(_find("UNUSED_INDEX", "low", table, f"Индекс {index} ни разу не использовался",
-                              "С момента запуска сервера или сброса статистики к индексу не было ни одного обращения. "
-                              "Прежде чем удалять, убедитесь, что статистика собрана за типичный период работы.",
-                              f"-- {drop}"))
-    for table in conn.never_analyzed():
-        findings.append(_find("NO_STATISTICS", "medium", table, "У планировщика нет статистики",
-                              "По таблице ни разу не выполнялся ANALYZE: оценки числа строк неверны, и планы запросов "
-                              "могут быть плохими.", f"ANALYZE {_ident(table, dialect)};"))
-
-    order = {"high": 0, "medium": 1, "low": 2}
-    findings.sort(key=lambda f: (order[f["severity"]], f["table"] or "", f["code"]))
-    score = max(0, 100 - sum(SEVERITY_PENALTY[f["severity"]] for f in findings))
-    return {"score": score, "tables": len(schema.tables), "findings": findings,
-            "counts": {s: sum(1 for f in findings if f["severity"] == s) for s in ("high", "medium", "low")},
-            "usage_stats": usage is not None}
-
-
 # ---------------------------------------------------------------- описание базы (словарь данных)
 DESCRIBE_SYSTEM = """Ты — технический писатель. По структуре таблиц базы данных кратко опиши по-русски назначение
 каждой таблицы (одно предложение) и каждого столбца (несколько слов). Не выдумывай того, чего не видно из имён и связей;
@@ -413,9 +307,13 @@ def _key_mark(t: TableInfo, col: str) -> str:
 
 
 def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schema: SchemaInfo,
-                         descriptions: dict | None, er_png: str | None = None) -> bytes:
-    """Словарь данных в Word по ГОСТ 2.105 / 7.32: Times New Roman, поля 30/10/20/20 мм, интервал 1,5,
-    таблицы с подписью «Таблица N – …» над таблицей слева."""
+                         descriptions: dict | None, er_png: str | None = None, audit_report: dict | None = None,
+                         scope: str | None = None) -> bytes:
+    """Описание базы данных в Word по ГОСТ 2.105 / 7.32: Times New Roman 14, поля 30/10/20/20 мм, интервал 1,5,
+    номер страницы вверху по центру, «Таблица N – …» над таблицей слева, «Рисунок N – …» под рисунком по центру.
+
+    Разделы: общие сведения, перечень таблиц, структура таблиц, связи (ER-диаграмма в нотации IDEF1X и перечень
+    внешних ключей), индексы и — по желанию — результаты аудита структуры."""
     from docx import Document
     from docx.enum.table import WD_TABLE_ALIGNMENT
     from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -484,30 +382,60 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
         return tb
 
     dbms = "MySQL" if dialect == "mysql" else "PostgreSQL"
-    para(f"ОПИСАНИЕ СТРУКТУРЫ БАЗЫ ДАННЫХ «{name}»", center=True, after=12)
-    para(f"Документ содержит описание таблиц базы данных «{name}» (СУБД {dbms} {version or ''}): назначение таблиц, "
-         f"состав и типы полей, ключи и связи между таблицами. Всего таблиц: {len(schema.tables)}. Описание "
-         f"сформировано программой AI Database Optimizer {dt.date.today().strftime('%d.%m.%Y')} по структуре "
-         "подключённой базы" + (", назначение таблиц и полей предложено языковой моделью и требует проверки."
-                                 if descriptions else "."))
-    n = 1
-    para("1 Перечень таблиц", indent=True, before=24, after=12, keep=True)
-    para(f"Таблица {n} – Перечень таблиц базы данных", indent=False, keep=True)
-    rows_fmt = lambda t: f"{t.row_count:,}".replace(",", " ") if t.row_count is not None else "—"  # noqa: E731
+    tables = schema.tables
+    links = [(t, fk) for t in tables for fk in t.foreign_keys]
+    n_tab = 0
+
+    def caption(text):
+        nonlocal n_tab
+        n_tab += 1
+        para(f"Таблица {n_tab} – {text}", indent=False, keep=True, before=6)
+
+    def heading(text):
+        para(text, indent=True, before=24, after=12, keep=True)
+
+    num = lambda v: f"{v:,}".replace(",", " ")  # noqa: E731
+    rows_fmt = lambda t: num(t.row_count) if t.row_count is not None else "—"  # noqa: E731
+    total_rows = sum(t.row_count or 0 for t in tables)
+    total_mb = sum(t.size_bytes or 0 for t in tables) / 1048576
+    what = f"схемы «{scope}» базы данных «{name.split('.')[0]}»" if scope else f"базы данных «{name}»"
+
+    # в заголовке прописными — только слова, имена объектов базы остаются как есть
+    head = (f"СХЕМЫ «{scope}» БАЗЫ ДАННЫХ «{name.split('.')[0]}»" if scope else f"БАЗЫ ДАННЫХ «{name}»")
+    para(f"ОПИСАНИЕ СТРУКТУРЫ {head}", center=True, after=12)
+    para(f"Документ описывает структуру {what}: назначение и состав таблиц, типы полей, ключи, связи и индексы"
+         + (", а также результаты аудита структуры" if audit_report else "") + ". Описание сформировано программой "
+         f"AI Database Optimizer {dt.date.today().strftime('%d.%m.%Y')} по подключённой базе"
+         + (", назначение таблиц и полей предложено языковой моделью и требует проверки." if descriptions else "."))
+
+    heading("1 Общие сведения")
+    caption("Общие сведения о базе данных")
+    info = [["СУБД", f"{dbms} {version or ''}".strip()], ["База данных", name.split(".")[0]]]
+    if scope:
+        info.append(["Схема", scope])
+    info += [["Таблиц", len(tables)], ["Строк (всего)", num(total_rows)], ["Объём данных и индексов", f"{total_mb:.1f} МБ".replace(".", ",")],
+             ["Внешних ключей", len(links)], ["Индексов", sum(len(t.indexes) for t in tables)]]
+    if audit_report:
+        info.append(["Оценка структуры", f"{audit_report['score']} из 100 ({audit_report['verdict']})"])
+    table(["Показатель", "Значение"], info, [8.5, 8.5])
+
+    heading("2 Перечень таблиц")
+    caption("Перечень таблиц")
     if descriptions:
         table(["№", "Таблица", "Назначение", "Строк"],
               [[i + 1, t.name, descriptions.get(t.name, {}).get("description", ""), rows_fmt(t)]
-               for i, t in enumerate(schema.tables)], [1.0, 4.5, 9.0, 2.5])
+               for i, t in enumerate(tables)], [1.0, 4.5, 9.0, 2.5])
     else:  # без описаний столбец «Назначение» остался бы пустым
-        table(["№", "Таблица", "Полей", "Строк"],
-              [[i + 1, t.name, len(t.columns), rows_fmt(t)] for i, t in enumerate(schema.tables)], [1.0, 9.5, 3.0, 3.5])
-    n += 1
-    para("2 Структура таблиц", indent=True, before=24, after=12, keep=True)
-    for t in schema.tables:
+        table(["№", "Таблица", "Полей", "Строк", "Объём, КБ"],
+              [[i + 1, t.name, len(t.columns), rows_fmt(t), num(round((t.size_bytes or 0) / 1024))]
+               for i, t in enumerate(tables)], [1.0, 8.0, 2.5, 3.0, 2.5])
+
+    heading("3 Структура таблиц")
+    for t in tables:
         d = descriptions.get(t.name, {})
         if d.get("description"):
             para(f"Таблица {t.name}: {d['description'][0].lower() + d['description'][1:]}", before=6)
-        para(f"Таблица {n} – Структура таблицы {t.name}", indent=False, keep=True, before=6)
+        caption(f"Структура таблицы {t.name}")
         cols = d.get("columns", {}) if isinstance(d.get("columns"), dict) else {}
         if descriptions:
             table(["Поле", "Тип", "NULL", "Ключ", "Описание"],
@@ -517,23 +445,54 @@ def data_dictionary_docx(name: str, dialect: Dialect, version: str | None, schem
             table(["Поле", "Тип", "NULL", "Ключ"],
                   [[c.name, short_type(c.type), "да" if c.nullable else "нет", _key_mark(t, c.name)]
                    for c in t.columns], [5.5, 4.5, 2.0, 5.0])
-        idx = [i for i in t.indexes if not i.primary]
-        if idx:
-            para("Индексы: " + "; ".join(f"{i.name} ({', '.join(i.columns)}){' — уникальный' if i.unique else ''}"
-                                          for i in idx) + ".", before=6)
-        n += 1
-    links = [(t.name, fk) for t in schema.tables for fk in t.foreign_keys]
-    para("3 Связи между таблицами", indent=True, before=24, after=12, keep=True)
+
+    heading("4 Связи между таблицами")
     if er_png:
-        doc.add_picture(io.BytesIO(base64.b64decode(er_png.split(",", 1)[-1])), width=Cm(17))
+        png = base64.b64decode(er_png.split(",", 1)[-1])
+        w_px, h_px = int.from_bytes(png[16:20], "big"), int.from_bytes(png[20:24], "big")
+        width = Cm(17) if not w_px or h_px / w_px * 17 <= 22 else Cm(22 * w_px / h_px)  # не выше страницы
+        para("Схема данных приведена на рисунке 1 в нотации IDEF1X: в каждом блоке над чертой — первичный ключ, "
+             "под чертой — остальные атрибуты, внешние ключи помечены (FK); линия связи идёт от родительской "
+             "таблицы к дочерней, точка на конце линии означает «много».")
+        doc.add_picture(io.BytesIO(png), width=width)
         doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para("Рисунок 1 – Схема связей таблиц базы данных", center=True, after=12)
+        doc.paragraphs[-1].paragraph_format.keep_with_next = True
+        para(f"Рисунок 1 – Схема данных {what}", center=True, after=12)
     if links:
-        for k, (tname, fk) in enumerate(links):
-            end = "." if k == len(links) - 1 else ";"
-            para(f"– {tname} ({', '.join(fk.columns)}) ссылается на {fk.ref_table} ({', '.join(fk.ref_columns)}){end}")
+        para(f"Внешние ключи перечислены в таблице {n_tab + 1}.")
+        caption("Внешние ключи")
+        table(["Дочерняя таблица", "Столбцы", "Родительская таблица", "Столбцы", "Связь"],
+              [[t.name, ", ".join(fk.columns), fk.ref_table, ", ".join(fk.ref_columns),
+                "1 : 0..N" if any(c.nullable for c in t.columns if c.name in fk.columns) else "1 : N"]
+               for t, fk in links], [4.2, 3.0, 4.2, 3.0, 2.6])
     else:
-        para("Внешние ключи в базе не объявлены.")
+        para("Внешние ключи не объявлены: связи между таблицами СУБД не контролирует.")
+
+    heading("5 Индексы")
+    idx_rows = [[t.name, i.name, ", ".join(i.columns), "первичный ключ" if i.primary else "уникальный" if i.unique else "обычный"]
+                for t in tables for i in t.indexes]
+    if idx_rows:
+        caption("Индексы")
+        table(["Таблица", "Индекс", "Столбцы", "Вид"], idx_rows, [4.3, 5.2, 4.5, 3.0])
+    else:
+        para("Индексов нет.")
+
+    if audit_report:
+        heading("6 Оценка структуры")
+        para(f"Оценка структуры — {audit_report['score']} из 100 ({audit_report['verdict']}). {audit_report['how']}")
+        caption("Оценка по направлениям")
+        table(["Направление", "Оценка", "Замечаний", "Что проверяется"],
+              [[c["title"], c["score"], c["issues"], c["about"]] for c in audit_report["categories"].values()],
+              [4.0, 2.0, 2.3, 8.7])
+        fs = audit_report["findings"]
+        if fs:
+            sev = {"high": "высокая", "medium": "средняя", "low": "низкая"}
+            caption("Замечания и рекомендации")
+            table(["№", "Таблица", "Замечание", "Важность", "Рекомендация"],
+                  [[k + 1, f["table"], f["title"] + (f". {f['note']}" if f.get("note") else ""), sev[f["severity"]],
+                    f["effect"]] for k, f in enumerate(fs[:80])], [0.9, 3.4, 5.4, 2.0, 5.3])
+        else:
+            para("Замечаний нет.")
     buf = io.BytesIO()
     doc.save(buf)
     return buf.getvalue()

@@ -23,7 +23,8 @@ from app.models import (AnalyzeRequest, AnalyzeResponse, BenchmarkRequest, Bench
                         ConnectionCreate, ConnectionOut, ExplainRequest, OptimizeRequest, OptimizeResponse, PlanSummary, ScriptAnalyzeResponse,
                         SchemaInfo)
 from app.services import benchmark as bench
-from app.services import explain, pipeline, safety, workbench
+from app.services import audit, explain, pipeline, safety, workbench
+from app.services.ai.optimizer import extract_json
 from app.services.ai.optimizer import BASELINE_MODEL, list_prompts
 from app.services.ai.providers import get_registry
 from app.services.connectors import DEFAULT_PORTS, ConnectionConfig, DBError, make_connector
@@ -198,6 +199,8 @@ class DocsRequest(BaseModel):
     describe: bool = False
     model: str | None = None
     er_png: str | None = None  # PNG схемы связей из интерфейса (data URL)
+    schema_name: str | None = None  # описать только одну схему
+    include_audit: bool = True      # раздел «Оценка структуры»
 
 
 @app.post("/api/console/run")
@@ -238,12 +241,61 @@ def console_profile(req: ProfileRequest):
     return {"selected": req.schema_name, "profile": prof}
 
 
-@app.get("/api/database/{connection_id}/audit")
-def database_audit(connection_id: int):
+def _audit(connection_id: int, schema_name: str | None) -> tuple:
     rec, conn = pipeline.open_connector(connection_id)
     with conn:
         schema, _ = pipeline.live_schema(conn, connection_id, refresh=True)
-        return workbench.audit(conn, rec.dbms, schema)
+        schema = workbench.filter_schema(schema, schema_name or None, conn.default_schema())
+        return rec, audit.run(conn, rec.dbms, schema)
+
+
+@app.get("/api/database/{connection_id}/audit")
+def database_audit(connection_id: int, schema: str | None = None):
+    """Аудит всей базы или одной схемы (schema=имя)."""
+    return _audit(connection_id, schema)[1]
+
+
+class AuditApplyRequest(BaseModel):
+    ids: list[str]
+    schema_name: str | None = None
+    username: str
+    password: str  # не сохраняется и не пишется в журнал
+
+
+@app.post("/api/database/{connection_id}/audit/apply")
+def database_audit_apply(connection_id: int, req: AuditApplyRequest):
+    """Выполняет выбранные исправления. Аудит проводится заново, и выполняются только его собственные
+    исправления по идентификаторам — произвольный SQL этим путём выполнить нельзя."""
+    rec, report = _audit(connection_id, req.schema_name)
+    wanted = set(req.ids)
+    fixes = [f for f in report["findings"] if f["id"] in wanted and f["fix_sql"]]
+    if not fixes:
+        raise HTTPException(400, "Нет выбранных исправлений — возможно, проблемы уже устранены. Обновите аудит.")
+    _, cfg = pipeline.connection_config(connection_id)
+    result = audit.apply(cfg, rec.dbms, fixes, req.username, req.password)
+    pipeline.invalidate_schema(connection_id)
+    return {**result, "before": report["score"]}
+
+
+class AuditExplainRequest(BaseModel):
+    schema_name: str | None = None
+    model: str | None = None
+
+
+@app.post("/api/database/{connection_id}/audit/explain")
+def database_audit_explain(connection_id: int, req: AuditExplainRequest):
+    """Разбор результатов аудита языковой моделью: общее состояние, что хорошо, что делать в первую очередь."""
+    _, report = _audit(connection_id, req.schema_name)
+    brief = {"score": report["score"], "tables": report["tables"],
+             "categories": {v["title"]: v["score"] for v in report["categories"].values()},
+             "findings": [{"severity": f["severity"], "table": f["table"], "title": f["title"], "note": f["note"]}
+                          for f in report["findings"][:60]]}
+    llm, model = workbench._complete(audit.EXPLAIN_SYSTEM, json.dumps(brief, ensure_ascii=False), req.model)  # noqa: SLF001
+    try:
+        data = extract_json(llm.text)
+    except ValueError as e:
+        raise HTTPException(502, f"Модель вернула ответ не в том формате: {e}") from e
+    return {**data, "model": model}
 
 
 _TOP_HINTS = {
@@ -270,8 +322,11 @@ def database_docs(connection_id: int, req: DocsRequest):
     rec, conn = pipeline.open_connector(connection_id)
     with conn:
         schema, version = pipeline.live_schema(conn, connection_id)
+        schema = workbench.filter_schema(schema, req.schema_name, conn.default_schema())
+        report = audit.run(conn, rec.dbms, schema) if req.include_audit else None
     desc = workbench.describe(schema, req.model, connection_id) if req.describe else None
-    data = workbench.data_dictionary_docx(rec.database, rec.dbms, version, schema, desc, req.er_png)
+    data = workbench.data_dictionary_docx(rec.database, rec.dbms, version, schema, desc, req.er_png, report,
+                                          scope=req.schema_name)
     return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     headers={"Content-Disposition": "attachment; filename=database_description.docx"})
 

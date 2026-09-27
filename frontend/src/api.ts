@@ -278,9 +278,13 @@ export const api = {
   consoleOverview: (id: number) => request<DbOverview>('GET', `/api/console/overview?connection_id=${id}`),
   consoleProfile: (b: { connection_id: number; schema_name: string; model?: string | null; analyze: boolean }) =>
     request<{ selected: string; profile: DbProfile | null }>('POST', '/api/console/profile', b),
-  audit: (id: number) => request<AuditReport>('GET', `/api/database/${id}/audit`),
+  audit: (id: number, schema?: string | null) => request<AuditReport>('GET', `/api/database/${id}/audit${schema ? `?schema=${encodeURIComponent(schema)}` : ''}`),
+  auditApply: (id: number, b: { ids: string[]; schema_name?: string | null; username: string; password: string }) =>
+    request<AuditApplyResult>('POST', `/api/database/${id}/audit/apply`, b),
+  auditExplain: (id: number, b: { schema_name?: string | null; model?: string | null }) =>
+    request<AuditExplanation>('POST', `/api/database/${id}/audit/explain`, b),
   topQueries: (id: number, limit = 20) => request<TopQueries>('GET', `/api/database/${id}/top-queries?limit=${limit}`),
-  docs: async (id: number, b: { describe: boolean; model?: string | null; er_png?: string | null }) => {
+  docs: async (id: number, b: { describe: boolean; model?: string | null; er_png?: string | null; schema_name?: string | null; include_audit?: boolean }) => {
     const res = await fetch(`/api/database/${id}/docs`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
     if (!res.ok) {
       let msg = `${res.status} ${res.statusText}`
@@ -313,21 +317,47 @@ export interface AskResult {
   attempts: { sql: string | null; error: string | null }[]
 }
 
+export type AuditCategory = 'integrity' | 'indexes' | 'types' | 'stats'
+
 export interface AuditFinding {
+  id: string
   code: string
+  category: AuditCategory
   severity: 'high' | 'medium' | 'low'
-  table: string | null
+  table: string
   title: string
-  detail: string
+  why: string
+  effect: string
   fix_sql: string | null
+  fix_kind: 'safe' | 'check' | 'manual'
+  note: string | null
 }
 
 export interface AuditReport {
   score: number
+  verdict: string
   tables: number
+  categories: Record<AuditCategory, { title: string; weight: number; about: string; score: number; issues: number; tables_affected: number }>
   findings: AuditFinding[]
   counts: { high: number; medium: number; low: number }
+  fixable: number
   usage_stats: boolean
+  how: string
+}
+
+export interface AuditApplyResult {
+  applied: number
+  failed: number
+  rolled_back: boolean
+  before: number
+  results: { id: string; ok: boolean; error: string | null }[]
+}
+
+export interface AuditExplanation {
+  summary: string
+  good?: string[]
+  priorities?: { title: string; why: string; tables?: string[] }[]
+  model: string
 }
 
 export interface TopQuery {

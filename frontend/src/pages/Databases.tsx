@@ -65,17 +65,16 @@ export function Databases({ connections, onChange, models, onOptimize }: {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  // ER-диаграмма — по одной схеме: у базы с несколькими схемами общая картинка нечитаема
+  // область работы: вся база или одна схема — общая для структуры, аудита, ER-диаграммы и описания
   const [defSchema, setDefSchema] = useState('public')
-  const [erSchema, setErSchema] = useState<string | null>(null)
+  const [scope, setScope] = useState<string | null>(null)
   useEffect(() => {
     if (selected == null) return
-    setErSchema(null)
-    api.consoleOverview(selected).then(o => { setDefSchema(o.default); setErSchema(o.selected ?? o.schemas[0]?.name ?? null) }).catch(() => {})
+    setScope(null)
+    api.consoleOverview(selected).then(o => { setDefSchema(o.default); if (o.schemas.length > 1) setScope(o.selected ?? null) }).catch(() => {})
   }, [selected])
-  const erSchemas = schema ? [...new Set(schema.tables.map(t => schemaOf(t.name, defSchema)))] : []
-  const erView: SchemaInfo | null = schema && (erSchemas.length > 1 && erSchema
-    ? { ...schema, tables: schema.tables.filter(t => schemaOf(t.name, defSchema) === erSchema) } : schema)
+  const schemaNames = schema ? [...new Set(schema.tables.map(t => schemaOf(t.name, defSchema)))].sort() : []
+  const scoped: SchemaInfo | null = schema && (scope ? { ...schema, tables: schema.tables.filter(t => schemaOf(t.name, defSchema) === scope) } : schema)
 
   const remove = async (id: number) => {
     await api.deleteConnection(id)
@@ -126,32 +125,56 @@ export function Databases({ connections, onChange, models, onOptimize }: {
       </div>
 
       <div className="min-w-0 space-y-3">
+        {selected != null && schemaNames.length > 1 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="kicker mr-1 text-stone">область</span>
+            {[null, ...schemaNames].map(n => (
+              <button key={n ?? '*'} onClick={() => setScope(n)}
+                className={`rounded-md px-2.5 py-1 text-[12.5px] ${n ? 'font-mono' : ''} ${scope === n ? 'bg-obsidian text-white' : 'shadow-[0_0_0_1px_#ebebeb] hover:shadow-[0_0_0_1px_#a8a8a8]'}`}>
+                {n ?? 'вся база'}{n && <span className={scope === n ? 'text-ash' : 'text-stone'}> {schema!.tables.filter(t => schemaOf(t.name, defSchema) === n).length}</span>}
+              </button>
+            ))}
+          </div>
+        )}
         {selected != null && <Tabs tabs={TOOL_TABS} active={tool} onChange={setTool} />}
         <div hidden={tool !== 'schema'}>
           <Card title="Структура базы" actions={selected != null && <Button variant="ghost" onClick={() => loadSchema(selected, true)}>{schemaBusy && <Spinner />} Обновить</Button>}>
-            {schema ? <SchemaView schema={schema} /> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Выберите подключение слева — здесь появятся его структура, аудит, медленные запросы, ER-диаграмма и описание базы'}</Empty>}
+            {!scoped ? <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Выберите подключение слева — здесь появятся его структура, аудит, медленные запросы, ER-диаграмма и описание базы'}</Empty>
+              : schemaNames.length > 1 && !scope
+                ? <div className="space-y-2">
+                  {schemaNames.map(n => {
+                    const ts = scoped.tables.filter(t => schemaOf(t.name, defSchema) === n)
+                    return (
+                      <details key={n} className="rounded-md shadow-[0_0_0_1px_#ebebeb]">
+                        <summary className="flex cursor-pointer items-center gap-3 px-3 py-2.5">
+                          <span className="font-mono text-[14px] font-medium text-obsidian">{n}</span>
+                          <span className="text-[12.5px] text-stone">{ts.length} табл. · ~{ts.reduce((x, t) => x + (t.row_count ?? 0), 0).toLocaleString('ru-RU')} строк</span>
+                          {n === defSchema && <Tag>по умолчанию</Tag>}
+                        </summary>
+                        <div className="border-t border-line p-3"><SchemaView schema={{ ...scoped, tables: ts }} /></div>
+                      </details>
+                    )
+                  })}
+                </div>
+                : <SchemaView schema={scoped} />}
           </Card>
         </div>
         {selected != null && <>
-          <div hidden={tool !== 'audit'}><Card title="Аудит базы"><AuditView key={selected} connectionId={selected} /></Card></div>
+          <div hidden={tool !== 'audit'}><Card title={scope ? `Аудит схемы ${scope}` : 'Аудит базы'}><AuditView key={`${selected}:${scope}`} connectionId={selected} scope={scope} models={models} username={connections.find(c => c.id === selected)?.username ?? ''} onFixed={() => loadSchema(selected, true)} /></Card></div>
           <div hidden={tool !== 'slow'}><Card title="Медленные запросы"><TopQueriesView key={selected} connectionId={selected} onOptimize={sql => onOptimize(sql, selected)} /></Card></div>
           <div hidden={tool !== 'er'}>
-            <Card title="Схема связей" actions={schema && <Button variant="ghost" onClick={async () => { if (erRef.current) { const png = await svgToPng(erRef.current); const a = document.createElement('a'); a.href = png; a.download = 'er_diagram.png'; a.click() } }}>PNG</Button>}>
-              {erView?.tables.length ? <>
-                {erSchemas.length > 1 && (
-                  <div className="mb-3 flex flex-wrap items-center gap-1.5">
-                    <span className="kicker mr-1 text-stone">схема</span>
-                    {erSchemas.map(s => (
-                      <button key={s} onClick={() => setErSchema(s)} className={`rounded-md px-2.5 py-1 font-mono text-[12px] ${erSchema === s ? 'bg-obsidian text-white' : 'shadow-[0_0_0_1px_#ebebeb] hover:shadow-[0_0_0_1px_#a8a8a8]'}`}>{s}</button>
-                    ))}
-                  </div>
-                )}
-                <p className="mb-3 text-[12.5px] text-stone">Таблицы можно перетаскивать мышью. PK — первичный ключ, FK — внешний; линии идут от внешнего ключа к таблице, на которую он ссылается.</p>
-                <div className="max-h-[720px] overflow-auto rounded-md shadow-[0_0_0_1px_#ebebeb]"><ErDiagram ref={erRef} schema={erView} /></div>
-              </> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'В базе нет таблиц'}</Empty>}
+            <Card title={scope ? `Схема данных: ${scope}` : 'Схема данных'} actions={scoped && <Button variant="ghost" onClick={async () => { if (erRef.current) { const png = await svgToPng(erRef.current); const a = document.createElement('a'); a.href = png; a.download = `er_${scope ?? 'database'}.png`; a.click() } }}>PNG</Button>}>
+              {scoped?.tables.length ? <>
+                <p className="mb-3 text-[12.5px] text-stone">
+                  Нотация IDEF1X: над чертой — первичный ключ, под чертой — остальные атрибуты, (FK) — внешний ключ; скруглённые углы — зависимая сущность.
+                  Сплошная линия — идентифицирующая связь, пунктир — неидентифицирующая; точка — «много», ромб — связь необязательна. Блоки можно перетаскивать; в отчёт попадает картинка в том виде, в каком она здесь.
+                </p>
+                {!scope && schemaNames.length > 1 && <p className="mb-3 text-[12.5px] text-warn">Показаны все схемы сразу — выберите одну вверху, так диаграмма будет читаемой.</p>}
+                <div className="max-h-[720px] overflow-auto rounded-md shadow-[0_0_0_1px_#ebebeb]"><ErDiagram ref={erRef} schema={scoped} /></div>
+              </> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'Таблиц нет'}</Empty>}
             </Card>
           </div>
-          <div hidden={tool !== 'docs'}><Card title="Описание базы"><DocsView connectionId={selected} models={models} getErPng={async () => erRef.current && schema?.tables.length ? svgToPng(erRef.current) : null} /></Card></div>
+          <div hidden={tool !== 'docs'}><Card title={scope ? `Отчёт по схеме ${scope}` : 'Отчёт по базе'}><DocsView connectionId={selected} scope={scope} models={models} getErPng={async () => erRef.current && scoped?.tables.length ? svgToPng(erRef.current) : null} /></Card></div>
         </>}
       </div>
     </div>
