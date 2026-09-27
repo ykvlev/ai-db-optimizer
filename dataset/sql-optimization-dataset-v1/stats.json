@@ -1,14 +1,14 @@
 {
- "version": "1.1.0",
- "records": 704,
- "llm_records": 444,
- "experiments": 8,
+ "version": "1.2.0",
+ "records": 944,
+ "llm_records": 684,
+ "experiments": 11,
  "queries": 96,
  "outcomes": {
-  "improved": 158,
-  "worse": 74,
-  "unchanged": 424,
-  "invalid": 44,
+  "improved": 229,
+  "worse": 119,
+  "unchanged": 510,
+  "invalid": 82,
   "error": 4
  }
 }

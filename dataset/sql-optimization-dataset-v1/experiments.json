@@ -186,5 +186,74 @@
   "app_version": "0.2.0",
   "started_at": "2026-09-26T21:32:44Z",
   "finished_at": "2026-09-26T23:14:59Z"
+ },
+ {
+  "experiment_id": 9,
+  "name": "Устойчивость: повтор 2, GigaChat-2-Pro / Max, MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "gigachat:GigaChat-2-Pro",
+   "gigachat:GigaChat-2-Max"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-27T08:17:13Z",
+  "finished_at": "2026-09-27T08:33:56Z"
+ },
+ {
+  "experiment_id": 10,
+  "name": "Устойчивость: повтор 3, GigaChat-2-Pro / Max, MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "gigachat:GigaChat-2-Pro",
+   "gigachat:GigaChat-2-Max"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-27T08:34:17Z",
+  "finished_at": "2026-09-27T08:50:44Z"
+ },
+ {
+  "experiment_id": 11,
+  "name": "Абляция: план выполнения, GigaChat-2-Pro, MySQL",
+  "dbms": "mysql",
+  "dbms_version": "8.4.11",
+  "query_set": "shop-bench-v1",
+  "database_seed": "shop-seed-v1",
+  "participants": [
+   "gigachat:GigaChat-2-Pro",
+   "gigachat:GigaChat-2-Pro@optimizer-v1-noplan"
+  ],
+  "prompt_version": "optimizer-v1",
+  "prompt_sha256": "6de1df86512c1c7266189cdd891031f0cc98369679b90ac5bb92c9c7a06618db",
+  "model_parameters": {
+   "temperature": 0.1,
+   "ollama_num_ctx": 4096
+  },
+  "benchmark_runs": 5,
+  "benchmark_warmup": 2,
+  "app_version": "0.2.0",
+  "started_at": "2026-09-27T08:50:50Z",
+  "finished_at": "2026-09-27T09:07:27Z"
  }
 ]

@@ -1,4 +1,4 @@
-# SQL Optimization Dataset v1.1.0
+# SQL Optimization Dataset v1.2.0
 
 База данных результатов интеллектуальной оптимизации SQL-запросов, полученная в экспериментах
 программного комплекса [AI Database Optimizer](https://github.com/ykvlev/ai-db-optimizer).
@@ -19,12 +19,12 @@
 
 | Показатель | Значение |
 |---|---|
-| Записей | 704 (из них 444 — ответы языковых моделей) |
-| Экспериментов | 8 |
+| Записей | 944 (из них 684 — ответы языковых моделей) |
+| Экспериментов | 11 |
 | Уникальных запросов | 96 (shop-bench-v1: 40 для MySQL и 40 для PostgreSQL; shop-bench-mini-v1: 16 для MySQL) |
 | Категорий запросов | 16, включая контрольную группу уже оптимальных запросов |
 | СУБД | MySQL 8.4.11, PostgreSQL 16.15 |
-| Исходы | улучшено 158, без изменений 424, ухудшено 74, некорректно 44, сбой вызова модели 4 |
+| Исходы | улучшено 229, без изменений 510, ухудшено 119, некорректно 82, сбой вызова модели 4 |
 
 ## Файлы
 
@@ -84,16 +84,18 @@
 ## Цитирование
 
 Яковлев А. С. SQL Optimization Dataset : база данных результатов интеллектуальной оптимизации SQL-запросов.
-Версия 1.1.0. – 2026. – DOI: 10.5281/zenodo.22984197 (все версии: 10.5281/zenodo.22982517). – URL: https://github.com/ykvlev/ai-db-optimizer/tree/main/dataset
+Версия 1.2.0. – 2026. – DOI всех версий: 10.5281/zenodo.22982517 (версия 1.1.0: 10.5281/zenodo.22984197). – URL: https://github.com/ykvlev/ai-db-optimizer/tree/main/dataset
 
 ---
 
 ## Изменения
 
+- 1.2.0 — добавлены эксперименты 9–11: два повтора эксперимента 7 для GigaChat-2-Pro и GigaChat-2-Max (оценка
+  устойчивости ответов) и абляция плана выполнения для GigaChat-2-Pro на полном наборе (240 записей).
 - 1.1.0 — добавлены эксперименты 7 и 8: сравнение GigaChat-2, GigaChat-2-Pro, GigaChat-2-Max, Qwen2.5-Coder-7B и
   правил на полном наборе из 40 запросов для MySQL и PostgreSQL (400 записей).
 - 1.0.0 — эксперименты 1–6 (304 записи).
 
-**English summary.** 704 measured (query × optimizer) records from eight experiments on MySQL 8.4 and PostgreSQL 16:
+**English summary.** 944 measured (query × optimizer) records from eleven experiments (incl. repeated runs for answer stability) on MySQL 8.4 and PostgreSQL 16:
 original and candidate SQL, execution plans, per-run timings, result-equivalence checksums, outcome labels and full
 LLM prompts/responses (GigaChat-2/Pro/Max, Qwen2.5-Coder-7B and a rule-based rewriter). Licensed under CC BY 4.0.

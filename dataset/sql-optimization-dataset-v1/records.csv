@@ -5287,3 +5287,1836 @@ FROM order_items oi
 JOIN products p ON p.id = oi.product_id
 WHERE oi.order_id = 250000
 ORDER BY oi.id",
+e9-date_function-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,26.424,126.13670000064303,4.773599997861311,50308.2,294.61,5543.4,1029,265,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16' ORDER BY id"
+e9-date_function-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,26.226,122.73460000142222,4.679800000303658,50308.2,294.61,5310.3,1029,249,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16'
+ORDER BY id"
+e9-date_function-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,23.222,113.85580000205664,4.902900000161026,50308.2,294.61,5695.5,1029,270,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03' ORDER BY id"
+e9-date_function-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,27.085,125.98710000020219,4.651500003092224,50308.2,294.61,5240.5,1028,238,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03'
+ORDER BY id"
+e9-date_function-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,26.107,125.27349999800208,4.798500001925277,50308.2,296.06,5350.9,444,264,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20' ORDER BY id"
+e9-date_function-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,25.398,118.4255000007397,4.662799998186529,50308.2,296.06,5441.8,1027,252,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20'
+ORDER BY id"
+e9-date_function-4-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,23.046,111.59889999908046,4.8423999978695065,50308.2,297.51,5567.7,1029,275,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06' ORDER BY id"
+e9-date_function-4-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,25.998,122.22769999789307,4.701400001067668,50308.2,297.51,6772.6,444,253,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06'
+ORDER BY id"
+e9-year_function-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,56.944,285.02510000180337,5.005399998481153,50308.2,50308.2,6731.5,461,338,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE status = 'paid' AND created_at >= '2024-01-01' AND created_at < '2025-01-01' ORDER BY created_at DESC LIMIT 50"
+e9-year_function-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,57.426,266.823400001158,4.646400000638096,50308.2,50308.2,6188.9,1031,325,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2024-01-01' AND created_at < '2025-01-01' AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50"
+e9-year_function-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,117.551,626.4163999985612,5.328899998858105,50308.2,50308.2,7625.9,463,365,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE created_at >= '2022-01-01' AND created_at < '2023-01-01' AND status = 'delivered' ORDER BY created_at DESC LIMIT 50"
+e9-year_function-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,109.711,599.9852999993891,5.468800001835916,50308.2,50308.2,6523.5,463,327,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2022-01-01' AND created_at < '2023-01-01' AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50"
+e9-year_function-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,31.953,117.43099999875994,3.6751000006916,50308.2,0.71,8002.6,446,365,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders FORCE INDEX (idx_orders_created_at) WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled' ORDER BY created_at DESC LIMIT 50"
+e9-year_function-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,22.849,111.30659999980708,4.8712999996496364,50308.2,60509.96,6111.3,1034,318,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50"
+e9-year_aggregate-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,different,6,6,0.631,171.0136000001512,271.22919999965234,548980.2,200880.19,4554.1,551,238,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at BETWEEN '2021-01-01' AND '2021-12-31'
+GROUP BY status
+ORDER BY status"
+e9-year_aggregate-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.921,165.03820000070846,179.26629999783472,548980.2,205768.2,6507.4,551,336,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at >= '2021-01-01' AND created_at < '2022-01-01'
+GROUP BY status
+ORDER BY status"
+e9-year_aggregate-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,different,6,6,0.805,168.83790000065346,209.70500000112224,548980.2,204369.06,4736.5,551,239,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at BETWEEN '2025-01-01' AND '2025-12-31'
+GROUP BY status
+ORDER BY status"
+e9-year_aggregate-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.877,192.08090000029188,219.02140000020154,548980.2,194975.96,6460.7,1116,343,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01'
+GROUP BY status
+ORDER BY status"
+e9-correlated_select-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.15,294.65780000100494,1958.7064999977883,10370.73,45184.32,9549.9,684,460,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","WITH user_orders AS (
+    SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+    FROM orders
+    GROUP BY user_id
+)
+SELECT u.id, u.name, COALESCE(ou.orders_count, 0) AS orders_count, COALESCE(ou.orders_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN user_orders ou ON u.id = ou.user_id
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e9-correlated_select-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.146,265.4277000001457,1816.1500000023807,10146.95,144427.94,8363.3,1249,407,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(SUM(o.orders_count), 0) AS orders_count, COALESCE(SUM(o.orders_sum), 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON o.user_id = u.id
+WHERE u.city = 'Томск'
+GROUP BY u.id, u.name
+ORDER BY u.id"
+e9-correlated_select-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.159,264.75890000074287,1665.764900000795,10146.95,44960.54,8009.7,1251,391,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COALESCE(o.orders_count, 0) AS orders_count, 
+  COALESCE(o.orders_sum, 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum 
+  FROM orders 
+  GROUP BY user_id
+) o ON u.id = o.user_id 
+WHERE u.city = 'Иркутск' 
+ORDER BY u.id"
+e9-correlated_select-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.149,261.32890000008047,1757.4552000005497,10146.95,44960.54,7969.5,686,415,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","WITH user_orders AS (
+  SELECT user_id, COUNT(*) as cnt, SUM(total) as sum_total
+  FROM orders
+  GROUP BY user_id
+)
+SELECT u.id, u.name, COALESCE(uo.cnt, 0) AS orders_count, COALESCE(uo.sum_total, 0) AS orders_sum
+FROM users u
+LEFT JOIN user_orders uo ON u.id = uo.user_id
+WHERE u.city = 'Иркутск'
+ORDER BY u.id"
+e9-correlated_select-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.152,265.1034000009531,1748.215200001141,10146.95,44960.54,7877.0,625,414,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COALESCE(o.orders_count, 0) AS orders_count, 
+  COALESCE(o.orders_sum, 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN (SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum FROM orders GROUP BY user_id) o ON u.id = o.user_id 
+WHERE u.city = 'Самара' 
+ORDER BY u.id"
+e9-correlated_select-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.637,258.9818999986164,406.52509999927133,10146.95,77388.57,8211.8,1248,376,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.name, COUNT(o.id) AS orders_count, COALESCE(SUM(o.total), 0) AS orders_sum
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE u.city = 'Самара'
+GROUP BY u.id, u.name
+ORDER BY u.id"
+e9-correlated_exists-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,3431,3431,0.856,212.58490000036545,248.26200000097742,27579.96,44181.17,6267.0,729,337,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14000
+WHERE u.city = 'Казань'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e9-correlated_exists-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,6805.2,729,282,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e9-correlated_exists-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,2165,2165,0.933,221.6162999975495,237.43850000028033,27579.96,44181.17,7042.3,731,337,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14500
+WHERE u.city = 'Новосибирск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e9-correlated_exists-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,6584.1,735,340,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e9-not_in-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,31.366,136.2167999977828,4.342799998994451,120270.05,184477.08,5773.4,794,294,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'cancelled'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-not_in-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,0.09,135.55009999981849,1501.1976999994658,120270.05,358330.32,7206.8,792,365,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users AS u
+LEFT JOIN (
+  SELECT DISTINCT user_id
+  FROM orders
+  WHERE status = 'cancelled'
+) AS o ON u.id = o.user_id
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-not_in-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,26.175,114.42260000330862,4.371400002128212,120270.05,184477.08,5944.7,773,302,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'refunded'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-not_in-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,0.081,121.62239999815938,1496.42749999839,120270.05,358330.32,6709.6,1358,365,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users AS u
+LEFT JOIN (
+  SELECT DISTINCT o.user_id
+  FROM orders AS o
+  WHERE o.status = 'refunded'
+) AS r ON u.id = r.user_id
+WHERE r.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-not_in-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,28.442,120.64009999812697,4.241599999659229,120270.05,184477.08,6113.3,791,306,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'new'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-not_in-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,0.089,132.18500000220956,1493.4855999999854,120270.05,358330.32,6840.7,770,362,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users AS u
+LEFT JOIN (
+  SELECT DISTINCT user_id
+  FROM orders
+  WHERE status = 'new'
+) AS o ON u.id = o.user_id
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e9-distinct_join-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,7949.7,1273,396,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e9-distinct_join-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,4950.7,708,238,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e9-distinct_join-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,9199.5,708,435,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e9-distinct_join-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,8476.3,1272,320,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e9-distinct_join-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8871.6,675,401,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+e9-distinct_join-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,6477.0,708,316,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e9-or_columns-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.442,41.57420000046841,28.835800003434997,10146.95,,6006.4,483,270,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","(SELECT id, name, email, phone FROM users WHERE email = 'user500@mail.ru') UNION ALL (SELECT id, name, email, phone FROM users WHERE phone = '+79000000501')"
+e9-or_columns-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,7434.8,485,299,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e9-or_columns-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.242,34.8956999987422,28.10680000038701,10146.95,,5083.5,497,266,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'","(SELECT id, name, email, phone FROM users WHERE email = 'user77777@yandex.ru') UNION ALL (SELECT id, name, email, phone FROM users WHERE phone = '+79000077778')"
+e9-or_columns-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,5062.8,495,261,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e9-type_mismatch-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,TYPE_MISMATCH,equivalent,1,1,1.013,2.0015000009152573,1.976499999727821,1.0,1.0,4059.2,365,192,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e9-type_mismatch-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,TYPE_MISMATCH,equivalent,1,1,1.081,2.044099997874582,1.8909000027633738,1.0,1.0,6708.8,365,210,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e9-type_mismatch-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.17,23.992000002181157,20.51460000075167,10146.95,10146.95,5535.9,438,300,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e9-type_mismatch-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Max,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.11,24.885700000595534,22.420999997848412,10146.95,10146.95,5843.4,438,277,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e9-big_offset-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.289,18.559000000095693,14.394099998753518,50308.2,49956.02,5634.0,412,269,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 100000,1) LIMIT 20"
+e9-big_offset-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,4327.5,409,213,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e9-big_offset-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.24,41.400900001463015,33.39060000143945,50308.2,49956.02,6224.4,394,296,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 250000,1) LIMIT 20"
+e9-big_offset-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,3926.4,979,211,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e9-big_offset-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.442,78.65420000234735,54.52789999981178,50308.2,20249.36,6248.9,394,300,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 450000,1) LIMIT 20"
+e9-big_offset-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,4368.0,406,214,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e9-leading_like-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4413.2,382,222,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e9-leading_like-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,3375.8,376,167,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e9-leading_like-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,5170.5,382,216,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e9-leading_like-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,3927.4,382,192,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e9-in_subquery_agg-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,0.99,4641.106900002342,4686.064000001352,206.67,523668.77,5775.5,634,286,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1900
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e9-in_subquery_agg-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,1.005,4657.693799999834,4633.312599999044,202.5,523664.6,4963.0,1199,245,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","WITH grouped_products AS (
+  SELECT product_id
+  FROM order_items
+  GROUP BY product_id
+  HAVING SUM(quantity) > 1900
+)
+SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN grouped_products gp ON p.id = gp.product_id
+ORDER BY p.id"
+e9-in_subquery_agg-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,1.007,4614.843300001667,4582.859099999041,202.5,523664.6,5748.4,1200,284,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1950
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e9-in_subquery_agg-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,1.028,4659.295500001463,4533.337600001687,202.5,523664.6,5487.2,1200,203,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products AS p
+INNER JOIN (
+  SELECT product_id
+  FROM order_items
+  GROUP BY product_id
+  HAVING SUM(quantity) > 1950
+) AS oi ON p.id = oi.product_id
+ORDER BY p.id"
+e9-report-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.86,209.9863000003097,244.2549000006693,166808.53,91924.06,6491.1,1088,347,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e9-report-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,166808.53,,8164.0,1653,398,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC",
+e9-report-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,1.017,276.8901999988884,272.3922000004677,166808.53,87414.72,7147.7,1653,355,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e9-report-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,166808.53,,6107.9,1653,318,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC",
+e9-count_distinct_subquery-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,5443.5,517,250,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e9-count_distinct_subquery-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,5671.2,1081,280,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e9-max_per_group-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.668,119.6533999973326,44.84769999908167,6394.76,3.5,5841.7,1184,286,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT user_id, id, total
+FROM (
+  SELECT user_id, id, total,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+  FROM orders
+  WHERE user_id BETWEEN 1 AND 1500
+) t
+WHERE rn = 1
+ORDER BY user_id, id"
+e9-max_per_group-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Max,llm,optimizer-v1,invalid,rejected,True,False,SYNTAX_ERROR,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,error,,,,,,6394.76,,5559.5,1184,284,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","WITH ranked_orders AS (
+  SELECT user_id, id, total,
+         RANK() OVER (PARTITION BY user_id ORDER BY total DESC) as rank
+  FROM orders
+  WHERE user_id BETWEEN 1 AND 1500
+)
+SELECT user_id, id, total
+FROM ranked_orders
+WHERE rank = 1
+ORDER BY user_id, id"
+e9-max_per_group-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.419,114.66400000063004,47.40809999930207,6208.46,3.5,6046.5,624,317,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","WITH ranked_orders AS (
+    SELECT user_id, id, total,
+           ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+    FROM orders
+    WHERE user_id BETWEEN 50001 AND 51500
+)
+SELECT user_id, id, total
+FROM ranked_orders
+WHERE rn = 1
+ORDER BY user_id, id"
+e9-max_per_group-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,0.078,127.21179999789456,1635.7014999994135,6208.46,54494.65,5742.5,624,293,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT o.user_id, o.id, o.total
+FROM orders o
+JOIN (
+  SELECT user_id, MAX(total) as max_total
+  FROM orders
+  GROUP BY user_id
+) m ON o.user_id = m.user_id AND o.total = m.max_total
+WHERE o.user_id BETWEEN 50001 AND 51500
+ORDER BY o.user_id, o.id"
+e9-control-1-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,2448.5,325,123,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e9-control-1-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,1945.9,889,101,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e9-control-2-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,FILESORT,equivalent,5,5,0.972,2.00089999998454,2.0593000008375384,1.75,1.75,6040.4,381,279,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at
+FROM orders FORCE INDEX (idx_orders_user_id)
+WHERE user_id = 31337
+ORDER BY created_at"
+e9-control-2-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FILESORT,,,,,,,1.75,,4130.5,379,224,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at"
+e9-control-3-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,False,False,INVALID_RESPONSE,,,,,,,,92.06,,4723.7,376,216,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e9-control-3-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,92.06,,4371.3,371,228,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e9-control-4-gigachat:GigaChat-2-Pro,9,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,3,3,0.973,1.9901999985449947,2.044900000328198,2.1,2.1,3790.1,552,192,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id","SELECT oi.id, p.name, oi.quantity, oi.price
+FROM products p 
+JOIN order_items oi ON p.id = oi.product_id AND oi.order_id = 250000
+ORDER BY oi.id"
+e9-control-4-gigachat:GigaChat-2-Max,9,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,2.1,,2436.9,552,110,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e10-date_function-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,31.811,109.55869999816059,3.4440999988873955,50308.2,294.61,6223.5,1029,265,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16' ORDER BY id"
+e10-date_function-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,33.878,110.76859999957378,3.269600001658546,50308.2,294.61,4844.0,1029,240,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16'
+ORDER BY id"
+e10-date_function-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,27.517,114.10020000039367,4.146499999478692,50308.2,294.61,5042.0,444,270,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03' ORDER BY id"
+e10-date_function-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,38.934,125.83330000052229,3.232000002753921,50308.2,294.61,4781.4,453,252,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03'
+ORDER BY id"
+e10-date_function-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,27.083,129.52620000214665,4.782500000146683,50308.2,296.06,6525.6,444,281,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20' ORDER BY id"
+e10-date_function-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,24.878,118.80440000095405,4.7754000006534625,50308.2,296.06,4623.7,464,251,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20'
+ORDER BY id"
+e10-date_function-4-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,23.736,127.6864999999816,5.379500002163695,50308.2,297.51,5363.9,464,258,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06' ORDER BY id"
+e10-date_function-4-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,26.821,127.83850000050734,4.7664000012446195,50308.2,297.51,4601.2,464,251,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06'
+ORDER BY id"
+e10-year_function-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,53.117,292.8972000008798,5.5142000019259285,50308.2,50308.2,7501.4,461,342,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE status = 'paid' AND created_at >= '2024-01-01' AND created_at < '2025-01-01' ORDER BY created_at DESC LIMIT 50"
+e10-year_function-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX,,,,,,,50308.2,,5445.5,461,271,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50",
+e10-year_function-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX,,,,,,,50308.2,,6179.5,463,295,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50",
+e10-year_function-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,116.335,600.9527999995044,5.165700000361539,50308.2,50308.2,5894.5,1034,316,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2022-01-01' AND created_at < '2023-01-01' AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50"
+e10-year_function-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,21.92,120.50900000031106,5.497599999216618,50308.2,60509.96,7998.6,467,419,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled' ORDER BY created_at DESC LIMIT 50"
+e10-year_function-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Max,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,23.046,110.78610000186018,4.807100001926301,50308.2,60509.96,6249.7,463,340,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at
+FROM orders
+WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50"
+e10-year_aggregate-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,different,6,6,0.637,168.04250000132015,263.94340000115335,548980.2,200880.19,4690.9,735,246,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at BETWEEN '2021-01-01' AND '2021-12-31'
+GROUP BY status
+ORDER BY status"
+e10-year_aggregate-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.883,156.81749999930616,177.57569999957923,548980.2,205768.2,6325.7,551,340,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at >= '2021-01-01' AND created_at < '2022-01-01'
+GROUP BY status
+ORDER BY status"
+e10-year_aggregate-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,different,6,6,0.782,162.8130000026431,208.23500000187778,548980.2,204369.06,4502.7,551,232,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at BETWEEN '2025-01-01' AND '2025-12-31'
+GROUP BY status
+ORDER BY status"
+e10-year_aggregate-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,,,,,,,548980.2,,8054.7,551,431,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status",
+e10-correlated_select-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.164,267.8029000016977,1630.10519999807,10146.95,44960.54,9020.4,684,436,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COALESCE(o.orders_count, 0) AS orders_count, 
+  COALESCE(o.orders_sum, 0) AS orders_sum 
+FROM users u 
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum 
+  FROM orders 
+  GROUP BY user_id
+) o ON u.id = o.user_id 
+WHERE u.city = 'Томск' 
+ORDER BY u.id"
+e10-correlated_select-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.158,282.40370000276016,1786.0584000009112,10146.95,44960.54,7816.7,1124,419,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","WITH user_orders AS (
+  SELECT user_id, COUNT(*) as cnt, SUM(total) as total_sum
+  FROM orders
+  GROUP BY user_id
+)
+SELECT u.id, u.name, COALESCE(uo.cnt, 0) AS orders_count, COALESCE(uo.total_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN user_orders uo ON uo.user_id = u.id
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e10-correlated_select-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.152,267.05890000084764,1761.1190999996325,10146.95,44960.54,8603.0,627,409,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COALESCE(o.orders_count, 0) AS orders_count, 
+  COALESCE(o.orders_sum, 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN (SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum FROM orders GROUP BY user_id) o ON u.id = o.user_id 
+WHERE u.city = 'Иркутск' 
+ORDER BY u.id"
+e10-correlated_select-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.146,291.0061000002315,1997.4088999988453,10146.95,144427.94,8182.0,686,405,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(SUM(o.orders_count), 0) AS orders_count, COALESCE(SUM(o.orders_sum), 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON o.user_id = u.id
+WHERE u.city = 'Иркутск'
+GROUP BY u.id, u.name
+ORDER BY u.id"
+e10-correlated_select-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.638,304.3851000002178,477.02080000090064,10146.95,77388.57,8667.8,708,391,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COUNT(o.id) AS orders_count, 
+  COALESCE(SUM(o.total), 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN orders o ON o.user_id = u.id 
+WHERE 
+  u.city = 'Самара' 
+GROUP BY 
+  u.id, u.name 
+ORDER BY 
+  u.id"
+e10-correlated_select-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.169,328.2843999986653,1939.9576999967394,10146.95,44960.54,7729.0,684,404,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(o.orders_count, 0) AS orders_count, COALESCE(o.orders_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON o.user_id = u.id
+WHERE u.city = 'Самара'
+ORDER BY u.id"
+e10-correlated_exists-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,3431,3431,0.844,221.98600000047009,263.0343000018911,27579.96,44181.17,7283.0,1077,324,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14000
+WHERE u.city = 'Казань'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e10-correlated_exists-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,6095.5,757,302,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id",
+e10-correlated_exists-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,2165,2165,0.962,254.5518999977503,264.5079000030819,27579.96,44181.17,6055.7,731,320,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14500
+WHERE u.city = 'Новосибирск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e10-correlated_exists-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,,,,,,,27579.96,,5998.1,735,323,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id",
+e10-not_in-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,27.319,159.57150000031106,5.841099999088328,120270.05,184477.08,7385.3,1359,290,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'cancelled'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e10-not_in-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,120270.05,,5540.4,794,289,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100",
+e10-not_in-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,31.422,140.295099998184,4.464800000278046,120270.05,184477.08,6467.1,794,291,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'refunded'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e10-not_in-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,0.082,137.61040000099456,1683.4559999988414,120270.05,358330.32,7391.4,1358,362,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users AS u
+LEFT JOIN (
+  SELECT DISTINCT user_id
+  FROM orders
+  WHERE status = 'refunded'
+) AS o ON u.id = o.user_id
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e10-not_in-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,32.716,146.66760000181966,4.483000000618631,120270.05,184477.08,6186.2,770,304,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'new'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e10-not_in-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,0.09,137.98030000180006,1528.0448000012257,120270.05,358330.32,6650.9,791,357,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users AS u
+LEFT JOIN (
+  SELECT DISTINCT user_id
+  FROM orders
+  WHERE status = 'new'
+) AS o ON u.id = o.user_id
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e10-distinct_join-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,7576.5,708,382,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT DISTINCT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e10-distinct_join-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,4966.5,708,250,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e10-distinct_join-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8668.0,708,435,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e10-distinct_join-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,4438.5,677,239,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e10-distinct_join-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8370.9,677,397,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+e10-distinct_join-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,4461.0,1272,237,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id",
+e10-or_columns-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.306,40.522700001019984,31.024200001411373,10146.95,,5199.7,483,269,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","SELECT id, name, email, phone FROM users WHERE email = 'user500@mail.ru'
+UNION ALL
+SELECT id, name, email, phone FROM users WHERE phone = '+79000000501'"
+e10-or_columns-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,5423.4,509,289,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'",
+e10-or_columns-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.27,39.53259999980219,31.136800000240328,10146.95,,5969.8,481,266,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'","(SELECT id, name, email, phone FROM users WHERE email = 'user77777@yandex.ru') UNION ALL (SELECT id, name, email, phone FROM users WHERE phone = '+79000077778')"
+e10-or_columns-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,,,,,,,10146.95,,5857.1,497,300,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'",
+e10-type_mismatch-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,TYPE_MISMATCH,equivalent,1,1,1.017,1.8077999993693084,1.7780000016500708,1.0,1.0,3822.2,367,192,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e10-type_mismatch-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,TYPE_MISMATCH,equivalent,1,1,0.867,1.755799999955343,2.0255999988876283,1.0,1.0,3736.8,365,202,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e10-type_mismatch-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.122,25.08289999968838,22.35120000113966,10146.95,10146.95,6316.4,442,296,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e10-type_mismatch-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Max,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.23,25.288900000305148,20.562199999403674,10146.95,10146.95,5759.4,440,286,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e10-big_offset-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.542,17.90400000027148,11.611899997660657,50308.2,49956.02,5201.4,409,266,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 100000,1) LIMIT 20"
+e10-big_offset-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,3862.6,414,209,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000",
+e10-big_offset-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.392,47.13410000113072,33.86870000031195,50308.2,49956.02,5741.7,412,280,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 250000,1) LIMIT 20"
+e10-big_offset-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,4554.3,978,209,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000",
+e10-big_offset-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.37,84.35129999998026,61.56429999828106,50308.2,20249.36,6457.2,412,302,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 450000,1) LIMIT 20"
+e10-big_offset-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LARGE_OFFSET;FULL_INDEX_SCAN,,,,,,,50308.2,,4082.8,412,204,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000",
+e10-leading_like-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4620.6,382,202,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e10-leading_like-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4254.4,384,189,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e10-leading_like-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4706.8,382,216,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e10-leading_like-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,3233.3,382,169,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e10-in_subquery_agg-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,1.027,4763.352400001168,4639.884399999573,202.5,523664.6,6342.4,1200,286,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1900
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e10-in_subquery_agg-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,0.989,4762.078499999916,4815.614900002402,202.5,523664.6,3900.7,633,209,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products AS p
+INNER JOIN (
+  SELECT product_id
+  FROM order_items
+  GROUP BY product_id
+  HAVING SUM(quantity) > 1900
+) AS oi ON p.id = oi.product_id
+ORDER BY p.id"
+e10-in_subquery_agg-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,1.014,4769.184099997801,4705.330199998571,202.5,523664.6,6092.3,1075,296,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1950
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e10-in_subquery_agg-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,0.995,5060.191000000486,5086.11259999816,202.5,523664.6,4271.7,1199,210,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products AS p
+INNER JOIN (
+  SELECT product_id
+  FROM order_items
+  GROUP BY product_id
+  HAVING SUM(quantity) > 1950
+) AS oi ON p.id = oi.product_id
+ORDER BY p.id"
+e10-report-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.85,234.11639999903855,275.5029999971157,166808.53,91924.06,7848.2,1653,346,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e10-report-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,166808.53,,7809.9,1652,342,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC",
+e10-report-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,1.063,303.01759999929345,285.1624000031734,166808.53,87414.72,7030.9,1653,346,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e10-report-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,,,,,,,166808.53,,6586.2,1652,347,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC",
+e10-count_distinct_subquery-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,6142.3,1082,291,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e10-count_distinct_subquery-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,6088.1,1081,323,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e10-max_per_group-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.465,123.26020000182325,49.99610000231769,6394.76,3.5,5884.1,619,286,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT user_id, id, total
+FROM (
+  SELECT user_id, id, total,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+  FROM orders
+  WHERE user_id BETWEEN 1 AND 1500
+) t
+WHERE rn = 1
+ORDER BY user_id, id"
+e10-max_per_group-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Max,llm,optimizer-v1,invalid,rejected,True,False,SYNTAX_ERROR,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,error,,,,,,6394.76,,5210.3,803,285,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","WITH ranked_orders AS (
+  SELECT user_id, id, total,
+         RANK() OVER(PARTITION BY user_id ORDER BY total DESC) as rank
+  FROM orders
+  WHERE user_id BETWEEN 1 AND 1500
+)
+SELECT user_id, id, total
+FROM ranked_orders
+WHERE rank = 1
+ORDER BY user_id, id"
+e10-max_per_group-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.684,132.01399999888963,49.18990000078338,6208.46,3.5,5930.0,624,291,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT user_id, id, total
+FROM (
+  SELECT user_id, id, total,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+  FROM orders
+  WHERE user_id BETWEEN 50001 AND 51500
+) t
+WHERE rn = 1
+ORDER BY user_id, id"
+e10-max_per_group-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Max,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,0.07,125.38389999826904,1792.0960000010382,6208.46,54494.65,5202.7,624,273,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT o.user_id, o.id, o.total
+FROM orders o
+JOIN (
+  SELECT user_id, MAX(total) as max_total
+  FROM orders
+  GROUP BY user_id
+) m ON o.user_id = m.user_id AND o.total = m.max_total
+WHERE o.user_id BETWEEN 50001 AND 51500
+ORDER BY o.user_id, o.id"
+e10-control-1-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,2869.6,890,120,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e10-control-1-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,2487.3,325,100,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e10-control-2-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FILESORT,equivalent,5,5,0.925,2.6285000021744054,2.841900000930764,1.75,1.75,6032.9,381,296,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at FROM orders FORCE INDEX (idx_orders_user_id) WHERE user_id = 31337 ORDER BY created_at DESC"
+e10-control-2-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,FILESORT,,,,,,,1.75,,4162.6,379,227,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at"
+e10-control-3-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,False,False,INVALID_RESPONSE,,,,,,,,92.06,,4565.8,376,216,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e10-control-3-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,92.06,,4783.6,376,244,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e10-control-4-gigachat:GigaChat-2-Pro,10,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,3,3,0.977,2.033500000834465,2.0814999988942873,2.1,2.1,3948.6,552,186,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id","SELECT oi.id, p.name, oi.quantity, oi.price
+FROM products p 
+JOIN order_items oi ON p.id = oi.product_id AND oi.order_id = 250000
+ORDER BY oi.id"
+e10-control-4-gigachat:GigaChat-2-Max,10,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Max,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,2.1,,2090.2,1116,96,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id",
+e11-date_function-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,26.99,136.78299999810406,5.067900001449743,50308.2,294.61,5243.2,462,265,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16' ORDER BY id"
+e11-date_function-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,date_function-1,date_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,28.725,142.44789999793284,4.959099998814054,50308.2,294.61,5667.2,815,202,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2025-03-15'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2025-03-15' AND created_at < '2025-03-16' ORDER BY id"
+e11-date_function-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,27.797,134.33509999958915,4.832800001167925,50308.2,294.61,5605.5,453,270,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03' ORDER BY id"
+e11-date_function-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,date_function-2,date_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,203,203,27.252,120.29299999994691,4.414099999848986,50308.2,294.61,5031.4,280,196,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2023-11-02'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2023-11-02' AND created_at < '2023-11-03' ORDER BY id"
+e11-date_function-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,26.325,145.17229999910342,5.514600001333747,50308.2,296.06,4810.3,464,258,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20' ORDER BY id"
+e11-date_function-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,date_function-3,date_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,204,204,24.221,113.99750000055064,4.7064999998838175,50308.2,296.06,4215.9,815,207,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2021-07-19'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2021-07-19' AND created_at < '2021-07-20' ORDER BY id"
+e11-date_function-4-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,25.627,124.79389999862178,4.869700002018362,50308.2,297.51,5267.2,464,263,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06' ORDER BY id"
+e11-date_function-4-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,date_function-4,date_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;FULL_INDEX_SCAN,equivalent,205,205,25.752,122.73089999871445,4.765800000313902,50308.2,297.51,4197.9,280,212,"SELECT id, user_id, total
+FROM orders
+WHERE DATE(created_at) = '2026-01-05'
+ORDER BY id","SELECT id, user_id, total FROM orders WHERE created_at >= '2026-01-05' AND created_at < '2026-01-06' ORDER BY id"
+e11-year_function-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX,,,,,,,50308.2,,5782.3,461,292,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50",
+e11-year_function-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,year_function-1,year_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,53.65,301.56630000055884,5.621000000246568,50308.2,50308.2,7034.8,844,347,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2024 AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE status = 'paid' AND created_at >= '2024-01-01' AND created_at < '2025-01-01' ORDER BY created_at DESC LIMIT 50"
+e11-year_function-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,FUNCTION_ON_COLUMN;MISSING_INDEX,,,,,,,50308.2,,6144.5,463,298,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50",
+e11-year_function-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,year_function-2,year_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;MISSING_INDEX,different,50,50,101.272,619.1890999980387,6.1141000005591195,50308.2,50308.2,7026.8,324,319,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2022 AND status = 'delivered'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE created_at BETWEEN '2022-01-01' AND '2022-12-31' AND status = 'delivered' ORDER BY created_at DESC LIMIT 50"
+e11-year_function-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,21.271,118.92409999927622,5.590799999481533,50308.2,60509.96,9306.3,446,449,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled' ORDER BY created_at DESC LIMIT 50"
+e11-year_function-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,year_function-3,year_function,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX,equivalent,50,50,21.025,118.1293999979971,5.618400002276758,50308.2,60509.96,6588.5,307,315,"SELECT id, user_id, total, created_at
+FROM orders
+WHERE YEAR(created_at) = 2025 AND status = 'cancelled'
+ORDER BY created_at DESC
+LIMIT 50","SELECT id, user_id, total, created_at FROM orders WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' AND status = 'cancelled' ORDER BY created_at DESC LIMIT 50"
+e11-year_aggregate-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,different,6,6,0.612,178.711900000053,291.8084999982966,548980.2,200880.19,4638.1,551,246,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at BETWEEN '2021-01-01' AND '2021-12-31'
+GROUP BY status
+ORDER BY status"
+e11-year_aggregate-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,year_aggregate-1,year_aggregate,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.91,171.3357000007818,188.1855000028736,548980.2,205768.2,5831.8,325,298,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2021
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue FROM orders WHERE created_at >= '2021-01-01' AND created_at < '2022-01-01' GROUP BY status ORDER BY status"
+e11-year_aggregate-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.809,165.19830000106595,204.30250000208616,548980.2,194975.96,4786.4,525,252,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01'
+GROUP BY status
+ORDER BY status"
+e11-year_aggregate-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,year_aggregate-2,year_aggregate,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;ORDER_BY_NO_INDEX;FULL_TABLE_SCAN;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.871,175.3007000006619,201.17820000086795,548980.2,194975.96,6025.6,840,297,"SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(created_at) = 2025
+GROUP BY status
+ORDER BY status","SELECT status, COUNT(*) AS cnt, SUM(total) AS revenue FROM orders WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01' GROUP BY status ORDER BY status"
+e11-correlated_select-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.699,292.1014000021387,418.1301999997231,10146.95,77388.57,8059.4,684,391,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COUNT(o.id) AS orders_count, 
+  COALESCE(SUM(o.total), 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN orders o ON o.user_id = u.id 
+WHERE 
+  u.city = 'Томск' 
+GROUP BY 
+  u.id, u.name 
+ORDER BY 
+  u.id"
+e11-correlated_select-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,correlated_select-1,correlated_select,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.156,277.15170000010403,1779.4497999966552,10146.95,44960.54,7630.1,561,398,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(o.orders_count, 0) AS orders_count, COALESCE(o.orders_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON u.id = o.user_id
+WHERE u.city = 'Томск'
+ORDER BY u.id"
+e11-correlated_select-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.667,275.1419000014721,412.44649999862304,10146.95,77388.57,7855.1,627,393,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COUNT(o.id) AS orders_count, 
+  COALESCE(SUM(o.total), 0) AS orders_sum 
+FROM 
+  users u 
+LEFT JOIN orders o ON o.user_id = u.id 
+WHERE 
+  u.city = 'Иркутск' 
+GROUP BY 
+  u.id, u.name 
+ORDER BY 
+  u.id"
+e11-correlated_select-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,correlated_select-2,correlated_select,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.155,284.89429999899585,1835.1561999988917,10146.95,44960.54,8170.8,562,397,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Иркутск'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(o.orders_count, 0) AS orders_count, COALESCE(o.orders_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON u.id = o.user_id
+WHERE u.city = 'Иркутск'
+ORDER BY u.id"
+e11-correlated_select-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.158,285.1507000013953,1802.114400001301,10146.95,44960.54,8456.3,625,418,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT 
+  u.id, 
+  u.name, 
+  COALESCE(o.orders_count, 0) AS orders_count, 
+  COALESCE(o.orders_sum, 0) AS orders_sum 
+FROM users u 
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum 
+  FROM orders 
+  GROUP BY user_id
+) o ON u.id = o.user_id 
+WHERE u.city = 'Самара' 
+ORDER BY u.id"
+e11-correlated_select-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,correlated_select-3,correlated_select,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,CORRELATED_SUBQUERY;CORRELATED_SUBQUERY;MISSING_INDEX,equivalent,10000,10000,0.154,278.9602000011655,1807.003000001714,10146.95,44960.54,7991.3,502,397,"SELECT u.id, u.name,
+  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,
+  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum
+FROM users u
+WHERE u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.name, COALESCE(o.orders_count, 0) AS orders_count, COALESCE(o.orders_sum, 0) AS orders_sum
+FROM users u
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS orders_sum
+  FROM orders
+  GROUP BY user_id
+) o ON u.id = o.user_id
+WHERE u.city = 'Самара'
+ORDER BY u.id"
+e11-correlated_exists-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,3431,3431,0.869,221.10369999791146,254.45119999858434,27579.96,44181.17,7714.1,1255,337,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14000
+WHERE u.city = 'Казань'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e11-correlated_exists-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,correlated_exists-1,correlated_exists,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,3431,3431,0.875,234.2370000005758,267.75069999712287,27579.96,44181.17,6974.1,529,371,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Казань'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14000)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14000
+WHERE u.city = 'Казань'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e11-correlated_exists-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,2165,2165,0.943,231.43889999846579,245.37730000156444,27579.96,44181.17,6857.8,720,322,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14500
+WHERE u.city = 'Новосибирск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e11-correlated_exists-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,correlated_exists-2,correlated_exists,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,MISSING_INDEX;MISSING_INDEX;CORRELATED_SUBQUERY,equivalent,2165,2165,0.936,232.5012000001152,248.48819999897387,27579.96,44181.17,8316.1,530,375,"SELECT u.id, u.email
+FROM users u
+WHERE u.city = 'Новосибирск'
+  AND EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 14500)
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id AND o.total > 14500
+WHERE u.city = 'Новосибирск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e11-not_in-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,28.984,128.49089999872376,4.433199999766657,120270.05,184477.08,5941.9,794,290,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'cancelled'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-not_in-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,not_in-1,not_in,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,30.83,146.8869000018458,4.764400000567548,120270.05,184477.08,6985.3,482,293,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'cancelled'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-not_in-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,26.933,129.26190000143833,4.799300000740914,120270.05,184477.08,6221.5,773,294,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'refunded'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-not_in-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,not_in-2,not_in,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,29.094,140.98139999987325,4.845700001169462,120270.05,184477.08,6407.0,997,315,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'refunded')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'refunded'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-not_in-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,27.005,131.31689999863738,4.862699999648612,120270.05,184477.08,6013.1,943,304,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'new'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-not_in-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,not_in-3,not_in,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;NOT_IN_SUBQUERY;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,100,100,31.439,153.69499999724212,4.888699997536605,120270.05,184477.08,5576.5,459,283,"SELECT id, email
+FROM users
+WHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'new')
+ORDER BY id
+LIMIT 100","SELECT u.id, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'new'
+WHERE o.user_id IS NULL
+ORDER BY u.id
+LIMIT 100"
+e11-distinct_join-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8126.1,1273,401,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id"
+e11-distinct_join-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,distinct_join-1,distinct_join,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,5418.9,454,251,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'
+ORDER BY u.id",
+e11-distinct_join-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8574.9,708,402,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+GROUP BY u.id, u.email
+ORDER BY u.id"
+e11-distinct_join-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,distinct_join-2,distinct_join,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,MISSING_INDEX;TEMPORARY_TABLE,,,,,,,27579.96,,5926.0,969,268,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-06-01' AND u.city = 'Томск'
+ORDER BY u.id",
+e11-distinct_join-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8577.0,1230,401,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.email
+FROM users u
+INNER JOIN orders o USING(user_id)
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id"
+e11-distinct_join-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,distinct_join-3,distinct_join,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,invalid,rejected,True,False,WRONG_COLUMN,MISSING_INDEX;TEMPORARY_TABLE,error,,,,,,27579.96,,8979.3,423,411,"SELECT DISTINCT u.id, u.email
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара'
+ORDER BY u.id","SELECT u.id, u.email FROM users u INNER JOIN orders o USING(user_id) WHERE o.created_at >= '2025-12-01' AND u.city = 'Самара' GROUP BY u.id, u.email ORDER BY u.id"
+e11-or_columns-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.19,31.3492999994196,26.342400000430644,10146.95,,5638.1,485,269,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","SELECT id, name, email, phone FROM users WHERE email = 'user500@mail.ru'
+UNION ALL
+SELECT id, name, email, phone FROM users WHERE phone = '+79000000501'"
+e11-or_columns-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,or_columns-1,or_columns,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.38,40.014599999267375,29.003100000409177,10146.95,,5748.6,291,247,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user500@mail.ru' OR phone = '+79000000501'","SELECT id, name, email, phone FROM users WHERE email = 'user500@mail.ru'
+UNION ALL 
+SELECT id, name, email, phone FROM users WHERE phone = '+79000000501'"
+e11-or_columns-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.127,42.201500000373926,37.44389999701525,10146.95,,6047.7,495,280,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'","(SELECT id, name, email, phone FROM users WHERE email = 'user77777@yandex.ru') UNION ALL (SELECT id, name, email, phone FROM users WHERE phone = '+79000077778')"
+e11-or_columns-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,or_columns-2,or_columns,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,OR_DIFFERENT_COLUMNS;FULL_TABLE_SCAN;INDEX_NOT_USED,equivalent,2,2,1.494,42.38419999819598,28.37340000041877,10146.95,,4913.8,283,246,"SELECT id, name, email, phone
+FROM users
+WHERE email = 'user77777@yandex.ru' OR phone = '+79000077778'","SELECT id, name, email, phone FROM users WHERE email = 'user77777@yandex.ru'
+UNION ALL 
+SELECT id, name, email, phone FROM users WHERE phone = '+79000077778'"
+e11-type_mismatch-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,TYPE_MISMATCH,equivalent,1,1,1.224,2.9175999989092816,2.3827999975765124,1.0,1.0,4258.1,367,192,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e11-type_mismatch-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,type_mismatch-1,type_mismatch,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,TYPE_MISMATCH,equivalent,1,1,1.027,2.2610000014537945,2.2023999990778975,1.0,1.0,4176.1,335,194,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = '123457'","SELECT id, user_id, status, total FROM orders WHERE id = 123457"
+e11-type_mismatch-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.117,24.864300001354422,22.258000000874745,10146.95,10146.95,6040.9,438,300,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e11-type_mismatch-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,type_mismatch-2,type_mismatch,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,invalid,rejected,True,True,RESULT_CHANGED,TYPE_MISMATCH;MISSING_INDEX;FULL_TABLE_SCAN,different,1,0,1.143,27.866500000527594,24.379499998758547,10146.95,10146.95,6677.4,291,302,"SELECT id, name, phone
+FROM users
+WHERE phone = 79000012345","SELECT id, name, phone FROM users WHERE phone = '79000012345'"
+e11-big_offset-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.483,19.782899998972425,13.343099999474362,50308.2,49956.02,4887.5,412,242,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 100000,1) LIMIT 20"
+e11-big_offset-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,big_offset-1,big_offset,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.444,20.261300000129268,14.031999999133404,50308.2,49956.02,5724.7,277,268,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 100000","SELECT id, user_id, total FROM orders FORCE INDEX (PRIMARY) WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 100000,1) LIMIT 20"
+e11-big_offset-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.305,47.130200000538025,36.11610000007204,50308.2,49956.02,6568.6,412,301,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 250000,1) LIMIT 20"
+e11-big_offset-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,big_offset-2,big_offset,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,LARGE_OFFSET;FULL_INDEX_SCAN,equivalent,20,20,1.01,49.102599998150254,48.60059999919031,50308.2,174535.45,4820.5,259,211,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 250000","SELECT id, user_id, total FROM orders FORCE INDEX (PRIMARY) ORDER BY id LIMIT 20 OFFSET 250000"
+e11-big_offset-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.324,91.67330000127549,69.23360000291723,50308.2,20249.36,5929.4,414,310,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 450000,1) LIMIT 20"
+e11-big_offset-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,big_offset-3,big_offset,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,invalid,rejected,True,True,RESULT_CHANGED,LARGE_OFFSET;FULL_INDEX_SCAN,different,20,20,1.258,84.58640000026207,67.22090000039316,50308.2,20249.36,5223.6,794,255,"SELECT id, user_id, total
+FROM orders
+ORDER BY id
+LIMIT 20 OFFSET 450000","SELECT id, user_id, total FROM orders WHERE id > (SELECT id FROM orders ORDER BY id LIMIT 450000,1) ORDER BY id LIMIT 20"
+e11-leading_like-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4225.1,382,204,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e11-leading_like-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,leading_like-1,leading_like,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,4344.5,256,215,"SELECT id, email
+FROM users
+WHERE email LIKE '%123@example.org'
+ORDER BY id",
+e11-leading_like-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,LEADING_WILDCARD,,,,,,,10146.95,,6019.0,382,292,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id",
+e11-leading_like-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,leading_like-2,leading_like,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,LEADING_WILDCARD,equivalent,100,100,0.723,38.449499999842374,53.186299999651965,10146.95,10146.95,4440.3,247,207,"SELECT id, email
+FROM users
+WHERE email LIKE '%496@mail.ru'
+ORDER BY id","SELECT id, email FROM users WHERE email REGEXP '496@mail.ru$' ORDER BY id"
+e11-in_subquery_agg-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,0.993,4673.350000000937,4707.476200001111,202.5,523664.6,6110.8,633,272,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1900
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e11-in_subquery_agg-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,in_subquery_agg-1,in_subquery_agg,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,,equivalent,1000,1000,1.014,4843.401099999028,4777.294299998175,202.5,523664.6,5521.8,967,235,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1900
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+INNER JOIN (SELECT product_id FROM order_items GROUP BY product_id HAVING SUM(quantity) > 1900) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e11-in_subquery_agg-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,1000,1000,0.997,4645.541099998809,4659.660500001337,202.5,523664.6,6655.6,1200,284,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+JOIN (
+  SELECT product_id 
+  FROM order_items
+  GROUP BY product_id 
+  HAVING SUM(quantity) > 1950
+) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e11-in_subquery_agg-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,in_subquery_agg-2,in_subquery_agg,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,,equivalent,1000,1000,0.996,4634.534600001643,4655.2873000000545,202.5,523664.6,5370.6,924,246,"SELECT id, name, category, price
+FROM products
+WHERE id IN (
+  SELECT product_id FROM order_items
+  GROUP BY product_id HAVING SUM(quantity) > 1950
+)
+ORDER BY id","SELECT p.id, p.name, p.category, p.price
+FROM products p
+INNER JOIN (SELECT product_id FROM order_items GROUP BY product_id HAVING SUM(quantity) > 1950) oi ON p.id = oi.product_id
+ORDER BY p.id"
+e11-report-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.934,225.44620000189752,241.2564999976894,166808.53,91924.06,6708.6,1653,346,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e11-report-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,report-1,report,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,worse,rejected,True,True,PERFORMANCE_REGRESSION,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,6,6,0.823,210.1533000022755,255.32030000249506,166808.53,91924.06,8235.8,685,359,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'refunded' AND o.created_at >= '2025-01-01' AND o.created_at < '2026-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e11-report-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,0.995,277.1811000020534,278.52079999865964,166808.53,87414.72,7937.1,1592,366,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e11-report-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,report-2,report,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,FUNCTION_ON_COLUMN;MISSING_INDEX;FULL_TABLE_SCAN;INDEX_NOT_USED;FILESORT;TEMPORARY_TABLE,equivalent,8,8,0.97,271.0010000009788,279.3199999978242,166808.53,87414.72,7558.4,1200,357,"SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND YEAR(o.created_at) = 2023
+GROUP BY p.category
+ORDER BY revenue DESC","SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+JOIN orders o ON o.id = oi.order_id
+WHERE o.status = 'cancelled' AND o.created_at >= '2023-01-01' AND o.created_at < '2024-01-01'
+GROUP BY p.category
+ORDER BY revenue DESC"
+e11-count_distinct_subquery-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,,,,,,,5612.54,,5555.2,517,291,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",
+e11-count_distinct_subquery-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,count_distinct_subquery-1,count_distinct_subquery,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;FULL_TABLE_SCAN;FULL_INDEX_SCAN,equivalent,1,1,8.26,1514.7417999978643,183.3740999973088,5612.54,174535.45,4921.0,826,237,"SELECT COUNT(*) AS customers
+FROM (SELECT DISTINCT user_id FROM orders WHERE status = 'paid') t",SELECT COUNT(DISTINCT user_id) AS customers FROM orders FORCE INDEX(idx_orders_user_id) WHERE status = 'paid'
+e11-max_per_group-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.426,119.07580000115559,49.080699998739874,6394.76,3.5,6430.1,1141,286,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT user_id, id, total
+FROM (
+  SELECT user_id, id, total,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+  FROM orders
+  WHERE user_id BETWEEN 1 AND 1500
+) t
+WHERE rn = 1
+ORDER BY user_id, id"
+e11-max_per_group-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,max_per_group-1,max_per_group,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,1.943,126.64500000028056,65.18589999905089,6394.76,33621.91,8177.3,946,344,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 1 AND 1500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT o.user_id, o.id, o.total
+FROM orders o
+JOIN (SELECT user_id, MAX(total) as max_total
+       FROM orders 
+       WHERE user_id BETWEEN 1 AND 1500
+       GROUP BY user_id) m ON o.user_id = m.user_id AND o.total = m.max_total
+ORDER BY o.user_id, o.id"
+e11-max_per_group-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Pro,llm,optimizer-v1,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.533,125.26870000147028,49.450700000306824,6208.46,3.5,6047.1,624,292,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT user_id, id, total 
+FROM (
+  SELECT user_id, id, total,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn
+  FROM orders
+  WHERE user_id BETWEEN 50001 AND 51500
+) t
+WHERE rn = 1
+ORDER BY user_id, id"
+e11-max_per_group-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,max_per_group-2,max_per_group,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,MISSING_INDEX;CORRELATED_SUBQUERY;ORDER_BY_NO_INDEX,equivalent,1500,1500,2.097,129.40620000154013,61.71449999965262,6208.46,32642.43,7405.0,393,344,"SELECT o.user_id, o.id, o.total
+FROM orders o
+WHERE o.user_id BETWEEN 50001 AND 51500
+  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)
+ORDER BY o.user_id, o.id","SELECT o.user_id, o.id, o.total
+FROM orders o
+INNER JOIN (
+  SELECT user_id, MAX(total) as max_total
+  FROM orders
+  WHERE user_id BETWEEN 50001 AND 51500
+  GROUP BY user_id
+) m ON o.user_id = m.user_id AND o.total = m.max_total
+ORDER BY o.user_id, o.id"
+e11-control-1-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,False,False,,,,,,,,,1.0,,2679.1,847,111,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e11-control-1-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,control-1,control,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,False,False,,,,,,,,,1.0,,2877.4,244,120,"SELECT id, user_id, status, total
+FROM orders
+WHERE id = 424242",
+e11-control-2-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,FILESORT,equivalent,5,5,1.04,2.4126000025717076,2.318899998499546,1.75,1.75,6477.2,379,308,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at FROM orders FORCE INDEX (idx_orders_user_id) WHERE user_id = 31337 ORDER BY created_at DESC"
+e11-control-2-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,control-2,control,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,unchanged,no_change,True,True,,FILESORT,equivalent,5,5,0.992,2.154300000256626,2.1706000006815884,1.75,1.75,6230.4,249,271,"SELECT id, status, total, created_at
+FROM orders
+WHERE user_id = 31337
+ORDER BY created_at","SELECT id, status, total, created_at
+FROM orders FORCE INDEX (idx_orders_user_id)
+WHERE user_id = 31337
+ORDER BY created_at"
+e11-control-3-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,invalid,rejected,False,False,INVALID_RESPONSE,,,,,,,,92.06,,4757.8,376,205,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100",
+e11-control-3-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,control-3,control,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,,equivalent,100,100,1.129,3.9383000002999324,3.489599999738857,92.06,0.71,4150.5,275,179,"SELECT id, user_id, total
+FROM orders
+WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02'
+ORDER BY created_at
+LIMIT 100","SELECT id, user_id, total FROM orders FORCE INDEX (idx_orders_created_at) WHERE created_at >= '2025-05-01' AND created_at < '2025-05-02' ORDER BY created_at LIMIT 100"
+e11-control-4-gigachat:GigaChat-2-Pro,11,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Pro,llm,optimizer-v1,unchanged,no_change,True,True,,,equivalent,3,3,0.988,2.025300000241259,2.050700000836514,2.1,2.1,4439.7,552,191,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id","SELECT oi.id, p.name, oi.quantity, oi.price
+FROM products p 
+JOIN order_items oi ON p.id = oi.product_id AND oi.order_id = 250000
+ORDER BY oi.id"
+e11-control-4-gigachat:GigaChat-2-Pro@optimizer-v1-noplan,11,mysql,8.4.11,shop-bench-v1,control-4,control,gigachat:GigaChat-2-Pro@optimizer-v1-noplan,llm,optimizer-v1-noplan,improved,accepted,True,True,,,equivalent,3,3,1.364,2.9131000010238495,2.1352999974624254,2.1,2.1,4929.9,408,213,"SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id","SELECT oi.id, p.name, oi.quantity, oi.price
+FROM order_items oi
+STRAIGHT_JOIN products p ON p.id = oi.product_id
+WHERE oi.order_id = 250000
+ORDER BY oi.id"
