@@ -1,0 +1,11 @@
+﻿participant,experience,task,sql
+P01,1,date_function-1,
+P01,1,year_function-2,
+P01,1,correlated_select-1,
+P01,1,not_in-1,
+P01,1,distinct_join-1,
+P01,1,or_columns-1,
+P01,1,big_offset-3,
+P01,1,max_per_group-1,
+P01,1,control-2,
+P01,1,report-1,

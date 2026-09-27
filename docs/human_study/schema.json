@@ -1,0 +1,64 @@
+[
+ {
+  "name": "order_items",
+  "rows": 1495606,
+  "columns": [
+   "id BIGINT",
+   "order_id BIGINT",
+   "product_id INT",
+   "quantity INT",
+   "price DECIMAL(10,2)"
+  ],
+  "indexes": [
+   "idx_order_items_order_id (order_id)",
+   "idx_order_items_product_id (product_id)",
+   "PRIMARY (id)"
+  ]
+ },
+ {
+  "name": "orders",
+  "rows": 498672,
+  "columns": [
+   "id BIGINT",
+   "user_id BIGINT",
+   "status VARCHAR(16)",
+   "total DECIMAL(12,2)",
+   "created_at DATETIME"
+  ],
+  "indexes": [
+   "idx_orders_created_at (created_at)",
+   "idx_orders_user_id (user_id)",
+   "PRIMARY (id)"
+  ]
+ },
+ {
+  "name": "products",
+  "rows": 2000,
+  "columns": [
+   "id INT",
+   "name VARCHAR(200)",
+   "category VARCHAR(64)",
+   "price DECIMAL(10,2)",
+   "created_at DATETIME"
+  ],
+  "indexes": [
+   "PRIMARY (id)"
+  ]
+ },
+ {
+  "name": "users",
+  "rows": 99467,
+  "columns": [
+   "id BIGINT",
+   "email VARCHAR(255)",
+   "phone VARCHAR(32)",
+   "name VARCHAR(100)",
+   "city VARCHAR(64)",
+   "created_at DATETIME"
+  ],
+  "indexes": [
+   "PRIMARY (id)",
+   "uq_users_email (email)"
+  ]
+ }
+]

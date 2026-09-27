@@ -28,3 +28,8 @@ docs/gigachat/*.html
 docs/gigachat/*.pdf
 docs/gigachat/Письмо_в_Сбер.md
 docs/gigachat/Письмо_в_Сбер.txt
+docs/human_study/*.docx
+docs/human_study/*.pdf
+docs/human_study/answers.csv
+docs/human_study/results_humans.csv
+docs/human_study/summary.json

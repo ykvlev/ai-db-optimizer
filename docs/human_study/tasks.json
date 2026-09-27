@@ -1,0 +1,62 @@
+[
+ {
+  "n": 1,
+  "key": "date_function-1",
+  "title": "Заказы за 2025-03-15",
+  "sql": "SELECT id, user_id, total\nFROM orders\nWHERE DATE(created_at) = '2025-03-15'\nORDER BY id"
+ },
+ {
+  "n": 2,
+  "key": "year_function-2",
+  "title": "Последние заказы «delivered» за 2022",
+  "sql": "SELECT id, user_id, total, created_at\nFROM orders\nWHERE YEAR(created_at) = 2022 AND status = 'delivered'\nORDER BY created_at DESC\nLIMIT 50"
+ },
+ {
+  "n": 3,
+  "key": "correlated_select-1",
+  "title": "Статистика клиентов, Томск",
+  "sql": "SELECT u.id, u.name,\n  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count,\n  (SELECT SUM(o.total) FROM orders o WHERE o.user_id = u.id) AS orders_sum\nFROM users u\nWHERE u.city = 'Томск'\nORDER BY u.id"
+ },
+ {
+  "n": 4,
+  "key": "not_in-1",
+  "title": "Клиенты без заказов «cancelled»",
+  "sql": "SELECT id, email\nFROM users\nWHERE id NOT IN (SELECT user_id FROM orders WHERE status = 'cancelled')\nORDER BY id\nLIMIT 100"
+ },
+ {
+  "n": 5,
+  "key": "distinct_join-1",
+  "title": "Активные клиенты с 2026-01-01, Казань",
+  "sql": "SELECT DISTINCT u.id, u.email\nFROM users u\nJOIN orders o ON o.user_id = u.id\nWHERE o.created_at >= '2026-01-01' AND u.city = 'Казань'\nORDER BY u.id"
+ },
+ {
+  "n": 6,
+  "key": "or_columns-1",
+  "title": "Поиск клиента по email или телефону (500)",
+  "sql": "SELECT id, name, email, phone\nFROM users\nWHERE email = 'user500@mail.ru' OR phone = '+79000000501'"
+ },
+ {
+  "n": 7,
+  "key": "big_offset-3",
+  "title": "Страница заказов, OFFSET 450000",
+  "sql": "SELECT id, user_id, total\nFROM orders\nORDER BY id\nLIMIT 20 OFFSET 450000"
+ },
+ {
+  "n": 8,
+  "key": "max_per_group-1",
+  "title": "Крупнейший заказ клиентов 1–1500",
+  "sql": "SELECT o.user_id, o.id, o.total\nFROM orders o\nWHERE o.user_id BETWEEN 1 AND 1500\n  AND o.total = (SELECT MAX(o2.total) FROM orders o2 WHERE o2.user_id = o.user_id)\nORDER BY o.user_id, o.id"
+ },
+ {
+  "n": 9,
+  "key": "control-2",
+  "title": "Заказы клиента",
+  "sql": "SELECT id, status, total, created_at\nFROM orders\nWHERE user_id = 31337\nORDER BY created_at"
+ },
+ {
+  "n": 10,
+  "key": "report-1",
+  "title": "Отчёт по категориям, refunded 2025",
+  "sql": "SELECT p.category, SUM(oi.quantity * oi.price) AS revenue, COUNT(DISTINCT o.id) AS orders\nFROM order_items oi\nJOIN products p ON p.id = oi.product_id\nJOIN orders o ON o.id = oi.order_id\nWHERE o.status = 'refunded' AND YEAR(o.created_at) = 2025\nGROUP BY p.category\nORDER BY revenue DESC"
+ }
+]
