@@ -18,7 +18,7 @@ function Test-Url($url) {
 # 1. Демо-базы (если Docker запущен)
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     docker info *> $null
-    if ($LASTEXITCODE -eq 0) { Say 'Базы данных: запуск…'; docker compose -f "$root\docker\docker-compose.yml" up -d | Out-Null }
+    if ($LASTEXITCODE -eq 0) { Say 'Базы данных: запуск…'; docker compose -f "$root\docker\docker-compose.yml" up -d mysql postgres | Out-Null }
     else { Say 'Docker не запущен — демо-базы недоступны (программа работает и без них).' 'Yellow' }
 }
 

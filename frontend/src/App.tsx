@@ -11,6 +11,9 @@ import { Setup } from './pages/Setup'
 import { Start } from './pages/Start'
 import { Logo } from './components/Logo'
 
+// В режиме разработки интерфейс (Vite, :5173) и сервер (:8000) разные; в Docker сервер сам раздаёт интерфейс
+const SERVER_HOST = window.location.port === '5173' ? 'localhost:8000' : window.location.host
+
 const pages = [
   { id: 'start', label: 'Начало', group: 'Главная', desc: 'Состояние программы и быстрые действия' },
   { id: 'analyzer', label: 'Анализ запроса', group: 'Работа', desc: 'Вставьте SQL — программа найдёт проблемы, а ИИ предложит более быструю версию и проверит её на базе' },
@@ -97,7 +100,7 @@ export default function App() {
             <Dot ok={backendOk} />
             <div className="min-w-0 flex-1 leading-tight">
               <div className="truncate text-[13px] text-obsidian">Локальная установка</div>
-              <div className="truncate font-mono text-[11px] text-stone">localhost:8000</div>
+              <div className="truncate font-mono text-[11px] text-stone">{SERVER_HOST}</div>
             </div>
           </div>
         </div>

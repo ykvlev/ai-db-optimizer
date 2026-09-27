@@ -10,9 +10,10 @@ import re
 import time
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Iterator
 
+from app.config import get_settings
 from app.models import ColumnInfo, Dialect, ForeignKeyInfo, IndexInfo, SchemaInfo, TableInfo
 
 
@@ -374,6 +375,11 @@ class PostgresConnector(Connector):
 
 
 def make_connector(cfg: ConnectionConfig, timeout_ms: int = 30000) -> Connector:
+    # В Docker «localhost» — это сам контейнер: подключения к базам на компьютере пользователя
+    # перенаправляются на адрес хоста (LOCALHOST_ALIAS=host.docker.internal).
+    alias = get_settings().localhost_alias
+    if alias and cfg.host in ("localhost", "127.0.0.1", "::1"):
+        cfg = replace(cfg, host=alias)
     if cfg.dbms == "mysql":
         return MySQLConnector(cfg, timeout_ms)
     if cfg.dbms == "postgres":

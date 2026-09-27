@@ -58,7 +58,7 @@ if (-not $NoDocker) {
             Say 'Docker установлен, но не запущен — откройте Docker Desktop и запустите setup ещё раз.' 'Yellow'
         } else {
             Say 'Запускаю демо-базы MySQL и PostgreSQL (первый раз — несколько минут)…'
-            docker compose -f "$root\docker\docker-compose.yml" up -d
+            docker compose -f "$root\docker\docker-compose.yml" up -d mysql postgres
         }
     }
 }

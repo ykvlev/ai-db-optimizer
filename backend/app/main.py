@@ -9,6 +9,7 @@ import json
 from fastapi import FastAPI, HTTPException, Query as Q, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
 
 from app import __version__
@@ -274,3 +275,9 @@ def export_runs(format: str = Q("json", pattern="^(json|csv|xlsx)$"), kind: str 
     wb.save(buf)
     return Response(buf.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     headers={"Content-Disposition": "attachment; filename=ai_db_optimizer_runs.xlsx"})
+
+
+# Интерфейс раздаётся самим сервером, если задан FRONTEND_DIR (запуск в Docker). Монтируется последним,
+# чтобы не перекрывать маршруты /api.
+if get_settings().frontend_dir:
+    app.mount("/", StaticFiles(directory=get_settings().frontend_dir, html=True), name="frontend")

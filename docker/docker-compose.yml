@@ -1,7 +1,35 @@
-# Тестовые СУБД с демонстрационной БД «shop» (детерминированные данные, seed v1).
-# Запуск:  docker compose -f docker/docker-compose.yml up -d
+# Программа целиком: интерфейс и сервер (app, http://localhost:8080) и тестовые СУБД с демонстрационной БД
+# «shop» (детерминированные данные, seed v1). Запуск одной командой (или двойным щелчком по Запустить.cmd):
+#   docker compose -f docker/docker-compose.yml up -d --build
+# Только базы данных (для запуска сервера из исходников):  ... up -d mysql postgres
 # Подключение для анализа (только SELECT): user optimizer_ro / optimizer_ro
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/app.Dockerfile
+    image: aidbo-app
+    container_name: aidbo-app
+    ports:
+      - "8080:8000"
+    env_file:
+      - path: ../backend/.env        # ключи GigaChat и других моделей (необязательно)
+        required: false
+    environment:
+      # базы на компьютере пользователя (127.0.0.1:3307 и т. п.) доступны из контейнера по адресу хоста
+      LOCALHOST_ALIAS: host.docker.internal
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - app-data:/app/backend/data   # история анализов и экспериментов сохраняется между запусками
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.4
     container_name: aidbo-mysql
@@ -37,5 +65,6 @@ services:
       retries: 60
 
 volumes:
+  app-data:
   mysql-data:
   pg-data:

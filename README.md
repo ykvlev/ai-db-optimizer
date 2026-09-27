@@ -32,7 +32,13 @@
 
 ## Быстрый старт
 
-Нужны: Python 3.11+, Node.js 20+, Docker Desktop (для демонстрационных БД), Git.
+**Проще всего — через Docker, одной кнопкой.** Нужен только Docker Desktop. Двойной щелчок по `Запустить.cmd`
+в папке проекта: собираются и запускаются программа и демонстрационные БД, открывается браузер
+(http://localhost:8080). `Остановить.cmd` — остановка, история анализов сохраняется. Ключи моделей берутся из
+`backend/.env`, если он есть; базы на этом компьютере подключаются как обычно — по адресу 127.0.0.1.
+То же без Windows: `docker compose -f docker/docker-compose.yml up -d --build`.
+
+**Для разработки** нужны Python 3.11+, Node.js 20+, Docker Desktop (для демонстрационных БД), Git.
 
 **Windows — двумя командами** (из папки проекта, в PowerShell):
 
@@ -47,7 +53,7 @@ powershell -ExecutionPolicy Bypass -File scripts\start.ps1   # каждый ра
 
 ```bash
 # 1. Тестовые БД (MySQL 8.4 :3307 и PostgreSQL 16 :5434, база shop, пользователь optimizer_ro/optimizer_ro)
-docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml up -d mysql postgres
 
 # 2. Backend
 cd backend

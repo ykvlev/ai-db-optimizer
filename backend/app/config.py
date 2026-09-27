@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     secret_key: str | None = None
 
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    # Запуск в Docker: собранный интерфейс (frontend/dist), который сервер раздаёт сам, и адрес компьютера
+    # пользователя, на который перенаправляются подключения к localhost
+    frontend_dir: str | None = None
+    localhost_alias: str | None = None
 
     # --- LLM-провайдеры (все необязательные; доступны те, что настроены) ---
     default_model: str | None = None  # id модели из /api/models, напр. "gigachat:GigaChat-2-Max"

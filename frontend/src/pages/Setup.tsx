@@ -44,7 +44,7 @@ export function Setup() {
         <div className="kicker text-stone">15 минут · Windows, Linux, macOS</div>
         <h1 className="text-[24px] font-[450] leading-[1.15] tracking-[-0.04em] text-obsidian">Установка и помощь</h1>
         <p className="max-w-2xl text-[16px] leading-[1.5] text-charcoal">
-          Около 15 минут. Нужны Python, Node.js и Docker. Программа работает на вашем компьютере: данные и запросы
+          Через Docker — несколько минут и одна кнопка, из исходников — около 15 минут. Программа работает на вашем компьютере: данные и запросы
           никуда не отправляются, кроме выбранной вами модели ИИ.
         </p>
         <div className="inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_0_0_1px_#ebebeb]">
@@ -57,20 +57,25 @@ export function Setup() {
         </div>
       </header>
 
-      {w && (
-        <section className="rounded-md bg-obsidian p-6 text-white">
-          <div className="kicker text-smoke">Быстрый способ</div>
-          <div className="mt-3 text-[20px] font-[450] tracking-[-0.03em]">Две команды — и всё работает</div>
-          <p className="mt-2 max-w-2xl text-[14px] leading-[1.5] text-ash">
-            Установите программы из шага 1, скачайте проект и выполните два скрипта в PowerShell из папки проекта.
-            Первый всё установит, второй запустит базы данных, сервер, интерфейс и откроет браузер.
-          </p>
-          <div className="mt-3 space-y-2">
+      <section className="rounded-md bg-obsidian p-6 text-white">
+        <div className="kicker text-smoke">Быстрый способ</div>
+        <div className="mt-3 text-[20px] font-[450] tracking-[-0.03em]">Одна кнопка — через Docker</div>
+        <p className="mt-2 max-w-2xl text-[14px] leading-[1.5] text-ash">
+          Нужен только Docker Desktop. Скачайте проект и {w ? 'дважды щёлкните Запустить.cmd в его папке' : 'выполните команду в папке проекта'}:
+          соберутся и запустятся программа и демонстрационные базы, откроется http://localhost:8080.
+          История анализов сохраняется между запусками, ключи моделей берутся из backend/.env.
+        </p>
+        <div className="mt-3 space-y-2">
+          {w
+            ? <CopyBlock label="Или из командной строки">{`Запустить.cmd`}</CopyBlock>
+            : <CopyBlock label="Запуск">{`docker compose -f docker/docker-compose.yml up -d --build`}</CopyBlock>}
+          {w && <>
+            <p className="pt-2 text-[13px] text-ash">Без Docker для программы — два скрипта PowerShell (нужны программы из шага 1):</p>
             <CopyBlock label="Один раз — установка">{`powershell -ExecutionPolicy Bypass -File scripts\\setup.ps1`}</CopyBlock>
             <CopyBlock label="Каждый раз — запуск">{`powershell -ExecutionPolicy Bypass -File scripts\\start.ps1`}</CopyBlock>
-          </div>
-        </section>
-      )}
+          </>}
+        </div>
+      </section>
 
       <Section n="01" title="Что нужно">
         <ul className="space-y-2 text-[13.5px]">
@@ -92,7 +97,7 @@ export function Setup() {
           Запускает демонстрационную базу интернет-магазина в MySQL (порт 3307) и PostgreSQL (порт 5434).
           Первый запуск занимает несколько минут: скачиваются образы и генерируются данные — 2 млн строк.
         </p>
-        <CopyBlock>{`docker compose -f docker/docker-compose.yml up -d`}</CopyBlock>
+        <CopyBlock>{`docker compose -f docker/docker-compose.yml up -d mysql postgres`}</CopyBlock>
       </Section>
 
       <Section n="04" title="Сервер">
