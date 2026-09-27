@@ -109,7 +109,7 @@ export function Console({ connections, models, onOptimize, onNavigate }: {
           {workSchema && <span className="font-mono text-[12px] text-stone">схема {workSchema}</span>}
         </div>
         {overview && overview.schemas.length > 0 && (
-          <DbIntro key={connId} overview={overview} busy={introBusy} hasModel={llm.length > 0} onChoose={choose} onRun={runSuggested} />
+          <DbIntro key={connId} overview={overview} busy={introBusy} hasModel={llm.length > 0} onChoose={choose} onRun={runSuggested} onShowEr={() => onNavigate(`databases/er/${connId}`)} />
         )}
         <div className="card flex flex-wrap items-center gap-2 p-3">
           <span className="kicker text-stone">Спросить базу</span>

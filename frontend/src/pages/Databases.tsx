@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Connection, Dialect, ModelsInfo, SchemaInfo } from '../api'
 import { api } from '../api'
 import { AuditView, DocsView, TopQueriesView } from '../components/DbTools'
+import { schemaOf } from '../components/DbIntro'
 import { ErDiagram, svgToPng } from '../components/ErDiagram'
 import { Button, Card, Empty, ErrorBox, Spinner, Tabs, Tag } from '../components/ui'
 import { SchemaView } from './Analyzer'
@@ -50,6 +51,31 @@ export function Databases({ connections, onChange, models, onOptimize }: {
 
   useEffect(() => { if (selected != null) loadSchema(selected) }, [selected])
   useEffect(() => { if (selected == null && connections.length) setSelected(connections[0].id) }, [connections, selected])
+
+  // переход из консоли: #/databases/er/<id> — сразу ER-диаграмма нужной базы
+  useEffect(() => {
+    const onHash = () => {
+      const [, page, t, id] = window.location.hash.replace('#', '').split('/')
+      if (page !== 'databases' || !t) return
+      if (TOOL_TABS.some(x => x.id === t)) setTool(t as Tool)
+      if (id && !Number.isNaN(Number(id))) setSelected(Number(id))
+    }
+    onHash()
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  // ER-диаграмма — по одной схеме: у базы с несколькими схемами общая картинка нечитаема
+  const [defSchema, setDefSchema] = useState('public')
+  const [erSchema, setErSchema] = useState<string | null>(null)
+  useEffect(() => {
+    if (selected == null) return
+    setErSchema(null)
+    api.consoleOverview(selected).then(o => { setDefSchema(o.default); setErSchema(o.selected ?? o.schemas[0]?.name ?? null) }).catch(() => {})
+  }, [selected])
+  const erSchemas = schema ? [...new Set(schema.tables.map(t => schemaOf(t.name, defSchema)))] : []
+  const erView: SchemaInfo | null = schema && (erSchemas.length > 1 && erSchema
+    ? { ...schema, tables: schema.tables.filter(t => schemaOf(t.name, defSchema) === erSchema) } : schema)
 
   const remove = async (id: number) => {
     await api.deleteConnection(id)
@@ -111,9 +137,17 @@ export function Databases({ connections, onChange, models, onOptimize }: {
           <div hidden={tool !== 'slow'}><Card title="Медленные запросы"><TopQueriesView key={selected} connectionId={selected} onOptimize={sql => onOptimize(sql, selected)} /></Card></div>
           <div hidden={tool !== 'er'}>
             <Card title="Схема связей" actions={schema && <Button variant="ghost" onClick={async () => { if (erRef.current) { const png = await svgToPng(erRef.current); const a = document.createElement('a'); a.href = png; a.download = 'er_diagram.png'; a.click() } }}>PNG</Button>}>
-              {schema?.tables.length ? <>
+              {erView?.tables.length ? <>
+                {erSchemas.length > 1 && (
+                  <div className="mb-3 flex flex-wrap items-center gap-1.5">
+                    <span className="kicker mr-1 text-stone">схема</span>
+                    {erSchemas.map(s => (
+                      <button key={s} onClick={() => setErSchema(s)} className={`rounded-md px-2.5 py-1 font-mono text-[12px] ${erSchema === s ? 'bg-obsidian text-white' : 'shadow-[0_0_0_1px_#ebebeb] hover:shadow-[0_0_0_1px_#a8a8a8]'}`}>{s}</button>
+                    ))}
+                  </div>
+                )}
                 <p className="mb-3 text-[12.5px] text-stone">Таблицы можно перетаскивать мышью. PK — первичный ключ, FK — внешний; линии идут от внешнего ключа к таблице, на которую он ссылается.</p>
-                <div className="max-h-[720px] overflow-auto rounded-md shadow-[0_0_0_1px_#ebebeb]"><ErDiagram ref={erRef} schema={schema} /></div>
+                <div className="max-h-[720px] overflow-auto rounded-md shadow-[0_0_0_1px_#ebebeb]"><ErDiagram ref={erRef} schema={erView} /></div>
               </> : <Empty>{schemaBusy ? 'Загрузка схемы…' : 'В базе нет таблиц'}</Empty>}
             </Card>
           </div>

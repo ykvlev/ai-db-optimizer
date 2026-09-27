@@ -98,7 +98,7 @@ export const ErDiagram = forwardRef<SVGSVGElement, { schema: SchemaInfo }>(funct
             <rect width={BOX_W} height={h} rx="6" fill="#ffffff" stroke="#d6d6d6" />
             <rect width={BOX_W} height={HEAD} rx="6" fill="#171717" />
             <rect y={HEAD - 6} width={BOX_W} height="6" fill="#171717" />
-            <text x="10" y="18" fontSize="12.5" fontWeight="600" fill="#ffffff" fontFamily={FONT}>{t.name.length > 26 ? t.name.slice(0, 25) + '…' : t.name}</text>
+            <text x="10" y="18" fontSize="12.5" fontWeight="600" fill="#ffffff" fontFamily={FONT}>{(n => n.length > 26 ? n.slice(0, 25) + '…' : n)(t.name.split('.').pop()!)}</text>
             {t.row_count != null && <text x={BOX_W - 10} y="18" fontSize="10" textAnchor="end" fill="#a8a8a8" fontFamily={FONT}>{t.row_count.toLocaleString('ru-RU')}</text>}
             {t.columns.slice(0, MAX_ROWS).map((c, i) => {
               const k = isKey(t, c.name)

@@ -5,12 +5,13 @@ import { Button, Spinner } from './ui'
 export const schemaOf = (table: string, def: string) => table.includes('.') ? table.slice(0, table.lastIndexOf('.')) : def
 
 // «Знакомство с базой»: выбор рабочей схемы, анализ базы моделью и готовые запросы
-export function DbIntro({ overview, busy, hasModel, onChoose, onRun }: {
+export function DbIntro({ overview, busy, hasModel, onChoose, onRun, onShowEr }: {
   overview: DbOverview
   busy: boolean
   hasModel: boolean
   onChoose: (schema: string, analyze: boolean) => void
   onRun: (sql: string) => void
+  onShowEr?: () => void  // открыть ER-диаграмму рабочей схемы
 }) {
   const { schemas, selected, profile } = overview
   const [pick, setPick] = useState<string>(selected ?? schemas[0]?.name ?? '')
@@ -60,6 +61,7 @@ export function DbIntro({ overview, busy, hasModel, onChoose, onRun }: {
         <span className="kicker text-stone">О базе</span>
         <span className="font-mono text-[12.5px] text-obsidian">схема {selected}</span>
         <span className="ml-auto" />
+        {onShowEr && <button className="text-[12.5px] text-stone underline" onClick={e => { e.preventDefault(); onShowEr() }}>схема связей</button>}
         <button className="text-[12.5px] text-stone underline" onClick={e => { e.preventDefault(); setChanging(true) }}>сменить схему</button>
         {hasModel && <button className="text-[12.5px] text-stone underline" disabled={busy} onClick={e => { e.preventDefault(); onChoose(selected, true) }}>{busy ? 'анализ…' : profile ? 'обновить анализ' : 'проанализировать'}</button>}
       </summary>
