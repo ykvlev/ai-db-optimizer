@@ -132,7 +132,8 @@ def render(html_by_name: dict[str, tuple[str, int]]):
     proc = subprocess.Popen([EDGE, "--headless=new", "--remote-debugging-port=9335", f"--user-data-dir={prof}", "about:blank"],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
-        for _ in range(50):
+        ws_url = None
+        for _ in range(200):  # под нагрузкой Edge запускается дольше
             try:
                 ws_url = next(t["webSocketDebuggerUrl"] for t in httpx.get("http://127.0.0.1:9335/json", timeout=2).json()
                               if t["type"] == "page")
@@ -175,7 +176,7 @@ def render(html_by_name: dict[str, tuple[str, int]]):
 def main():
     FIG.mkdir(exist_ok=True)
     c = httpx.Client(base_url=API, timeout=60)
-    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3, 4, 5, 6, 7, 8)}
+    exps = {i: c.get(f"/api/experiments/{i}").json() for i in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)}
     m1 = exps[1]["summary"]["models"]["baseline:rule-based"]
     m2 = exps[2]["summary"]["models"]["baseline:rule-based"]
     e3 = exps[3]

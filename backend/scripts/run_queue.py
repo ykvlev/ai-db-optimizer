@@ -25,6 +25,12 @@ QUEUE = [
      [*GIGA, QWEN, "baseline:rule-based"]),
     ("Сравнение моделей shop-bench-v1: GigaChat-2 / Pro / Max, Qwen, базовая линия, PostgreSQL", "shop-bench-v1",
      "postgres", [*GIGA, QWEN, "baseline:rule-based"]),
+    # устойчивость ответов: повторы эксперимента 7 для GigaChat-2-Pro и -Max (первый прогон — эксперимент 7)
+    ("Устойчивость: повтор 2, GigaChat-2-Pro / Max, MySQL", "shop-bench-v1", "mysql", GIGA[1:]),
+    ("Устойчивость: повтор 3, GigaChat-2-Pro / Max, MySQL", "shop-bench-v1", "mysql", GIGA[1:]),
+    # абляция плана выполнения на полном наборе для облачной модели
+    ("Абляция: план выполнения, GigaChat-2-Pro, MySQL", "shop-bench-v1", "mysql",
+     [GIGA[1], f"{GIGA[1]}@optimizer-v1-noplan"]),
 ]
 
 
