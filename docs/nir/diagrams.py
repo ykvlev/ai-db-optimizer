@@ -429,7 +429,7 @@ def main():
     import re
     items = {
         "d_idef0_a0": idef0_context(), "d_idef0_dec": idef0_decomposition(), "d_usecase": use_case(),
-        "d_sequence": sequence(), "d_states": states(), "d_arch": architecture(), "d_er": er(),
+        "d_sequence": sequence(), "d_states": states(), "d_er": er(),  # d_arch — в diagrams2.py
         "d_flow_decision": flow_decision(), "d_flow_equiv": flow_equivalence(),
     }
     jobs = {}

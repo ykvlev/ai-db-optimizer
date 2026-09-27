@@ -215,8 +215,65 @@ def dfd() -> str:
     return s.svg()
 
 
+def context() -> str:
+    """Контекстная диаграмма (уровень 1 модели C4): система, её пользователи и внешние системы."""
+    s = Svg(1100, 560, 14)
+    for x, t in ((60, "Разработчик,\nадминистратор БД"), (270, "Исследователь")):
+        s.actor(x + 45, 30, t)
+    s.box(360, 210, 380, 130, "", sw=2.4)
+    s.text(550, 245, "AI Database Optimizer", bold=True, size=17)
+    s.text(550, 290, "анализ и оптимизация SQL-запросов\nс проверкой рекомендаций модели", size=13)
+    s.box(40, 420, 300, 90, "Исследуемые СУБД\nMySQL, PostgreSQL\n[внешняя система]", size=13)
+    s.box(400, 420, 300, 90, "Поставщики языковых моделей\nGigaChat, YandexGPT, Ollama\n[внешняя система]", size=13)
+    s.box(760, 420, 300, 90, "Открытый репозиторий данных\nGitHub, Zenodo\n[внешняя система]", size=13, dashed=True)
+    s.line([(105, 162), (105, 190), (430, 190), (430, 210)]); s.text(260, 178, "анализирует и оптимизирует запросы", size=12)
+    s.line([(315, 152), (315, 160), (520, 160), (520, 210)])
+    s.text(640, 150, "проводит эксперименты, получает отчёты", size=12)
+    s.line([(430, 340), (430, 380), (190, 380), (190, 420)]); s.text(300, 368, "SQL только чтение", size=12)
+    s.line([(550, 340), (550, 420)]); s.text(540, 400, "промпт, ответ (HTTPS)", anchor="end", size=12)
+    s.line([(700, 340), (700, 380), (910, 380), (910, 420)], dashed=True); s.text(810, 368, "выгрузка датасета", size=12)
+    return s.svg()
+
+
+def layered() -> str:
+    """Многоуровневая архитектура: уровни и слои с направленными зависимостями; внешние сервисы вынесены отдельно."""
+    s = Svg(1120, 760, 14)
+    # уровень представления
+    s.box(20, 20, 760, 120, "", dashed=True, sw=1.2)
+    s.text(34, 40, "Уровень представления", anchor="start", italic=True, size=13)
+    s.box(120, 55, 560, 70, "Одностраничное веб-приложение (SPA)\nReact, TypeScript, Monaco Editor", size=13)
+    # уровень приложения
+    s.box(20, 175, 760, 420, "", dashed=True, sw=1.2)
+    s.text(34, 195, "Уровень приложения (сервер FastAPI)", anchor="start", italic=True, size=13)
+    s.box(50, 210, 700, 60, "Слой API: маршруты REST, схемы данных (Pydantic), обработка ошибок", size=13)
+    s.box(50, 300, 700, 150, "", sw=1.2)
+    s.text(64, 318, "Слой бизнес-логики", anchor="start", italic=True, size=12)
+    for i, t in enumerate(["Конвейер\nоптимизации", "Анализ: разбор,\nправила, план", "ИИ-модуль:\nконтекст, промпты", "Проверки: безопасность,\nсхема, эквивалентность", "Бенчмарк\nи оценка", "Режим\nэкспериментов"]):
+        s.box(64 + (i % 3) * 228, 330 + (i // 3) * 58, 214, 50, t, size=12)
+    s.box(50, 480, 700, 100, "", sw=1.2)
+    s.text(64, 498, "Слой интеграции и доступа к данным", anchor="start", italic=True, size=12)
+    for i, t in enumerate(["Репозиторий\n(SQLAlchemy)", "Коннекторы СУБД\n(PyMySQL, psycopg)", "Адаптеры моделей\n(LLMProvider)"]):
+        s.box(64 + i * 228, 515, 214, 55, t, size=12)
+    # уровень данных
+    s.box(20, 630, 760, 110, "", dashed=True, sw=1.2)
+    s.text(34, 650, "Уровень данных", anchor="start", italic=True, size=13)
+    s.box(64, 665, 300, 60, "БД результатов\n(SQLite / PostgreSQL)", size=13)
+    s.box(400, 665, 350, 60, "Исследуемые СУБД\n(MySQL, PostgreSQL; только чтение)", size=13)
+    # внешние сервисы
+    s.box(830, 420, 270, 150, "", dashed=True, sw=1.2)
+    s.text(844, 440, "Внешние сервисы", anchor="start", italic=True, size=13)
+    s.box(850, 465, 230, 90, "Поставщики LLM\nGigaChat, YandexGPT,\nOpenAI-совм., Ollama", size=12)
+    # зависимости сверху вниз
+    s.line([(400, 125), (400, 210)]); s.text(410, 158, "HTTP, JSON", anchor="start", size=12)
+    s.line([(400, 270), (400, 300)])
+    s.line([(400, 450), (400, 480)])
+    s.line([(171, 570), (171, 665)]); s.line([(399, 570), (399, 612), (575, 612), (575, 665)])
+    s.line([(734, 542), (850, 542)]); s.text(792, 530, "HTTPS", size=12)
+    return s.svg()
+
+
 def main():
-    items = {"d_components": components(), "d_deployment": deployment(), "d_activity": activity(),
+    items = {"d_context": context(), "d_arch": layered(), "d_components": components(), "d_deployment": deployment(), "d_activity": activity(),
              "d_classes": classes(), "d_dfd": dfd()}
     jobs = {}
     for name, svg in items.items():
