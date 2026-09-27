@@ -78,3 +78,6 @@ CREATE ROLE optimizer_ro LOGIN PASSWORD 'optimizer_ro';
 GRANT CONNECT ON DATABASE shop TO optimizer_ro;
 GRANT USAGE ON SCHEMA public TO optimizer_ro;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO optimizer_ro;
+-- статистика запросов для раздела «Медленные запросы» (shared_preload_libraries задан в docker-compose.yml)
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+GRANT pg_read_all_stats TO optimizer_ro;

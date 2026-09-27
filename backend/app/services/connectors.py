@@ -17,6 +17,12 @@ from app.config import get_settings
 from app.models import ColumnInfo, Dialect, ForeignKeyInfo, IndexInfo, SchemaInfo, TableInfo
 
 
+# служебные запросы к системному каталогу (в том числе самой программы) в «медленных запросах» не показываем
+_SYSTEM_QUERY = re.compile(r"information_schema|performance_schema|pg_catalog|\bpg_(class|namespace|stat\w*|index|"
+                           r"extension|roles|database|attribute|constraint|proc|type|settings)\b|@@|\bversion\s*\(|"
+                           r"current_schema|^\s*show\b", re.IGNORECASE)
+
+
 class DBError(Exception):
     """Ошибка СУБД с кодом (MySQL errno / PostgreSQL SQLSTATE) для классификации ошибок ИИ."""
 
@@ -93,6 +99,20 @@ class Connector(ABC):
 
     def ping(self) -> None:
         self.server_version()
+
+    # ---------------------------------------------------------- статистика для аудита и «медленных запросов»
+    def index_usage(self) -> list[tuple[str, str]] | None:
+        """(таблица, индекс) — неуникальные индексы без единого обращения с момента сброса статистики.
+        None, если статистика недоступна (нет прав или она отключена)."""
+        return None
+
+    def never_analyzed(self) -> list[str]:
+        """Таблицы, по которым у планировщика нет статистики."""
+        return []
+
+    def top_statements(self, limit: int = 20) -> list[dict]:
+        """Самые тяжёлые запросы по суммарному времени выполнения (только SELECT/WITH)."""
+        raise DBError("Статистика запросов для этой СУБД не поддерживается", "NO_STATS")
 
 
 # ====================================================================== MySQL
@@ -203,6 +223,36 @@ class MySQLConnector(Connector):
             except DBError as e:  # EXPLAIN ANALYZE появился в 8.0.18
                 plan["_analyze_error"] = str(e)
         return plan
+
+    def index_usage(self) -> list[tuple[str, str]] | None:
+        try:
+            rows = self._query(
+                "SELECT OBJECT_NAME, INDEX_NAME FROM performance_schema.table_io_waits_summary_by_index_usage "
+                "WHERE OBJECT_SCHEMA = %s AND INDEX_NAME IS NOT NULL AND INDEX_NAME <> 'PRIMARY' AND COUNT_STAR = 0",
+                (self.cfg.database,))
+        except DBError:
+            return None
+        unique = {(t, i) for t, i in self._query(
+            "SELECT TABLE_NAME, INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = %s AND NON_UNIQUE = 0",
+            (self.cfg.database,))}
+        return [(t, i) for t, i in rows if (t, i) not in unique]
+
+    def top_statements(self, limit: int = 20) -> list[dict]:
+        try:
+            rows = self._query(
+                "SELECT DIGEST_TEXT, QUERY_SAMPLE_TEXT, COUNT_STAR, SUM_TIMER_WAIT / 1e9, AVG_TIMER_WAIT / 1e9, "
+                "SUM_ROWS_EXAMINED, SUM_ROWS_SENT FROM performance_schema.events_statements_summary_by_digest "
+                "WHERE SCHEMA_NAME = %s AND (DIGEST_TEXT LIKE 'SELECT%%' OR DIGEST_TEXT LIKE 'WITH%%') "
+                "ORDER BY SUM_TIMER_WAIT DESC LIMIT %s", (self.cfg.database, int(limit) * 4))
+        except DBError as e:
+            raise DBError("Нет доступа к performance_schema. Выдайте пользователю право: GRANT SELECT ON "
+                          f"performance_schema.events_statements_summary_by_digest TO '{self.cfg.username}'@'%'; "
+                          f"({e})", "NO_STATS") from e
+        return [{"query": sample or digest, "normalized": digest, "calls": int(calls), "total_ms": float(total),
+                 "mean_ms": float(mean), "rows_examined": int(examined), "rows_sent": int(sent),
+                 "runnable": bool(sample) and not (sample or "").endswith("...")}
+                for digest, sample, calls, total, mean, examined, sent in rows
+                if not _SYSTEM_QUERY.search(digest.replace("`", ""))][:limit]
 
     def _handler_reads(self, cur) -> float:
         cur.execute("SHOW SESSION STATUS LIKE 'Handler_read%%'")
@@ -365,6 +415,32 @@ class PostgresConnector(Connector):
                 tables[t].foreign_keys.append(ForeignKeyInfo(name=cname, columns=list(cols), ref_table=rt,
                                                              ref_columns=list(rcols)))
         return SchemaInfo(tables=list(tables.values()), source="live")
+
+    def index_usage(self) -> list[tuple[str, str]] | None:
+        q = self._QNAME.format(rel="s.relname").replace("n.nspname", "s.schemaname")
+        return [(t, i) for t, i in self._query(
+            f"SELECT {q}, s.indexrelname FROM pg_stat_user_indexes s JOIN pg_index x ON x.indexrelid = s.indexrelid "
+            "WHERE s.idx_scan = 0 AND NOT x.indisunique AND NOT x.indisprimary")]
+
+    def never_analyzed(self) -> list[str]:
+        return [r[0] for r in self._query(
+            f"SELECT {self._QNAME.format(rel='c.relname')} FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+            f"WHERE {self._USER_SCHEMAS} AND c.relkind IN ('r','p') AND c.reltuples < 0 ORDER BY 1")]
+
+    def top_statements(self, limit: int = 20) -> list[dict]:
+        schema = self._query("SELECT n.nspname FROM pg_extension e JOIN pg_namespace n ON n.oid = e.extnamespace "
+                             "WHERE e.extname = 'pg_stat_statements'")
+        if not schema:
+            raise DBError("В базе не включено расширение pg_stat_statements", "NO_EXTENSION")
+        ns = schema[0][0].replace('"', '""')
+        rows = self._query(
+            f'SELECT query, calls, total_exec_time, mean_exec_time, rows FROM "{ns}".pg_stat_statements '
+            "WHERE dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) "
+            "AND query ~* '^\\s*(select|with)\\s' AND query NOT ILIKE '%%pg_stat_statements%%' "
+            "ORDER BY total_exec_time DESC LIMIT %s", (int(limit) * 4,))
+        return [{"query": q, "normalized": q, "calls": int(calls), "total_ms": float(total), "mean_ms": float(mean),
+                 "rows_sent": int(n), "rows_examined": None, "runnable": "$1" not in q}
+                for q, calls, total, mean, n in rows if not _SYSTEM_QUERY.search(q)][:limit]
 
     def explain(self, sql: str, analyze: bool = False) -> Any:
         opts = "ANALYZE, BUFFERS, FORMAT JSON" if analyze else "FORMAT JSON"

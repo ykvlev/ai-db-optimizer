@@ -60,7 +60,7 @@ services:
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d:ro
       - pg-data:/var/lib/postgresql/data
-    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "work_mem=8MB"]
+    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "work_mem=8MB", "-c", "shared_preload_libraries=pg_stat_statements"]
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres", "-d", "shop"]
       interval: 5s

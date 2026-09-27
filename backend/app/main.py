@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException, Query as Q, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from app import __version__
@@ -22,7 +23,7 @@ from app.models import (AnalyzeRequest, AnalyzeResponse, BenchmarkRequest, Bench
                         ConnectionCreate, ConnectionOut, ExplainRequest, OptimizeRequest, OptimizeResponse, PlanSummary, ScriptAnalyzeResponse,
                         SchemaInfo)
 from app.services import benchmark as bench
-from app.services import explain, pipeline, safety
+from app.services import explain, pipeline, safety, workbench
 from app.services.ai.optimizer import BASELINE_MODEL, list_prompts
 from app.services.ai.providers import get_registry
 from app.services.connectors import DEFAULT_PORTS, ConnectionConfig, DBError, make_connector
@@ -46,6 +47,11 @@ app.include_router(research_router)
 @app.exception_handler(DBError)
 def _db_error(_: Request, e: DBError):
     return JSONResponse(status_code=400, content={"detail": str(e), "code": e.code})
+
+
+@app.exception_handler(workbench.WorkbenchError)
+def _workbench_error(_: Request, e: workbench.WorkbenchError):
+    return JSONResponse(status_code=400, content={"detail": str(e)})
 
 
 @app.exception_handler(pipeline.PipelineError)
@@ -165,6 +171,78 @@ def schema(connection_id: int, refresh: bool = False):
     _, conn = pipeline.open_connector(connection_id)
     with conn:
         return pipeline.live_schema(conn, connection_id, refresh=refresh)[0]
+
+
+# ---------------------------------------------------------------- консоль, «Спроси базу», аудит, документация
+class ConsoleRequest(BaseModel):
+    connection_id: int
+    sql: str
+    limit: int = Field(workbench.CONSOLE_ROW_LIMIT, ge=1, le=5000)
+
+
+class AskRequest(BaseModel):
+    connection_id: int
+    question: str
+    model: str | None = None
+
+
+class DocsRequest(BaseModel):
+    describe: bool = False
+    model: str | None = None
+    er_png: str | None = None  # PNG схемы связей из интерфейса (data URL)
+
+
+@app.post("/api/console/run")
+def console_run(req: ConsoleRequest):
+    rec, conn = pipeline.open_connector(req.connection_id)
+    with conn:
+        return workbench.run_console(conn, rec.dbms, req.sql, req.limit)
+
+
+@app.post("/api/console/ask")
+def console_ask(req: AskRequest):
+    rec, conn = pipeline.open_connector(req.connection_id)
+    with conn:
+        schema, version = pipeline.live_schema(conn, req.connection_id)
+        return workbench.ask(conn, rec.dbms, version, schema, req.question, req.model)
+
+
+@app.get("/api/database/{connection_id}/audit")
+def database_audit(connection_id: int):
+    rec, conn = pipeline.open_connector(connection_id)
+    with conn:
+        schema, _ = pipeline.live_schema(conn, connection_id, refresh=True)
+        return workbench.audit(conn, rec.dbms, schema)
+
+
+_TOP_HINTS = {
+    "postgres": ["В postgresql.conf: shared_preload_libraries = 'pg_stat_statements' и перезапуск сервера",
+                 "В базе (от администратора): CREATE EXTENSION pg_stat_statements;",
+                 "Чтобы видеть запросы всех пользователей: GRANT pg_read_all_stats TO <пользователь>;"],
+    "mysql": ["Статистика performance_schema в MySQL 8 включена по умолчанию",
+              "Выдайте пользователю право на чтение: GRANT SELECT ON performance_schema.* TO '<пользователь>'@'%';"],
+}
+
+
+@app.get("/api/database/{connection_id}/top-queries")
+def database_top_queries(connection_id: int, limit: int = Q(20, ge=1, le=100)):
+    rec, conn = pipeline.open_connector(connection_id)
+    with conn:
+        try:
+            return {"available": True, "queries": conn.top_statements(limit), "hint": []}
+        except DBError as e:
+            return {"available": False, "reason": str(e), "queries": [], "hint": _TOP_HINTS[rec.dbms]}
+
+
+@app.post("/api/database/{connection_id}/docs")
+def database_docs(connection_id: int, req: DocsRequest):
+    rec, conn = pipeline.open_connector(connection_id)
+    with conn:
+        schema, version = pipeline.live_schema(conn, connection_id)
+    desc = workbench.describe(schema, req.model, connection_id) if req.describe else None
+    data = workbench.data_dictionary_docx(rec.database, rec.dbms, version, schema, desc, req.er_png)
+    return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    headers={"Content-Disposition": "attachment; filename=database_description.docx"})
 
 
 # ---------------------------------------------------------------- история, статистика, экспорт

@@ -100,4 +100,6 @@ ANALYZE TABLE users, products, orders, order_items;
 -- Пользователь только для чтения: именно под ним AI Database Optimizer подключается к БД
 CREATE USER 'optimizer_ro'@'%' IDENTIFIED BY 'optimizer_ro';
 GRANT SELECT, SHOW VIEW ON shop.* TO 'optimizer_ro'@'%';
+-- статистика запросов и индексов для разделов «Медленные запросы» и «Аудит» (только чтение)
+GRANT SELECT ON performance_schema.* TO 'optimizer_ro'@'%';
 FLUSH PRIVILEGES;
