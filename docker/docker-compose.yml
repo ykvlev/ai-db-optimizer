@@ -3,6 +3,8 @@
 #   docker compose -f docker/docker-compose.yml up -d --build
 # Только базы данных (для запуска сервера из исходников):  ... up -d mysql postgres
 # Подключение для анализа (только SELECT): user optimizer_ro / optimizer_ro
+name: ai-db-optimizer   # имя группы контейнеров в Docker Desktop
+
 services:
   app:
     build:
@@ -66,5 +68,8 @@ services:
 
 volumes:
   app-data:
+    name: aidbo-app-data
   mysql-data:
+    name: aidbo-mysql-data
   pg-data:
+    name: aidbo-pg-data
