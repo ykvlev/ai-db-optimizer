@@ -56,6 +56,10 @@ jobs:
                    if 'test_integration' in c.attrib.get('classname', '')]
           assert cases, 'No database integration tests collected'
           assert not any(c.find('skipped') is not None for c in cases), 'Database integration tests skipped'
+          controls = [c for c in ET.parse('backend/test-results.xml').iter('testcase')
+                      if 'test_research_controls' in c.attrib.get('classname', '')]
+          assert len(controls) == 14, 'Expected 14 research controls across MySQL and PostgreSQL'
+          assert not any(c.find('skipped') is not None for c in controls), 'Research controls skipped'
           PY
       - uses: actions/upload-artifact@v4
         if: always()
