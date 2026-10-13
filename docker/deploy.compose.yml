@@ -1,0 +1,53 @@
+services:
+  app:
+    image: ${DEPLOY_IMAGE:?Set an immutable registry image}
+    ports:
+      - "127.0.0.1:${DEPLOY_PORT:?Set deployment port}:8000"
+    environment:
+      LOCALHOST_ALIAS: host.docker.internal
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - app-data:/app/backend/data
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DEPLOY_DB_PASSWORD:?Set deployment database password}
+      MYSQL_DATABASE: shop
+    ports:
+      - "127.0.0.1:${DEPLOY_MYSQL_PORT:?Set MySQL port}:3306"
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'mysqladmin ping -h 127.0.0.1 -p"$$MYSQL_ROOT_PASSWORD"']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    restart: unless-stopped
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${DEPLOY_DB_PASSWORD:?Set deployment database password}
+      POSTGRES_DB: shop
+    ports:
+      - "127.0.0.1:${DEPLOY_POSTGRES_PORT:?Set PostgreSQL port}:5432"
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d shop']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    restart: unless-stopped
+volumes:
+  app-data:
+  mysql-data:
+  postgres-data:

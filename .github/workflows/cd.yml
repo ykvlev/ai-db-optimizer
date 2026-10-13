@@ -1,0 +1,95 @@
+name: CD local
+
+on:
+  workflow_dispatch:
+    inputs:
+      ci_run:
+        description: Successful CI run on the default branch
+        required: true
+        type: string
+      production:
+        description: Promote to production after staging passes
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+  packages: read
+
+concurrency:
+  group: local-deployment
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.verify.outputs.commit }}
+    steps:
+      - name: Verify source of the release
+        id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ inputs.ci_run }}
+          CURRENT_REF: ${{ github.ref_name }}
+        run: |
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GH_REPO/actions/runs/$RUN_ID" > run.json
+          DEFAULT=$(gh api "repos/$GH_REPO" --jq .default_branch)
+          test "$CURRENT_REF" = "$DEFAULT"
+          jq -e --arg branch "$DEFAULT" --arg repo "$GH_REPO" \
+            '.conclusion == "success" and .event == "push" and .head_branch == $branch and .head_repository.full_name == $repo and .path == ".github/workflows/ci.yml"' run.json
+          echo "commit=$(jq -r .head_sha run.json)" >> "$GITHUB_OUTPUT"
+
+  staging:
+    needs: verify
+    runs-on: [self-hosted, Windows, X64, science-deploy]
+    environment: staging
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-image
+          run-id: ${{ inputs.ci_run }}
+          github-token: ${{ github.token }}
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Deploy and check staging
+        id: image
+        shell: pwsh
+        run: |
+          $image = (Get-Content image.txt -Raw).Trim()
+          ./scripts/deploy-local.ps1 -Environment staging -Image $image
+          "image=$image" >> $env:GITHUB_OUTPUT
+
+  production:
+    needs: [verify, staging]
+    if: inputs.production
+    runs-on: [self-hosted, Windows, X64, science-deploy]
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Promote the exact staging image
+        shell: pwsh
+        env:
+          RELEASE_IMAGE: ${{ needs.staging.outputs.image }}
+        run: ./scripts/deploy-local.ps1 -Environment production -Image $env:RELEASE_IMAGE
