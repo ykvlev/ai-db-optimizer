@@ -24,3 +24,26 @@
 При выборе production сначала разворачивается и проверяется staging. Затем production получает тот же digest. После успешной проверки API и интерфейса сохраняется квитанция версии. При сбое обновления восстанавливается предыдущий образ приложения; тома не удаляются. Это откат версии приложения, не откат данных или миграций. Первая неудачная установка не имеет предыдущего образа.
 
 Работающий компьютер и Docker Desktop необходимы для локального CD. Окружения не будут доступны при выключенном компьютере. Существующий запуск приложения на 8080 остаётся отдельным от этих окружений.
+
+## Первое подключение runner
+
+Архив официального Windows x64 runner 2.338.0 уже скачан, его SHA256 сверен с GitHub и файлы распакованы в `%LOCALAPPDATA%\ScienceActionsRunner`. Регистрация и запуск не выполнены: автоматическая проверка безопасности отклонила эту операцию. Следующие команды выполняет пользователь в своей консоли.
+
+1. Открыть Settings → Actions → Runners → New self-hosted runner в репозитории `ykvlev/ai-db-optimizer`, выбрать Windows x64 и скопировать актуальный временный токен из предлагаемой команды `config.cmd`.
+2. Перейти в подготовленную папку и зарегистрировать runner:
+
+   ```powershell
+   cd "$env:LOCALAPPDATA\ScienceActionsRunner"
+   .\config.cmd --url https://github.com/ykvlev/ai-db-optimizer --token <ВРЕМЕННЫЙ_ТОКЕН> --name science-local --labels science-deploy --unattended --work _work
+   ```
+
+3. Убедиться, что `pwsh` и `docker` доступны в PATH. На текущем компьютере PowerShell 7 входит в среду Codex; для этой консоли его можно добавить так:
+
+   ```powershell
+   $env:PATH = "$env:USERPROFILE\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;$env:PATH"
+   .\run.cmd
+   ```
+
+Runner должен появиться как Online с меткой `science-deploy`. Окно `run.cmd` нужно оставить открытым. Служба Windows и автозапуск runner не настраивались.
+
+После слияния pull request запустить CI основной ветки и дождаться успеха всех четырёх jobs. В Actions → CD local → Run workflow указать номер этого CI run. Без флага production выполняется только staging; с флагом выполняется staging, затем GitHub ждёт подтверждение пользователя `ykvlev` для production. Источник образа и успешный CI проверяются до выполнения задания на компьютере.
