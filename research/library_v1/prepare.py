@@ -77,7 +77,7 @@ def main():
     data={'version':'library_v1_draft','status':'awaiting_native_preflight_and_CI_freeze','source':'manually authored synthetic library workload; not independent real-world sampling','candidate_outputs_seen':False,'schema_ddl':DDL,'cases':[{'id':k,'intent':t,'sql':q,'ordered':True} for k,t,q in QUERIES],'states':states,'expected_values':{k:{s['id']:oracle(k,s) for s in states} for k,_,_ in QUERIES},'positive_controls':controls,'comparison':'Values including multiplicity and deterministic row order; interfaces separately within each DBMS. NULL only in returned column.','budget':'12 cases x 28 states x 2 DBMS = 672 reference executions; model collection planned only for MySQL (24 responses); no claim of model portability.'}
     path=ROOT/'corpus.json'
     if path.exists():raise SystemExit('Refusing to replace an existing corpus; use a new version directory.')
-    path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(hashlib.sha256(path.read_bytes()).hexdigest())
 
 if __name__=='__main__':main()
