@@ -48,6 +48,14 @@ jobs:
       - name: Backend and database integration tests
         working-directory: backend
         run: python -m pytest -q --junitxml=test-results.xml
+      - name: Validate library research references before model collection
+        run: python research/library_v1/preflight.py --output research-preflight
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: library-reference-preflight
+          path: research-preflight/
+          if-no-files-found: warn
       - name: Require database tests to execute
         run: |
           python - <<'PY'

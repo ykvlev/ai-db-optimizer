@@ -15,6 +15,7 @@ COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY backend/config ./config
+COPY research/library_v1 /app/research/library_v1
 COPY --from=frontend /src/dist /app/frontend
 ENV FRONTEND_DIR=/app/frontend
 EXPOSE 8000
