@@ -50,6 +50,14 @@ jobs:
         run: python -m pytest -q --junitxml=test-results.xml
       - name: Validate library research references before model collection
         run: python research/library_v1/preflight.py --output research-preflight
+      - name: Validate candidate evaluator on artificial controls
+        run: python research/library_v1/verify_evaluator.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluator-controls
+          path: evaluator-controls/
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         if: always()
         with:
