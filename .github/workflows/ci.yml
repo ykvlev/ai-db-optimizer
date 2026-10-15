@@ -55,9 +55,12 @@ jobs:
       - name: Verify document pipeline numbers against research data
         run: |
           # Числа в научных документах должны совпадать с исходными данными.
-          # Скрипты читают data.json и результаты замороженного корпуса из репозитория
-          # и возвращают код 1 при расхождении, поэтому шаг останавливает сборку.
-          python docs/document_pipelines/sitito/verify_tables.py
+          # Проверка приложения к НИР читает результаты замороженного корпуса,
+          # которые лежат в репозитории, и возвращает код 1 при расхождении.
+          #
+          # Проверка таблиц рукописи здесь не запускается: её источник —
+          # docs/nir/data.json, а он исключён правилом .gitignore (docs/nir/*.json).
+          # Запускать её нужно в рабочем каталоге: docs/document_pipelines/sitito/verify_tables.py
           python docs/document_pipelines/nir_appendix/verify_tables.py
       - uses: actions/upload-artifact@v4
         if: always()

@@ -45,7 +45,14 @@ def report(title: str, ok: bool) -> None:
     print(f"   -> {title}: {'совпало' if ok else 'ЕСТЬ РАСХОЖДЕНИЯ'}\n")
 
 
-def main() -> None:
+def main() -> int:
+    # data.json исключён из репозитория правилом .gitignore (docs/nir/*.json),
+    # поэтому в CI этой проверки нет. Здесь нужен понятный отказ, а не трассировка.
+    if not DATA.exists():
+        print(f"нет файла с исходными данными: {DATA}")
+        print("Он не хранится в репозитории: docs/nir/*.json исключены правилом .gitignore.")
+        print("Запускать эту проверку нужно в рабочем каталоге Science.")
+        return 2
     data = json.loads(DATA.read_text(encoding="utf-8"))
     everything = True
 
