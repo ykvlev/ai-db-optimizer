@@ -1,0 +1,214 @@
+{
+  "generation_requests_used": 75,
+  "generation_request_limit_this_overnight_cycle": 120,
+  "attempts": [
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "availability",
+      "probe": true,
+      "status": "received",
+      "utc": "2026-10-15T20:07:36.887161+00:00",
+      "elapsed_seconds": 133.28100000000268
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "no_loans",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:09:50.185245+00:00",
+      "elapsed_seconds": 45.18800000000192
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "loan_count",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:10:35.396163+00:00",
+      "elapsed_seconds": 17.327999999994063
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "zero_fee",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:10:52.761273+00:00",
+      "elapsed_seconds": 13.76600000000326
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "returned_count",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:06.542225+00:00",
+      "elapsed_seconds": 8.593999999997322
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "borrowers",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:15.142345+00:00",
+      "elapsed_seconds": 11.656000000002678
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "latest_ties",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:26.812684+00:00",
+      "elapsed_seconds": 16.17199999999866
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "price_range",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:42.988527+00:00",
+      "elapsed_seconds": 5.734000000004016
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "not_returned",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:48.739603+00:00",
+      "elapsed_seconds": 3.625
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "active_outer",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:11:52.357824+00:00",
+      "elapsed_seconds": 10.25
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "union_bag",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:02.619212+00:00",
+      "elapsed_seconds": 5.297000000005937
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "all_returned",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:07.929692+00:00",
+      "elapsed_seconds": 10.25
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "case": "top_books",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:18.182516+00:00",
+      "elapsed_seconds": 4.3289999999979045
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "availability",
+      "probe": true,
+      "status": "received",
+      "utc": "2026-10-15T20:12:22.547485+00:00",
+      "elapsed_seconds": 9.921999999998661
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "no_loans",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:32.473740+00:00",
+      "elapsed_seconds": 12.718000000000757
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "loan_count",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:45.188433+00:00",
+      "elapsed_seconds": 7.562999999994645
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "zero_fee",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:12:52.752335+00:00",
+      "elapsed_seconds": 7.89100000000326
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "returned_count",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:00.644034+00:00",
+      "elapsed_seconds": 5.343000000000757
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "borrowers",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:05.981878+00:00",
+      "elapsed_seconds": 8.735000000000582
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "latest_ties",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:14.724152+00:00",
+      "elapsed_seconds": 14.203000000001339
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "price_range",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:28.931427+00:00",
+      "elapsed_seconds": 3.8909999999959837
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "not_returned",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:32.829378+00:00",
+      "elapsed_seconds": 2.5780000000013388
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "active_outer",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:35.405925+00:00",
+      "elapsed_seconds": 8.281000000002678
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "union_bag",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:43.690832+00:00",
+      "elapsed_seconds": 4.281999999999243
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "all_returned",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:47.962851+00:00",
+      "elapsed_seconds": 11.655999999995402
+    },
+    {
+      "model": "phi3.5:3.8b",
+      "case": "top_books",
+      "probe": false,
+      "status": "received",
+      "utc": "2026-10-15T20:13:59.634471+00:00",
+      "elapsed_seconds": 2.9210000000020955
+    }
+  ]
+}

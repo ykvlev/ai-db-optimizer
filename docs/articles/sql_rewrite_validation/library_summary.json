@@ -1,0 +1,267 @@
+{
+  "source_run": "docs\\articles\\sql_rewrite_validation\\runs\\library_evaluation_20261015",
+  "corpus_sha256": "ff7d02331e7c5a4b650eff35742bb7d466753e7a2ed51d59310a6e8c3581ca58",
+  "models": {
+    "qwen2.5-coder:7b": {
+      "responses": 12,
+      "rewrites_offered": 5,
+      "counterexamples": 3,
+      "checks": 336,
+      "refuting_checks": 35,
+      "execution_errors": 0,
+      "interface_mismatches": 0,
+      "unsupported": 0
+    },
+    "phi3.5:3.8b": {
+      "responses": 12,
+      "rewrites_offered": 2,
+      "counterexamples": 1,
+      "checks": 336,
+      "refuting_checks": 3,
+      "execution_errors": 0,
+      "interface_mismatches": 0,
+      "unsupported": 0
+    }
+  },
+  "shared_errors": [
+    "union_bag"
+  ],
+  "errors_unique_to_model": {
+    "qwen2.5-coder:7b": [
+      "all_returned",
+      "zero_fee"
+    ],
+    "phi3.5:3.8b": []
+  },
+  "cases": [
+    "no_loans",
+    "loan_count",
+    "zero_fee",
+    "returned_count",
+    "borrowers",
+    "latest_ties",
+    "price_range",
+    "not_returned",
+    "active_outer",
+    "union_bag",
+    "all_returned",
+    "top_books"
+  ],
+  "matrix": {
+    "qwen2.5-coder:7b": {
+      "no_loans": {
+        "status": "not_refuted",
+        "unchanged": false,
+        "candidate_sql": "SELECT r.id FROM lib_readers r WHERE r.id NOT IN (SELECT reader_id FROM lib_loans) ORDER BY r.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "loan_count": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id, COUNT(l.id) AS n FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id = r.id GROUP BY r.id ORDER BY r.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "zero_fee": {
+        "status": "counterexample",
+        "unchanged": false,
+        "candidate_sql": "SELECT r.id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id=r.id WHERE l.fee IS NULL OR l.fee = 0 GROUP BY r.id ORDER BY r.id",
+        "refuting_states": [
+          "multiplicity_0",
+          "zero_fee_0",
+          "ties_0",
+          "random_uniform_1",
+          "random_uniform_7",
+          "random_uniform_11",
+          "random_uniform_14",
+          "random_uniform_18",
+          "random_uniform_19"
+        ],
+        "witness_state": "multiplicity_0"
+      },
+      "returned_count": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT reader_id, COUNT(CASE WHEN returned=1 THEN 1 END) AS n FROM lib_loans GROUP BY reader_id ORDER BY reader_id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "borrowers": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT DISTINCT r.id FROM lib_readers r JOIN lib_loans l ON l.reader_id=r.id JOIN lib_books b ON b.id=l.book_id WHERE b.price<=20 ORDER BY r.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "latest_ties": {
+        "status": "not_refuted",
+        "unchanged": false,
+        "candidate_sql": "SELECT l.id, l.reader_id, l.day_no FROM lib_loans l JOIN (SELECT reader_id, MAX(day_no) AS max_day_no FROM lib_loans GROUP BY reader_id) m ON l.reader_id = m.reader_id AND l.day_no = m.max_day_no ORDER BY l.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "price_range": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id, price FROM lib_books WHERE price BETWEEN 10 AND 20 ORDER BY id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "not_returned": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id FROM lib_loans WHERE returned <> 1 ORDER BY id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "active_outer": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id, l.id AS loan_id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id = r.id AND l.returned = 0 ORDER BY r.id, l.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "union_bag": {
+        "status": "counterexample",
+        "unchanged": false,
+        "candidate_sql": "SELECT reader_id FROM lib_loans WHERE returned=0 OR fee=0 ORDER BY reader_id",
+        "refuting_states": [
+          "multiplicity_0",
+          "nullable_0",
+          "ties_0"
+        ],
+        "witness_state": "multiplicity_0"
+      },
+      "all_returned": {
+        "status": "counterexample",
+        "unchanged": false,
+        "candidate_sql": "SELECT r.id FROM lib_readers r WHERE EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id AND l.returned=0) ORDER BY r.id",
+        "refuting_states": [
+          "fixed_0",
+          "multiplicity_0",
+          "zero_fee_0",
+          "nullable_0",
+          "boundary_0",
+          "ties_0",
+          "random_uniform_0",
+          "random_uniform_1",
+          "random_uniform_2",
+          "random_uniform_4",
+          "random_uniform_5",
+          "random_uniform_6",
+          "random_uniform_7",
+          "random_uniform_8",
+          "random_uniform_10",
+          "random_uniform_11",
+          "random_uniform_12",
+          "random_uniform_13",
+          "random_uniform_14",
+          "random_uniform_16",
+          "random_uniform_17",
+          "random_uniform_18",
+          "random_uniform_19"
+        ],
+        "witness_state": "fixed_0"
+      },
+      "top_books": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id, price FROM lib_books ORDER BY price DESC, id ASC LIMIT 2",
+        "refuting_states": [],
+        "witness_state": null
+      }
+    },
+    "phi3.5:3.8b": {
+      "no_loans": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id FROM lib_readers r WHERE NOT EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id) ORDER BY r.id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "loan_count": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id, COUNT(l.id) AS n \nFROM lib_readers r \nLEFT JOIN lib_loans l ON l.reader_id = r.id \nGROUP BY r.id \nORDER BY r.id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "zero_fee": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id=r.id GROUP BY r.id HAVING COALESCE(SUM(l.fee),0)=0 ORDER BY r.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "returned_count": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT reader_id, COUNT(CASE WHEN returned = 1 THEN 1 END) AS n FROM lib_loans GROUP BY reader_id ORDER BY reader_id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "borrowers": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT DISTINCT r.id FROM lib_readers r JOIN lib_loans l ON l.reader_id=r.id JOIN lib_books b ON b.id=l.book_id WHERE b.price<=20 ORDER BY r.id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "latest_ties": {
+        "status": "not_refuted",
+        "unchanged": false,
+        "candidate_sql": "SELECT l.id, l.reader_id, l.day_no \nFROM lib_loans l \nINNER JOIN (\n    SELECT reader_id, MAX(day_no) AS max_day_no\n    FROM lib_loans\n    GROUP BY reader_id\n) AS subquery ON l.reader_id = subquery.reader_id AND l.day_no = subquery.max_day_no\nORDER BY l.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "price_range": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id, price FROM lib_books WHERE price BETWEEN 10 AND 20 ORDER BY id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "not_returned": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id FROM lib_loans WHERE returned <> 1 ORDER BY id;",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "active_outer": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id, l.id AS loan_id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id = r.id AND l.returned = 0 ORDER BY r.id, l.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "union_bag": {
+        "status": "counterexample",
+        "unchanged": false,
+        "candidate_sql": "SELECT reader_id FROM lib_loans WHERE returned=0 OR fee=0 ORDER BY reader_id",
+        "refuting_states": [
+          "multiplicity_0",
+          "nullable_0",
+          "ties_0"
+        ],
+        "witness_state": "multiplicity_0"
+      },
+      "all_returned": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT r.id FROM lib_readers r WHERE EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id) AND NOT EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id AND (l.returned<>1 OR l.returned IS NULL)) ORDER BY r.id",
+        "refuting_states": [],
+        "witness_state": null
+      },
+      "top_books": {
+        "status": "not_refuted",
+        "unchanged": true,
+        "candidate_sql": "SELECT id, price FROM lib_books ORDER BY price DESC, id ASC LIMIT 2",
+        "refuting_states": [],
+        "witness_state": null
+      }
+    }
+  },
+  "universal_equivalence_claim": false
+}

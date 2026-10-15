@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-15T20:52:13.513526+00:00",
+  "corpus_sha256": "ff7d02331e7c5a4b650eff35742bb7d466753e7a2ed51d59310a6e8c3581ca58",
+  "mysql_version": "8.4.11",
+  "counts": {
+    "qwen2.5-coder:7b": {
+      "not_refuted": 9,
+      "counterexample": 3
+    },
+    "phi3.5:3.8b": {
+      "not_refuted": 11,
+      "counterexample": 1
+    }
+  },
+  "checked_pairs": 672,
+  "universal_equivalence_claim": false,
+  "collection": "docs/articles/sql_rewrite_validation/runs/library_models_20261015"
+}
