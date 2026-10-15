@@ -13,6 +13,9 @@ date-released: "2026-10-16"
 doi: "10.5281/zenodo.22982517"
 identifiers:
   - type: doi
+    value: "10.5281/zenodo.23405512"
+    description: "Версия 1.2.0"
+  - type: doi
     value: "10.5281/zenodo.22984197"
     description: "Версия 1.1.0"
   - type: doi
