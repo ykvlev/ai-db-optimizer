@@ -24,6 +24,15 @@ def save(path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=str), encoding='utf-8')
 
 
+def describe(path):
+    """Record a repository-relative path so run records never embed a host path."""
+    resolved = Path(path).resolve()
+    try:
+        return resolved.relative_to(ROOT.parent.parent).as_posix()
+    except ValueError:
+        return resolved.name
+
+
 def validate(sql):
     trees = sqlglot.parse(sql, read='mysql')
     if len(trees) != 1 or not isinstance(trees[0], exp.Query):
@@ -169,7 +178,7 @@ def main():
          'corpus_sha256': protocol['corpus_sha256'], 'mysql_version': version,
          'counts': {m: dict(Counter(r['status'] for r in results if r['model'] == m)) for m in MODELS},
          'checked_pairs': sum(len(r['checks']) for r in results),
-         'universal_equivalence_claim': False, 'collection': str(a.collection.resolve())})
+         'universal_equivalence_claim': False, 'collection': describe(a.collection)})
 
 
 if __name__ == '__main__':

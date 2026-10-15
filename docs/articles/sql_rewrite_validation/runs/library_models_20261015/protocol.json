@@ -1,0 +1,88 @@
+{
+  "utc": "2026-10-15T20:07:36.885162+00:00",
+  "corpus_sha256": "ff7d02331e7c5a4b650eff35742bb7d466753e7a2ed51d59310a6e8c3581ca58",
+  "freeze": {
+    "utc": "2026-10-15T06:01:02.423001+00:00",
+    "corpus_sha256": "ff7d02331e7c5a4b650eff35742bb7d466753e7a2ed51d59310a6e8c3581ca58",
+    "commit": "8b814b43f395398577ab04a1feab39b75c37c9ef",
+    "ci_run": 38687876326,
+    "ci_conclusion": "success",
+    "image_digest": "ghcr.io/ykvlev/ai-db-optimizer@sha256:3afee5a287e5967f85e96537758d52e2c9d8062d282ec5995696323270e76c0e",
+    "candidate_outputs_seen": false
+  },
+  "ollama": {
+    "version": "0.40.4"
+  },
+  "models": {
+    "qwen2.5-coder:7b": {
+      "name": "qwen2.5-coder:7b",
+      "model": "qwen2.5-coder:7b",
+      "modified_at": "2026-09-26T14:32:21.4370403+03:00",
+      "size": 4683087561,
+      "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 3584,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "insert"
+      ]
+    },
+    "phi3.5:3.8b": {
+      "name": "phi3.5:3.8b",
+      "model": "phi3.5:3.8b",
+      "modified_at": "2026-10-13T12:35:11.1797328+03:00",
+      "size": 2176178843,
+      "digest": "61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "phi3",
+        "families": [
+          "phi3"
+        ],
+        "parameter_size": "3.8B",
+        "quantization_level": "Q4_0",
+        "context_length": 131072,
+        "embedding_length": 3072,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion"
+      ]
+    }
+  },
+  "options": {
+    "temperature": 0,
+    "num_ctx": 4096,
+    "num_predict": 1200
+  },
+  "prompts": {
+    "no_loans": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT r.id FROM lib_readers r WHERE NOT EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id) ORDER BY r.id",
+    "loan_count": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT r.id,COUNT(l.id) AS n FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id=r.id GROUP BY r.id ORDER BY r.id",
+    "zero_fee": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT r.id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id=r.id GROUP BY r.id HAVING COALESCE(SUM(l.fee),0)=0 ORDER BY r.id",
+    "returned_count": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT reader_id,COUNT(CASE WHEN returned=1 THEN 1 END) AS n FROM lib_loans GROUP BY reader_id ORDER BY reader_id",
+    "borrowers": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT DISTINCT r.id FROM lib_readers r JOIN lib_loans l ON l.reader_id=r.id JOIN lib_books b ON b.id=l.book_id WHERE b.price<=20 ORDER BY r.id",
+    "latest_ties": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT l.id,l.reader_id,l.day_no FROM lib_loans l WHERE l.day_no=(SELECT MAX(x.day_no) FROM lib_loans x WHERE x.reader_id=l.reader_id) ORDER BY l.id",
+    "price_range": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT id,price FROM lib_books WHERE price BETWEEN 10 AND 20 ORDER BY id",
+    "not_returned": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT id FROM lib_loans WHERE returned<>1 ORDER BY id",
+    "active_outer": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT r.id,l.id AS loan_id FROM lib_readers r LEFT JOIN lib_loans l ON l.reader_id=r.id AND l.returned=0 ORDER BY r.id,l.id",
+    "union_bag": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT reader_id FROM lib_loans WHERE returned=0 UNION ALL SELECT reader_id FROM lib_loans WHERE fee=0 ORDER BY reader_id",
+    "all_returned": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT r.id FROM lib_readers r WHERE EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id) AND NOT EXISTS (SELECT 1 FROM lib_loans l WHERE l.reader_id=r.id AND (l.returned<>1 OR l.returned IS NULL)) ORDER BY r.id",
+    "top_books": "Rewrite the following MySQL 8.4 SELECT query for efficiency. Preserve output column names, values, duplicates, NULL behavior and the specified row order for EVERY state allowed by the schema. Do not add indexes or change the schema. Return only one SELECT statement, without markdown or explanation. If no safe improvement is available, return the original query.\nCREATE TABLE lib_readers(id INTEGER PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE)\nCREATE TABLE lib_books(id INTEGER PRIMARY KEY, title VARCHAR(40) NOT NULL UNIQUE, price INTEGER NOT NULL)\nCREATE TABLE lib_loans(id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, book_id INTEGER NOT NULL, day_no INTEGER NOT NULL, fee INTEGER NOT NULL, returned INTEGER, FOREIGN KEY(reader_id) REFERENCES lib_readers(id), FOREIGN KEY(book_id) REFERENCES lib_books(id))\nQUERY:\nSELECT id,price FROM lib_books ORDER BY price DESC,id ASC LIMIT 2"
+  },
+  "budget_before": 49,
+  "budget_limit": 120,
+  "scope": "24 MySQL generation attempts; no equivalence classification in collector"
+}
