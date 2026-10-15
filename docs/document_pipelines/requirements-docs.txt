@@ -1,0 +1,9 @@
+# Зависимости конвейеров документов.
+# Установка: pip install -r docs/document_pipelines/requirements-docs.txt
+#
+# В backend/requirements.txt эти пакеты не входят намеренно: приложению они не нужны.
+
+pymupdf>=1.24      # разбор PDF: постраничный текст, проверка пустых страниц, рендер
+Pillow>=10.0       # контактные листы страниц в scripts/qa_documents.py
+
+# python-docx используется сборкой документов и уже входит в backend/requirements.txt
