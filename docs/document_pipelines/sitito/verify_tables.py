@@ -13,12 +13,16 @@ PostgreSQL (опыт 8), поэтому задачи считаются пара
 from __future__ import annotations
 
 import json
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-SCIENCE = Path(r"C:\Users\Артём\Documents\Science")
-DATA = SCIENCE / "ai-db-optimizer/docs/nir/data.json"
-LIB = (SCIENCE / "ai-db-optimizer/docs/articles/sql_rewrite_validation/runs"
+# Пути считаются от корня репозитория: скрипт лежит в docs/document_pipelines/sitito/.
+# Так проверку можно запускать и в CI, где рабочих путей нет. Раньше здесь были
+# абсолютные пути, и скрипт работал только на машине автора.
+ROOT = Path(__file__).resolve().parents[3]
+DATA = ROOT / "docs/nir/data.json"
+LIB = (ROOT / "docs/articles/sql_rewrite_validation/runs"
        / "library_evaluation_20261015/results.json")
 
 NAME = {"gigachat:GigaChat-2": "GigaChat-2", "gigachat:GigaChat-2-Pro": "GigaChat-2-Pro",
@@ -119,7 +123,9 @@ def main() -> None:
 
     print("ИТОГ:", "все пять таблиц подтверждены исходными данными"
           if everything else "ЕСТЬ РАСХОЖДЕНИЯ")
+    # Код возврата нужен, чтобы шаг CI падал при расхождении, а не просто печатал текст.
+    return 0 if everything else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

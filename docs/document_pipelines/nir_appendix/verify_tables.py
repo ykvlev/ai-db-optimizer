@@ -10,12 +10,15 @@
 from __future__ import annotations
 
 import json
+import sys
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-SCIENCE = Path(r"C:\Users\Артём\Documents\Science")
-RESULTS = (SCIENCE / "ai-db-optimizer/docs/articles/sql_rewrite_validation/runs"
+# Пути считаются от корня репозитория: скрипт лежит в
+# docs/document_pipelines/nir_appendix/. Так проверку можно запускать и в CI.
+ROOT = Path(__file__).resolve().parents[3]
+RESULTS = (ROOT / "docs/articles/sql_rewrite_validation/runs"
            / "library_evaluation_20261015/results.json")
 SUMMARY = RESULTS.parent / "summary.json"
 
@@ -89,7 +92,9 @@ def main() -> None:
     corpus = summary["corpus_sha256"]
     print(f"\nконтрольная сумма корпуса: {corpus[:16]}…")
     print(f"\nИТОГ: {'все числа таблиц А.1–А.3 подтверждены исходными данными' if ok else 'ЕСТЬ РАСХОЖДЕНИЯ'}")
+    # Код возврата нужен, чтобы шаг CI падал при расхождении.
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

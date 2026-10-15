@@ -52,6 +52,13 @@ jobs:
         run: python research/library_v1/preflight.py --output research-preflight
       - name: Validate candidate evaluator on artificial controls
         run: python research/library_v1/verify_evaluator.py
+      - name: Verify document pipeline numbers against research data
+        run: |
+          # Числа в научных документах должны совпадать с исходными данными.
+          # Скрипты читают data.json и результаты замороженного корпуса из репозитория
+          # и возвращают код 1 при расхождении, поэтому шаг останавливает сборку.
+          python docs/document_pipelines/sitito/verify_tables.py
+          python docs/document_pipelines/nir_appendix/verify_tables.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
