@@ -65,9 +65,9 @@ def database(corpus):
             c.execute('USE ' + name)
             for ddl in corpus['schema_ddl']:
                 c.execute(ddl)
-            c.execute('CREATE USER %s@\'%\' IDENTIFIED BY %s', (user, password))
+            c.execute('CREATE USER %s@%s IDENTIFIED BY %s', (user, '%', password))
             account = True
-            c.execute('GRANT SELECT ON ' + name + '.* TO %s@\'%\'', (user,))
+            c.execute('GRANT SELECT ON ' + name + '.* TO %s@%s', (user, '%'))
         reader = pymysql.connect(host=os.getenv('RESEARCH_DB_HOST', '127.0.0.1'),
                                  port=int(os.getenv('RESEARCH_MYSQL_PORT', '3307')),
                                  user=user, password=password, database=name,
@@ -80,7 +80,7 @@ def database(corpus):
             reader.close()
         with admin.cursor() as c:
             if account:
-                c.execute('DROP USER %s@\'%\'', (user,))
+                c.execute('DROP USER %s@%s', (user, '%'))
             if created:
                 c.execute('DROP DATABASE ' + name)
         admin.close()
